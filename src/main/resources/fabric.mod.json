@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "gravitychanger",
+  "version": "${version}",
+
+  "name": "GravityChanger",
+  "description": "Changes gravity",
+  "authors": [
+    "andrew_10_"
+  ],
+
+  "license": "MIT",
+  
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.andrew.gravitychanger.GravityChangerMod"
+    ]
+  },
+  "mixins": [
+    "gravitychanger.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  }
+}

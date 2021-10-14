@@ -1,0 +1,34 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "me.andrew.gravitychanger.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "AbstractSkeletonEntityMixin",
+    "BedBlockMixin",
+    "BlockMixin",
+    "EntityMixin",
+    "ItemMixin",
+    "LivingEntityMixin",
+    "MobEntityMixin",
+    "PersistentProjectileEntityMixin",
+    "PlayerEntityMixin",
+    "ProjectileEntityMixin",
+    "RamImpactTaskMixin",
+    "ServerPlayerInteractionManagerMixin",
+    "ServerPlayNetworkHandlerMixin",
+    "SlimeBlockMixin",
+    "ThrownEntityMixin"
+  ],
+  "client": [
+    "client.CameraMixin",
+    "client.ClientPlayerEntityMixin",
+    "client.EntityRenderDispatcherMixin",
+    "client.GameRendererMixin",
+    "client.InGameOverlayRendererMixin",
+    "client.ItemPickupParticleMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
