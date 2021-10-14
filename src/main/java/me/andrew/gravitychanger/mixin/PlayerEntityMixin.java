@@ -61,41 +61,45 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
         if(gravitychanger$GRAVITY_DIRECTION.equals(data)) {
             Direction newGravityDirection = this.gravitychanger$getGravityDirection();
             if(this.gravitychanger$prevGravityDirection != newGravityDirection) {
-                Direction currentGravityDirection = this.gravitychanger$prevGravityDirection == null ? Direction.DOWN : this.gravitychanger$prevGravityDirection;
-
-                this.fallDistance = 0;
-
-                // Adjust position to avoid suffocation in blocks when changing gravity
-                if(this.gravitychanger$prevGravityDirection != null) {
-                    EntityDimensions dimensions = this.getDimensions(this.getPose());
-                    Direction relativeDirection = RotationUtil.dirWorldToPlayer(newGravityDirection, currentGravityDirection);
-                    Vec3d relativePosOffset = switch(relativeDirection) {
-                        case DOWN -> Vec3d.ZERO;
-                        case UP -> new Vec3d(0.0D, dimensions.height - 1.0E-6D, 0.0D);
-                        default -> Vec3d.of(relativeDirection.getVector()).multiply(dimensions.width / 2 - (newGravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D)).add(0.0D, dimensions.width / 2 - (currentGravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D), 0.0D);
-                    };
-                    this.setPosition(this.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, currentGravityDirection)));
-
-                    if((Object) this instanceof ServerPlayerEntity serverPlayerEntity) {
-                        serverPlayerEntity.networkHandler.syncWithPlayerPosition();
-                    }
-                }
-
-                this.setBoundingBox(this.calculateBoundingBox());
-
-                // Keep world looking direction when changing gravity
-                if(this.gravitychanger$prevGravityDirection != null) {
-                    if((Object) this instanceof ClientPlayerEntity) {
-                        Vec2f worldAngles = RotationUtil.rotPlayerToWorld(this.getYaw(), this.getPitch(), currentGravityDirection);
-                        Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, newGravityDirection);
-                        this.setYaw(newViewAngles.x);
-                        this.setPitch(newViewAngles.y);
-                    }
-                }
-
-                this.gravitychanger$prevGravityDirection = this.gravitychanger$getGravityDirection();
+                gravitychanger$onGravityChanged(newGravityDirection);
             }
         }
+    }
+
+    private void gravitychanger$onGravityChanged(Direction newGravityDirection) {
+        Direction currentGravityDirection = this.gravitychanger$prevGravityDirection == null ? Direction.DOWN : this.gravitychanger$prevGravityDirection;
+
+        this.fallDistance = 0;
+
+        // Adjust position to avoid suffocation in blocks when changing gravity
+        if(this.gravitychanger$prevGravityDirection != null) {
+            EntityDimensions dimensions = this.getDimensions(this.getPose());
+            Direction relativeDirection = RotationUtil.dirWorldToPlayer(newGravityDirection, currentGravityDirection);
+            Vec3d relativePosOffset = switch(relativeDirection) {
+                case DOWN -> Vec3d.ZERO;
+                case UP -> new Vec3d(0.0D, dimensions.height - 1.0E-6D, 0.0D);
+                default -> Vec3d.of(relativeDirection.getVector()).multiply(dimensions.width / 2 - (newGravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D)).add(0.0D, dimensions.width / 2 - (currentGravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D), 0.0D);
+            };
+            this.setPosition(this.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, currentGravityDirection)));
+
+            if((Object) this instanceof ServerPlayerEntity serverPlayerEntity) {
+                serverPlayerEntity.networkHandler.syncWithPlayerPosition();
+            }
+        }
+
+        this.setBoundingBox(this.calculateBoundingBox());
+
+        // Keep world looking direction when changing gravity
+        if(this.gravitychanger$prevGravityDirection != null) {
+            if((Object) this instanceof ClientPlayerEntity) {
+                Vec2f worldAngles = RotationUtil.rotPlayerToWorld(this.getYaw(), this.getPitch(), currentGravityDirection);
+                Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, newGravityDirection);
+                this.setYaw(newViewAngles.x);
+                this.setPitch(newViewAngles.y);
+            }
+        }
+
+        this.gravitychanger$prevGravityDirection = newGravityDirection;
     }
 
     @Inject(
@@ -112,7 +116,11 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     )
     private void inject_readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
         if(nbt.contains("GravityDirection", NbtElement.INT_TYPE)) {
-            this.gravitychanger$setGravityDirection(Direction.byId(nbt.getInt("GravityDirection")));
+            Direction gravityDirection = Direction.byId(nbt.getInt("GravityDirection"));
+            this.gravitychanger$setGravityDirection(gravityDirection);
+            if(gravityDirection == Direction.DOWN) {
+                this.gravitychanger$onGravityChanged(gravityDirection);
+            }
         }
     }
 
