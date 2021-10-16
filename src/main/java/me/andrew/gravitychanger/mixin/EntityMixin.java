@@ -166,6 +166,8 @@ public abstract class EntityMixin {
 
     @Shadow @Final protected Random random;
 
+    @Shadow public abstract void setVelocity(double x, double y, double z);
+
     @Inject(
             method = "calculateBoundingBox",
             at = @At("RETURN"),
@@ -292,7 +294,7 @@ public abstract class EntityMixin {
 
             this.world.getProfiler().push("move");
             if (this.movementMultiplier.lengthSquared() > 1.0E-7D) {
-                movement = movement.multiply(this.movementMultiplier);
+                movement = movement.multiply(RotationUtil.vecPlayerToWorld(this.movementMultiplier, gravityDirection));
                 this.movementMultiplier = Vec3d.ZERO;
                 this.setVelocity(Vec3d.ZERO);
             }
@@ -316,14 +318,13 @@ public abstract class EntityMixin {
             if (this.isRemoved()) {
                 this.world.getProfiler().pop();
             } else {
-                Vec3d velocity = this.getVelocity();
-                Vec3d playerVelocity = RotationUtil.vecWorldToPlayer(velocity, gravityDirection);
+                Vec3d playerVelocity = this.getVelocity();
                 if (playerMovement.x != playerAdjustedMovement.x) {
-                    this.setVelocity(RotationUtil.vecPlayerToWorld(0.0D, playerVelocity.y, playerVelocity.z, gravityDirection));
+                    this.setVelocity(0.0D, playerVelocity.y, playerVelocity.z);
                 }
 
                 if (playerMovement.z != playerAdjustedMovement.z) {
-                    this.setVelocity(RotationUtil.vecPlayerToWorld(playerVelocity.x, playerVelocity.y, 0.0D, gravityDirection));
+                    this.setVelocity(playerVelocity.x, playerVelocity.y, 0.0D);
                 }
 
                 Block block = blockState.getBlock();
@@ -354,9 +355,6 @@ public abstract class EntityMixin {
                                 Entity primaryPassenger = this.hasPassengers() && this.getPrimaryPassenger() != null ? this.getPrimaryPassenger() : (Entity)(Object) this;
                                 float volumeMultiplier = primaryPassenger == (Object) this ? 0.35F : 0.4F;
                                 Vec3d primaryPassengerVelocity = primaryPassenger.getVelocity();
-                                if(primaryPassenger == (Object) this) {
-                                    primaryPassengerVelocity = RotationUtil.vecWorldToPlayer(primaryPassengerVelocity, gravityDirection);
-                                }
                                 float volume = Math.min(1.0F, (float)Math.sqrt(primaryPassengerVelocity.x * primaryPassengerVelocity.x * 0.20000000298023224D + primaryPassengerVelocity.y * primaryPassengerVelocity.y + primaryPassengerVelocity.z * primaryPassengerVelocity.z * 0.20000000298023224D) * volumeMultiplier);
                                 this.playSwimSound(volume);
                             }
@@ -381,7 +379,7 @@ public abstract class EntityMixin {
 
                 this.tryCheckBlockCollision();
                 float velocityMultiplier = this.getVelocityMultiplier();
-                this.setVelocity(RotationUtil.vecPlayerToWorld(RotationUtil.vecWorldToPlayer(this.getVelocity(), gravityDirection).multiply(velocityMultiplier, 1.0D, velocityMultiplier), gravityDirection));
+                this.setVelocity(this.getVelocity().multiply(velocityMultiplier, 1.0D, velocityMultiplier));
                 if (this.world.getStatesInBoxIfLoaded(this.getBoundingBox().contract(1.0E-6D)).noneMatch((state) -> {
                     return state.isIn(BlockTags.FIRE) || state.isOf(Blocks.LAVA);
                 })) {
@@ -552,27 +550,6 @@ public abstract class EntityMixin {
     }
 
     @Redirect(
-            method = "updateVelocity",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;movementInputToVelocity(Lnet/minecraft/util/math/Vec3d;FF)Lnet/minecraft/util/math/Vec3d;",
-                    ordinal = 0
-            )
-    )
-    private Vec3d redirect_updateVelocity_movementInputToVelocity_0(Vec3d movementInput, float speed, float yaw) {
-        Vec3d vec3d = movementInputToVelocity(movementInput, speed, yaw);
-
-        if((Object) this instanceof PlayerEntity) {
-            PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
-            Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
-
-            vec3d = RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
-        }
-
-        return vec3d;
-    }
-
-    @Redirect(
             method = "isInsideWall",
             at = @At(
                     value = "INVOKE",
@@ -625,7 +602,7 @@ public abstract class EntityMixin {
         BlockState blockState = this.world.getBlockState(blockPos);
         if (blockState.getRenderType() != BlockRenderType.INVISIBLE) {
             Vec3d particlePos = this.getPos().add(RotationUtil.vecPlayerToWorld((this.random.nextDouble() - 0.5D) * (double)this.dimensions.width, 0.1D, (this.random.nextDouble() - 0.5D) * (double)this.dimensions.width, gravityDirection));
-            Vec3d playerVelocity = RotationUtil.vecWorldToPlayer(this.getVelocity(), gravityDirection);
+            Vec3d playerVelocity = this.getVelocity();
             Vec3d particleVelocity = RotationUtil.vecPlayerToWorld(playerVelocity.x * -4.0D, 1.5D, playerVelocity.z * -4.0D, gravityDirection);
             this.world.addParticle(new BlockStateParticleEffect(ParticleTypes.BLOCK, blockState), particlePos.x, particlePos.y, particlePos.z, particleVelocity.x, particleVelocity.y, particleVelocity.z);
         }

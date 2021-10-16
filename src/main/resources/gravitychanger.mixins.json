@@ -5,8 +5,6 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "AbstractSkeletonEntityMixin",
-    "BedBlockMixin",
-    "BlockMixin",
     "EntityMixin",
     "ItemMixin",
     "LivingEntityMixin",
@@ -17,7 +15,6 @@
     "RamImpactTaskMixin",
     "ServerPlayerInteractionManagerMixin",
     "ServerPlayNetworkHandlerMixin",
-    "SlimeBlockMixin",
     "ThrownEntityMixin"
   ],
   "client": [

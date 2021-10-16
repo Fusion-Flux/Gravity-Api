@@ -26,36 +26,6 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     }
 
     @Redirect(
-            method = "tickMovement",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/network/ClientPlayerEntity;getVelocity()Lnet/minecraft/util/math/Vec3d;",
-                    ordinal = 0
-            )
-    )
-    private Vec3d redirect_tickMovement_getVelocity_0(ClientPlayerEntity clientPlayerEntity) {
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) clientPlayerEntity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
-
-        return RotationUtil.vecWorldToPlayer(clientPlayerEntity.getVelocity(), gravityDirection);
-    }
-
-    @Redirect(
-            method = "tickMovement",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/network/ClientPlayerEntity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V",
-                    ordinal = 0
-            )
-    )
-    private void redirect_tickMovement_setVelocity_0(ClientPlayerEntity clientPlayerEntity, Vec3d vec3d) {
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) clientPlayerEntity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
-
-        clientPlayerEntity.setVelocity(RotationUtil.vecPlayerToWorld(vec3d, gravityDirection));
-    }
-
-    @Redirect(
             method = "wouldCollideAt",
             at = @At(
                     value = "NEW",
@@ -106,7 +76,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
                 double distToEdge = worldDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0D - g : g;
                 if (distToEdge < minDistToEdge && !this.wouldCollideAt(blockPos.offset(worldDirection))) {
                     minDistToEdge = distToEdge;
-                    direction = worldDirection;
+                    direction = playerDirection;
                 }
             }
 
@@ -116,11 +86,8 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
                     this.setVelocity(0.1D * (double)direction.getOffsetX(), velocity.y, velocity.z);
                 } else if(direction.getAxis() == Direction.Axis.Z) {
                     this.setVelocity(velocity.x, velocity.y, 0.1D * (double)direction.getOffsetZ());
-                } else {
-                    this.setVelocity(velocity.x, 0.1D * (double)direction.getOffsetY(), velocity.z);
                 }
             }
-
         }
     }
 }

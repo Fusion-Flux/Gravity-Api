@@ -99,6 +99,11 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
             }
         }
 
+        // Keep world velocity when changing gravity
+        if(this.gravitychanger$prevGravityDirection != null) {
+            this.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(this.getVelocity(), currentGravityDirection), newGravityDirection));
+        }
+
         this.gravitychanger$prevGravityDirection = newGravityDirection;
     }
 
@@ -140,6 +145,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     public void inject_travel(Vec3d movementInput, CallbackInfo ci) {
         ci.cancel();
 
+        // Do not move until gravity is synced
         if(this.gravitychanger$prevGravityDirection == null) return;
 
         Direction gravityDirection = this.gravitychanger$getGravityDirection();
@@ -152,18 +158,18 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
             i = RotationUtil.vecWorldToPlayer(this.getRotationVector(), gravityDirection).y;
             double swimVelocityMultiplier = i < -0.2D ? 0.085D : 0.06D;
             if (i <= 0.0D || this.jumping || !this.world.getBlockState(new BlockPos(RotationUtil.vecPlayerToWorld(RotationUtil.vecWorldToPlayer(this.getPos(), gravityDirection).add(0.0D, 1.0D - 0.1D, 0.0D), gravityDirection))).getFluidState().isEmpty()) {
-                Vec3d playerVelocity = RotationUtil.vecWorldToPlayer(this.getVelocity(), gravityDirection);
-                this.setVelocity(RotationUtil.vecPlayerToWorld(playerVelocity.add(0.0D, (i - playerVelocity.y) * swimVelocityMultiplier, 0.0D), gravityDirection));
+                Vec3d playerVelocity = this.getVelocity();
+                this.setVelocity(playerVelocity.add(0.0D, (i - playerVelocity.y) * swimVelocityMultiplier, 0.0D));
             }
         }
 
         if (this.abilities.flying && !this.hasVehicle()) {
-            i = RotationUtil.vecWorldToPlayer(this.getVelocity(), gravityDirection).y;
+            i = this.getVelocity().y;
             float flyingSpeed = this.flyingSpeed;
             this.flyingSpeed = this.abilities.getFlySpeed() * (float)(this.isSprinting() ? 2 : 1);
             super.travel(movementInput);
-            Vec3d playerVelocity = RotationUtil.vecWorldToPlayer(this.getVelocity(), gravityDirection);
-            this.setVelocity(RotationUtil.vecPlayerToWorld(playerVelocity.x, i * 0.6D, playerVelocity.z, gravityDirection));
+            Vec3d playerVelocity = this.getVelocity();
+            this.setVelocity(playerVelocity.x, i * 0.6D, playerVelocity.z);
             this.flyingSpeed = flyingSpeed;
             this.fallDistance = 0.0F;
             this.setFlag(Entity.FALL_FLYING_FLAG_INDEX, false);
@@ -262,34 +268,6 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
         } else {
             cir.setReturnValue(movement);
         }
-    }
-
-    @Redirect(
-            method = "method_30263",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/util/math/Box;offset(DDD)Lnet/minecraft/util/math/Box;",
-                    ordinal = 0
-            )
-    )
-    private Box redirect_method_30263_offset_0(Box box, double x, double y, double z) {
-        Direction gravityDirection = this.gravitychanger$getGravityDirection();
-
-        return box.offset(RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection));
-    }
-
-    @Redirect(
-            method = "tickMovement",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/player/PlayerEntity;getVelocity()Lnet/minecraft/util/math/Vec3d;",
-                    ordinal = 0
-            )
-    )
-    private Vec3d redirect_tickMovement_getVelocity_0(PlayerEntity playerEntity) {
-        Direction gravityDirection = this.gravitychanger$getGravityDirection();
-
-        return RotationUtil.vecWorldToPlayer(playerEntity.getVelocity(), gravityDirection);
     }
 
     @Redirect(
