@@ -25,7 +25,8 @@
     "client.EntityRenderDispatcherMixin",
     "client.GameRendererMixin",
     "client.InGameOverlayRendererMixin",
-    "client.ItemPickupParticleMixin"
+    "client.ItemPickupParticleMixin",
+    "client.PlayerEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
