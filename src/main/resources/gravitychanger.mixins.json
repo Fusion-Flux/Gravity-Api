@@ -5,8 +5,10 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "AbstractSkeletonEntityMixin",
+    "DirectionMixin",
     "EntityMixin",
     "ItemMixin",
+    "ItemUsageContextMixin",
     "LivingEntityMixin",
     "MobEntityMixin",
     "PersistentProjectileEntityMixin",
