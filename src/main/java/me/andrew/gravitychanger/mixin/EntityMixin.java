@@ -175,8 +175,14 @@ public abstract class EntityMixin {
     )
     private void inject_calculateBoundingBox(CallbackInfoReturnable<Box> cir) {
         if(!((Object) this instanceof PlayerEntity)) return;
+        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
+        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
-        cir.setReturnValue(this.gravitychanger$rotatePlayerBox(cir.getReturnValue()));
+        Box box = cir.getReturnValue().offset(this.pos.negate());
+        if(gravityDirection.getDirection() == Direction.AxisDirection.POSITIVE) {
+            box = box.offset(0.0D, -1.0E-6D, 0.0D);
+        }
+        cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection).offset(this.pos));
     }
 
     @Inject(
@@ -186,19 +192,14 @@ public abstract class EntityMixin {
     )
     private void inject_calculateBoundsForPose(EntityPose pos, CallbackInfoReturnable<Box> cir) {
         if(!((Object) this instanceof PlayerEntity)) return;
-
-        cir.setReturnValue(this.gravitychanger$rotatePlayerBox(cir.getReturnValue()));
-    }
-
-    private Box gravitychanger$rotatePlayerBox(Box box) {
         PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
         Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
-        box = box.offset(this.pos.negate());
+        Box box = cir.getReturnValue().offset(this.pos.negate());
         if(gravityDirection.getDirection() == Direction.AxisDirection.POSITIVE) {
             box = box.offset(0.0D, -1.0E-6D, 0.0D);
         }
-        return RotationUtil.boxPlayerToWorld(box, gravityDirection).offset(this.pos);
+        cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection).offset(this.pos));
     }
 
     @Inject(

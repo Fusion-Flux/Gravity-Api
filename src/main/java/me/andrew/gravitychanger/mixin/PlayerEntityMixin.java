@@ -360,7 +360,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     private Box redirect_tickMovement_expand_0(Box box, double x, double y, double z) {
         Direction gravityDirection = this.gravitychanger$getGravityDirection();
 
-        Vec3d vec3d = RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection);
+        Vec3d vec3d = RotationUtil.maskPlayerToWorld(x, y, z, gravityDirection);
         return box.expand(vec3d.x, vec3d.y, vec3d.z);
     }
 
@@ -375,7 +375,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     private Box redirect_tickMovement_expand_1(Box box, double x, double y, double z) {
         Direction gravityDirection = this.gravitychanger$getGravityDirection();
 
-        Vec3d vec3d = RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection);
+        Vec3d vec3d = RotationUtil.maskPlayerToWorld(x, y, z, gravityDirection);
         return box.expand(vec3d.x, vec3d.y, vec3d.z);
     }
 }

@@ -295,7 +295,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Inject(
             method = "getBoundingBox",
-            at = @At("HEAD"),
+            at = @At("RETURN"),
             cancellable = true
     )
     private void inject_getBoundingBox(EntityPose pose, CallbackInfoReturnable<Box> cir) {
@@ -303,7 +303,10 @@ public abstract class LivingEntityMixin extends Entity {
         PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
         Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
-        Box box = this.getDimensions(pose).getBoxAt(0, 0, 0);
+        Box box = cir.getReturnValue();
+        if(gravityDirection.getDirection() == Direction.AxisDirection.POSITIVE) {
+            box = box.offset(0.0D, -1.0E-6D, 0.0D);
+        }
         cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection));
     }
 
