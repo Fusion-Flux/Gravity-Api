@@ -6,18 +6,24 @@
   "mixins": [
     "AbstractSkeletonEntityMixin",
     "DirectionMixin",
+    "DrownedEntityMixin",
     "EntityMixin",
+    "IllusionerEntityMixin",
     "ItemMixin",
     "ItemUsageContextMixin",
     "LivingEntityMixin",
     "MobEntityMixin",
     "PersistentProjectileEntityMixin",
+    "PiglinEntityMixin",
+    "PillagerEntityMixin",
     "PlayerEntityMixin",
     "ProjectileEntityMixin",
     "RamImpactTaskMixin",
     "ServerPlayerInteractionManagerMixin",
     "ServerPlayNetworkHandlerMixin",
-    "ThrownEntityMixin"
+    "ThrownEntityMixin",
+    "WitchEntityMixin",
+    "WitherEntityMixin"
   ],
   "client": [
     "client.CameraMixin",

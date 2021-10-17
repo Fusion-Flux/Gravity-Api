@@ -3,15 +3,15 @@ package me.andrew.gravitychanger.mixin;
 import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.AbstractSkeletonEntity;
+import net.minecraft.entity.mob.IllusionerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(AbstractSkeletonEntity.class)
-public abstract class AbstractSkeletonEntityMixin {
+@Mixin(IllusionerEntity.class)
+public abstract class IllusionerEntityMixin {
     @Redirect(
             method = "attack",
             at = @At(

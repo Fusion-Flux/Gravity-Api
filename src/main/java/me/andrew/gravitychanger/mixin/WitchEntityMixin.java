@@ -3,15 +3,37 @@ package me.andrew.gravitychanger.mixin;
 import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.AbstractSkeletonEntity;
+import net.minecraft.entity.mob.WitchEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(AbstractSkeletonEntity.class)
-public abstract class AbstractSkeletonEntityMixin {
+@Mixin(WitchEntity.class)
+public abstract class WitchEntityMixin {
+    @ModifyVariable(
+            method = "attack",
+            at = @At(
+                    value = "INVOKE_ASSIGN",
+                    target = "Lnet/minecraft/entity/LivingEntity;getVelocity()Lnet/minecraft/util/math/Vec3d;",
+                    ordinal = 0
+            ),
+            ordinal = 0
+    )
+    private Vec3d modify_attack_Vec3d_0(Vec3d vec3d, LivingEntity target, float pullProgress) {
+        if(target instanceof PlayerEntity) {
+            PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
+            Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+
+            vec3d = RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
+        }
+
+        return vec3d;
+    }
+
     @Redirect(
             method = "attack",
             at = @At(
@@ -27,25 +49,25 @@ public abstract class AbstractSkeletonEntityMixin {
         PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
         Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
-        return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getHeight() * 0.3333333333333333D, 0.0D, gravityDirection)).x;
+        return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getStandingEyeHeight() - 1.100000023841858D, 0.0D, gravityDirection)).x;
     }
 
     @Redirect(
             method = "attack",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getBodyY(D)D",
+                    target = "Lnet/minecraft/entity/LivingEntity;getEyeY()D",
                     ordinal = 0
             )
     )
-    private double redirect_attack_getBodyY_0(LivingEntity target, double heightScale) {
+    private double redirect_attack_getEyeY_0(LivingEntity target) {
         if(!(target instanceof PlayerEntity)) {
-            return target.getBodyY(heightScale);
+            return target.getEyeY();
         }
         PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
         Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
-        return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getHeight() * 0.3333333333333333D, 0.0D, gravityDirection)).y;
+        return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getStandingEyeHeight() - 1.100000023841858D, 0.0D, gravityDirection)).y + 1.100000023841858D;
     }
 
     @Redirect(
@@ -63,7 +85,7 @@ public abstract class AbstractSkeletonEntityMixin {
         PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
         Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
-        return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getHeight() * 0.3333333333333333D, 0.0D, gravityDirection)).z;
+        return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getStandingEyeHeight() - 1.100000023841858D, 0.0D, gravityDirection)).z;
     }
 
     @Redirect(
