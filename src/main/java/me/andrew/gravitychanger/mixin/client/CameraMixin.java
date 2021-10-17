@@ -1,10 +1,9 @@
 package me.andrew.gravitychanger.mixin.client;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Quaternion;
@@ -35,13 +34,11 @@ public abstract class CameraMixin {
             )
     )
     private void redirect_update_setPos_0(Camera camera, double x, double y, double z, BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta) {
-        if(!(focusedEntity instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) focusedEntity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             this.setPos(x, y, z);
             return;
         }
-
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) focusedEntity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         double entityLerpedY = MathHelper.lerp(tickDelta, focusedEntity.prevY, focusedEntity.getY());
 
@@ -64,10 +61,8 @@ public abstract class CameraMixin {
             )
     )
     private void inject_setRotation(CallbackInfo ci) {
-        if(!(this.focusedEntity instanceof PlayerEntity)) return;
-
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this.focusedEntity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) this.focusedEntity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
 
         Quaternion rotation = RotationUtil.getCameraRotationQuaternion(gravityDirection).copy();
         rotation.hamiltonProduct(this.rotation);

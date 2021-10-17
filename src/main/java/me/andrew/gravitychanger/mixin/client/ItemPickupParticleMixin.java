@@ -1,10 +1,9 @@
 package me.andrew.gravitychanger.mixin.client;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.client.particle.ItemPickupParticle;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,11 +26,10 @@ public abstract class ItemPickupParticleMixin {
             ordinal = 0
     )
     private double modify_buildGeometry_double_0(double value) {
-        if(!(this.interactingEntity instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) this.interactingEntity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return value;
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this.interactingEntity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return value + RotationUtil.vecPlayerToWorld(0.0D, 0.5D, 0.0D, gravityDirection).x;
     }
@@ -47,11 +45,10 @@ public abstract class ItemPickupParticleMixin {
             ordinal = 1
     )
     private double modify_buildGeometry_double_1(double value) {
-        if(!(this.interactingEntity instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) this.interactingEntity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return value;
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this.interactingEntity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return value - 0.5D + RotationUtil.vecPlayerToWorld(0.0D, 0.5D, 0.0D, gravityDirection).y;
     }
@@ -67,11 +64,10 @@ public abstract class ItemPickupParticleMixin {
             ordinal = 2
     )
     private double modify_buildGeometry_double_2(double value) {
-        if(!(this.interactingEntity instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) this.interactingEntity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return value;
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this.interactingEntity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return value + RotationUtil.vecPlayerToWorld(0.0D, 0.5D, 0.0D, gravityDirection).z;
     }

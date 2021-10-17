@@ -1,9 +1,8 @@
 package me.andrew.gravitychanger.mixin;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,16 +19,12 @@ public abstract class DirectionMixin {
             )
     )
     private static float redirect_getEntityFacingOrder_getYaw_0(Entity entity, float tickDelta) {
-        float yaw = entity.getYaw(tickDelta);
-
-        if(entity instanceof PlayerEntity) {
-            PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) entity;
-            Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
-
-            yaw = RotationUtil.rotPlayerToWorld(yaw, entity.getPitch(tickDelta), gravityDirection).x;
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return entity.getYaw(tickDelta);
         }
 
-        return yaw;
+        return RotationUtil.rotPlayerToWorld(entity.getYaw(tickDelta), entity.getPitch(tickDelta), gravityDirection).x;
     }
 
     @Redirect(
@@ -41,16 +36,12 @@ public abstract class DirectionMixin {
             )
     )
     private static float redirect_getEntityFacingOrder_getPitch_0(Entity entity, float tickDelta) {
-        float pitch = entity.getPitch(tickDelta);
-
-        if(entity instanceof PlayerEntity) {
-            PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) entity;
-            Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
-
-            pitch = RotationUtil.rotPlayerToWorld(entity.getYaw(tickDelta), pitch, gravityDirection).y;
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return entity.getPitch(tickDelta);
         }
 
-        return pitch;
+        return RotationUtil.rotPlayerToWorld(entity.getYaw(tickDelta), entity.getPitch(tickDelta), gravityDirection).y;
     }
 
     @Redirect(
@@ -62,16 +53,12 @@ public abstract class DirectionMixin {
             )
     )
     private static float redirect_getLookDirectionForAxis_getYaw_0(Entity entity, float tickDelta) {
-        float yaw = entity.getYaw(tickDelta);
-
-        if(entity instanceof PlayerEntity) {
-            PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) entity;
-            Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
-
-            yaw = RotationUtil.rotPlayerToWorld(yaw, entity.getPitch(tickDelta), gravityDirection).x;
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return entity.getYaw(tickDelta);
         }
 
-        return yaw;
+        return RotationUtil.rotPlayerToWorld(entity.getYaw(tickDelta), entity.getPitch(tickDelta), gravityDirection).x;
     }
 
     @Redirect(
@@ -83,16 +70,12 @@ public abstract class DirectionMixin {
             )
     )
     private static float redirect_getLookDirectionForAxis_getYaw_1(Entity entity, float tickDelta) {
-        float yaw = entity.getYaw(tickDelta);
-
-        if(entity instanceof PlayerEntity) {
-            PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) entity;
-            Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
-
-            yaw = RotationUtil.rotPlayerToWorld(yaw, entity.getPitch(tickDelta), gravityDirection).x;
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return entity.getYaw(tickDelta);
         }
 
-        return yaw;
+        return RotationUtil.rotPlayerToWorld(entity.getYaw(tickDelta), entity.getPitch(tickDelta), gravityDirection).x;
     }
 
     @Redirect(
@@ -104,15 +87,11 @@ public abstract class DirectionMixin {
             )
     )
     private static float redirect_getLookDirectionForAxis_getPitch_0(Entity entity, float tickDelta) {
-        float pitch = entity.getPitch(tickDelta);
-
-        if(entity instanceof PlayerEntity) {
-            PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) entity;
-            Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
-
-            pitch = RotationUtil.rotPlayerToWorld(entity.getYaw(tickDelta), pitch, gravityDirection).y;
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return entity.getPitch(tickDelta);
         }
 
-        return pitch;
+        return RotationUtil.rotPlayerToWorld(entity.getYaw(tickDelta), entity.getPitch(tickDelta), gravityDirection).y;
     }
 }

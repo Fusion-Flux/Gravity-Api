@@ -1,6 +1,6 @@
 package me.andrew.gravitychanger.mixin.client;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
@@ -23,8 +23,7 @@ public abstract class PlayerEntityRendererMixin {
             ordinal = 0
     )
     private Vec3d modify_setupTransforms_Vec3d_0(Vec3d vec3d, AbstractClientPlayerEntity abstractClientPlayerEntity, MatrixStack matrixStack, float f, float g, float h) {
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) abstractClientPlayerEntity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) abstractClientPlayerEntity).gravitychanger$getAppliedGravityDirection();
 
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }

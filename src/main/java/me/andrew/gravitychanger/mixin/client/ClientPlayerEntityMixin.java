@@ -1,7 +1,7 @@
 package me.andrew.gravitychanger.mixin.client;
 
 import com.mojang.authlib.GameProfile;
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -34,8 +34,10 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
             )
     )
     private Box redirect_wouldCollideAt_new_0(double x1, double y1, double z1, double x2, double y2, double z2, BlockPos pos) {
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return new Box(x1, y1, z1, x2, y2, z2);
+        }
 
         Box playerBox = this.getBoundingBox();
         Vec3d playerMask = RotationUtil.maskPlayerToWorld(0.0D, 1.0D, 0.0D, gravityDirection);
@@ -54,10 +56,10 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
             cancellable = true
     )
     private void inject_pushOutOfBlocks(double x, double z, CallbackInfo ci) {
-        ci.cancel();
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
 
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        ci.cancel();
 
         Vec3d pos = RotationUtil.vecPlayerToWorld(x - this.getX(), 0.0D, z - this.getZ(), gravityDirection).add(this.getPos());
         BlockPos blockPos = new BlockPos(pos);

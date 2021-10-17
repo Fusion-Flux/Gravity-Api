@@ -138,9 +138,17 @@ public abstract class RotationUtil {
         return vecToRot(vec3d.x, vec3d.y, vec3d.z);
     }
 
+    public static Vec2f rotWorldToPlayer(Vec2f vec2f, Direction gravityDirection) {
+        return rotWorldToPlayer(vec2f.x, vec2f.y, gravityDirection);
+    }
+
     public static Vec2f rotPlayerToWorld(float yaw, float pitch, Direction gravityDirection) {
         Vec3d vec3d = RotationUtil.vecPlayerToWorld(rotToVec(yaw, pitch), gravityDirection);
         return vecToRot(vec3d.x, vec3d.y, vec3d.z);
+    }
+
+    public static Vec2f rotPlayerToWorld(Vec2f vec2f, Direction gravityDirection) {
+        return rotPlayerToWorld(vec2f.x, vec2f.y, gravityDirection);
     }
 
     private static Vec3d rotToVec(float yaw, float pitch) {

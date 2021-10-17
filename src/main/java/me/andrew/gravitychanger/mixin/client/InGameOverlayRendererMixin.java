@@ -1,6 +1,6 @@
 package me.andrew.gravitychanger.mixin.client;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -23,8 +23,10 @@ public abstract class InGameOverlayRendererMixin {
             cancellable = true
     )
     private static void inject_getInWallBlockState(PlayerEntity player, CallbackInfoReturnable<BlockState> cir) {
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) player;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) player).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
+
+        cir.cancel();
 
         BlockPos.Mutable mutable = new BlockPos.Mutable();
 

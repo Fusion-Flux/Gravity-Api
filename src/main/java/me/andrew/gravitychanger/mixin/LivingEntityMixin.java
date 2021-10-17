@@ -1,16 +1,13 @@
 package me.andrew.gravitychanger.mixin;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
-import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.NbtCompound;
@@ -67,23 +64,13 @@ public abstract class LivingEntityMixin extends Entity {
     }
 
     @Inject(
-            method = "onTrackedDataSet",
-            at = @At("RETURN")
-    )
-    private void inject_onTrackedDataSet(TrackedData<?> data, CallbackInfo ci) {
-        if(!((Object) this instanceof PlayerEntity)) return;
-        ((PlayerEntityAccessor) this).gravitychanger$onTrackedData(data);
-    }
-
-    @Inject(
             method = "travel",
             at = @At("HEAD"),
             cancellable = true
     )
     private void inject_travel(Vec3d movementInput, CallbackInfo ci) {
-        if(!((Object) this instanceof PlayerEntity)) return;
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
 
         ci.cancel();
 
@@ -240,33 +227,30 @@ public abstract class LivingEntityMixin extends Entity {
             index = 1
     )
     private Vec3d modify_method_26318_move_1(Vec3d vec3d) {
-        if((Object) this instanceof PlayerEntity) {
-            PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
-            Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
-
-            vec3d = RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
         }
 
-        return vec3d;
+        return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
     }
 
-    @Redirect(
+    @ModifyArg(
             method = "playBlockFallSound",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;",
                     ordinal = 0
-            )
+            ) ,
+            index = 0
     )
-    private BlockState redirect_playBlockFallSound_getBlockState_0(World world, BlockPos blockPos) {
-        if((Object) this instanceof PlayerEntity) {
-            PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
-            Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
-
-            blockPos = new BlockPos(this.getPos().add(RotationUtil.vecPlayerToWorld(0, -0.20000000298023224D, 0, gravityDirection)));
+    private BlockPos modify_playBlockFallSound_getBlockState_0(BlockPos blockPos) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return blockPos;
         }
 
-        return world.getBlockState(blockPos);
+        return new BlockPos(this.getPos().add(RotationUtil.vecPlayerToWorld(0, -0.20000000298023224D, 0, gravityDirection)));
     }
 
     @Redirect(
@@ -278,6 +262,11 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private Vec3d redirect_canSee_new_0(double x, double y, double z) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return new Vec3d(x, y, z);
+        }
+
         return this.getEyePos();
     }
 
@@ -290,6 +279,11 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private Vec3d redirect_canSee_new_1(double x, double y, double z, Entity entity) {
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return new Vec3d(x, y, z);
+        }
+
         return entity.getEyePos();
     }
 
@@ -299,9 +293,8 @@ public abstract class LivingEntityMixin extends Entity {
             cancellable = true
     )
     private void inject_getBoundingBox(EntityPose pose, CallbackInfoReturnable<Box> cir) {
-        if(!((Object) this instanceof PlayerEntity)) return;
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
 
         Box box = cir.getReturnValue();
         if(gravityDirection.getDirection() == Direction.AxisDirection.POSITIVE) {
@@ -316,9 +309,8 @@ public abstract class LivingEntityMixin extends Entity {
             cancellable = true
     )
     private void inject_updateLimbs(LivingEntity entity, boolean flutter, CallbackInfo ci) {
-        if(!(entity instanceof PlayerEntity)) return;
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) entity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
 
         ci.cancel();
 
@@ -346,9 +338,10 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private double redirect_tick_getX_0(LivingEntity livingEntity) {
-        if(!(livingEntity instanceof PlayerEntity)) return livingEntity.getX();
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) livingEntity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) livingEntity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return livingEntity.getX();
+        }
 
         return RotationUtil.vecWorldToPlayer(livingEntity.getX() - livingEntity.prevX, livingEntity.getY() - livingEntity.prevY, livingEntity.getZ() - livingEntity.prevZ, gravityDirection).x + livingEntity.prevX;
     }
@@ -362,9 +355,10 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private double redirect_tick_getZ_0(LivingEntity livingEntity) {
-        if(!(livingEntity instanceof PlayerEntity)) return livingEntity.getX();
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) livingEntity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) livingEntity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return livingEntity.getX();
+        }
 
         return RotationUtil.vecWorldToPlayer(livingEntity.getX() - livingEntity.prevX, livingEntity.getY() - livingEntity.prevY, livingEntity.getZ() - livingEntity.prevZ, gravityDirection).z + livingEntity.prevZ;
     }
@@ -378,14 +372,16 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private double redirect_damage_getX_0(Entity attacker) {
-        Vec3d attackerPos = attacker instanceof PlayerEntity ? attacker.getEyePos() : attacker.getPos();
-        if(!((Object) this instanceof PlayerEntity)) {
-            return attackerPos.x;
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            if(((EntityAccessor) attacker).gravitychanger$getAppliedGravityDirection() == Direction.DOWN) {
+                return attacker.getX();
+            } else {
+                return attacker.getEyePos().x;
+            }
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
-        return RotationUtil.vecWorldToPlayer(attackerPos, gravityDirection).x;
+        return RotationUtil.vecWorldToPlayer(attacker.getEyePos(), gravityDirection).x;
     }
 
     @Redirect(
@@ -397,14 +393,16 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private double redirect_damage_getZ_0(Entity attacker) {
-        Vec3d attackerPos = attacker instanceof PlayerEntity ? attacker.getEyePos() : attacker.getPos();
-        if(!((Object) this instanceof PlayerEntity)) {
-            return attackerPos.z;
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            if(((EntityAccessor) attacker).gravitychanger$getAppliedGravityDirection() == Direction.DOWN) {
+                return attacker.getZ();
+            } else {
+                return attacker.getEyePos().z;
+            }
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
-        return RotationUtil.vecWorldToPlayer(attackerPos, gravityDirection).z;
+        return RotationUtil.vecWorldToPlayer(attacker.getEyePos(), gravityDirection).z;
     }
 
     @Redirect(
@@ -416,11 +414,10 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private double redirect_damage_getX_0(LivingEntity target) {
-        if(!(target instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return target.getX();
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return RotationUtil.vecWorldToPlayer(target.getPos(), gravityDirection).x;
     }
@@ -434,11 +431,10 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private double redirect_damage_getZ_0(LivingEntity target) {
-        if(!(target instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return target.getZ();
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return RotationUtil.vecWorldToPlayer(target.getPos(), gravityDirection).z;
     }
@@ -452,11 +448,10 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private double redirect_knockback_getX_0(LivingEntity target) {
-        if(!(target instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return target.getX();
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return RotationUtil.vecWorldToPlayer(target.getPos(), gravityDirection).x;
     }
@@ -470,11 +465,10 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private double redirect_knockback_getZ_0(LivingEntity target) {
-        if(!(target instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return target.getZ();
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return RotationUtil.vecWorldToPlayer(target.getPos(), gravityDirection).z;
     }
@@ -488,14 +482,16 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private double redirect_knockback_getX_1(LivingEntity attacker, LivingEntity target) {
-        Vec3d pos = attacker instanceof PlayerEntity ? attacker.getEyePos() : attacker.getPos();
-        if(!(target instanceof PlayerEntity)) {
-            return pos.x;
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            if(((EntityAccessor) attacker).gravitychanger$getAppliedGravityDirection() == Direction.DOWN) {
+                return attacker.getX();
+            } else {
+                return attacker.getEyePos().x;
+            }
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
-        return RotationUtil.vecWorldToPlayer(pos, gravityDirection).x;
+        return RotationUtil.vecWorldToPlayer(attacker.getEyePos(), gravityDirection).x;
     }
 
     @Redirect(
@@ -507,14 +503,16 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private double redirect_knockback_getZ_1(LivingEntity attacker, LivingEntity target) {
-        Vec3d pos = attacker instanceof PlayerEntity ? attacker.getEyePos() : attacker.getPos();
-        if(!(target instanceof PlayerEntity)) {
-            return pos.z;
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            if(((EntityAccessor) attacker).gravitychanger$getAppliedGravityDirection() == Direction.DOWN) {
+                return attacker.getZ();
+            } else {
+                return attacker.getEyePos().z;
+            }
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
-        return RotationUtil.vecWorldToPlayer(pos, gravityDirection).z;
+        return RotationUtil.vecWorldToPlayer(attacker.getEyePos(), gravityDirection).z;
     }
 
     @Redirect(
@@ -526,7 +524,8 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private BlockPos redirect_baseTick_new_0(double x, double y, double z) {
-        if(!((Object) this instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return new BlockPos(x, y, z);
         }
 
@@ -542,11 +541,10 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private Vec3d redirect_spawnItemParticles_add_0(Vec3d vec3d, double x, double y, double z) {
-        if(!((Object) this instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return vec3d.add(x, y, z);
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return this.getEyePos().add(RotationUtil.vecPlayerToWorld(vec3d, gravityDirection));
     }
@@ -561,11 +559,10 @@ public abstract class LivingEntityMixin extends Entity {
             ordinal = 0
     )
     private Vec3d modify_spawnItemParticles_Vec3d_0(Vec3d vec3d) {
-        if(!((Object) this instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return vec3d;
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
     }
@@ -579,9 +576,8 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private void modify_tickStatusEffects_addParticle_0(Args args) {
-        if(!((Object) this instanceof PlayerEntity)) return;
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
 
         Vec3d vec3d = this.getPos().subtract(RotationUtil.vecPlayerToWorld(this.getPos().subtract(args.get(1), args.get(2), args.get(3)), gravityDirection));
         args.set(1, vec3d.x);
@@ -598,9 +594,8 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private void modify_addDeathParticless_addParticle_0(Args args) {
-        if(!((Object) this instanceof PlayerEntity)) return;
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
 
         Vec3d vec3d = this.getPos().subtract(RotationUtil.vecPlayerToWorld(this.getPos().subtract(args.get(1), args.get(2), args.get(3)), gravityDirection));
         args.set(1, vec3d.x);

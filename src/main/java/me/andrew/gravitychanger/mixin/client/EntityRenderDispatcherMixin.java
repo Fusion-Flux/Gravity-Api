@@ -1,6 +1,6 @@
 package me.andrew.gravitychanger.mixin.client;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -10,7 +10,6 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.WorldView;
@@ -40,10 +39,9 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_0(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof PlayerEntity)) return;
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
         if(!this.renderShadows) return;
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) entity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         matrices.push();
         matrices.multiply(RotationUtil.getCameraRotationQuaternion(gravityDirection));
@@ -58,7 +56,8 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_1(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof PlayerEntity)) return;
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
         if(!this.renderShadows) return;
 
         matrices.pop();
@@ -74,10 +73,9 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_2(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof PlayerEntity)) return;
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
         if(!this.renderShadows) return;
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) entity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         matrices.multiply(RotationUtil.getCameraRotationQuaternion(gravityDirection));
     }
@@ -88,9 +86,8 @@ public abstract class EntityRenderDispatcherMixin {
             cancellable = true
     )
     private static void inject_renderShadow(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Entity entity, float opacity, float tickDelta, WorldView world, float radius, CallbackInfo ci) {
-        if(!(entity instanceof PlayerEntity)) return;
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) entity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
 
         ci.cancel();
 
@@ -157,11 +154,10 @@ public abstract class EntityRenderDispatcherMixin {
             ordinal = 0
     )
     private static Box modify_renderHitbox_Box_0(Box box, MatrixStack matrices, VertexConsumer vertices, Entity entity, float tickDelta) {
-        if(!(entity instanceof  PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return box;
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) entity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return RotationUtil.boxWorldToPlayer(box, gravityDirection);
     }
@@ -176,11 +172,10 @@ public abstract class EntityRenderDispatcherMixin {
             ordinal = 0
     )
     private static Vec3d modify_renderHitbox_Vec3d_0(Vec3d vec3d, MatrixStack matrices, VertexConsumer vertices, Entity entity, float tickDelta) {
-        if(!(entity instanceof  PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return vec3d;
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) entity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }

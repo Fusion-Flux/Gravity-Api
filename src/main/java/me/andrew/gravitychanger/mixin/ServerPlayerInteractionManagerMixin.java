@@ -1,6 +1,6 @@
 package me.andrew.gravitychanger.mixin;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
@@ -20,8 +20,10 @@ public abstract class ServerPlayerInteractionManagerMixin {
             )
     )
     private double redirect_processBlockBreakingAction_getX_0(ServerPlayerEntity serverPlayerEntity) {
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) serverPlayerEntity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) serverPlayerEntity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return serverPlayerEntity.getX();
+        }
 
         return serverPlayerEntity.getX() + RotationUtil.vecPlayerToWorld(0.0D, 1.5D, 0.0D, gravityDirection).x;
     }
@@ -35,8 +37,10 @@ public abstract class ServerPlayerInteractionManagerMixin {
             )
     )
     private double redirect_processBlockBreakingAction_getY_0(ServerPlayerEntity serverPlayerEntity) {
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) serverPlayerEntity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) serverPlayerEntity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return serverPlayerEntity.getY();
+        }
 
         return serverPlayerEntity.getY() - 1.5D + RotationUtil.vecPlayerToWorld(0.0D, 1.5D, 0.0D, gravityDirection).y;
     }
@@ -50,8 +54,10 @@ public abstract class ServerPlayerInteractionManagerMixin {
             )
     )
     private double redirect_processBlockBreakingAction_getZ_0(ServerPlayerEntity serverPlayerEntity) {
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) serverPlayerEntity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) serverPlayerEntity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return serverPlayerEntity.getZ();
+        }
 
         return serverPlayerEntity.getZ() + RotationUtil.vecPlayerToWorld(0.0D, 1.5D, 0.0D, gravityDirection).z;
     }

@@ -1,9 +1,8 @@
 package me.andrew.gravitychanger.mixin;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,10 +16,11 @@ public abstract class ProjectileEntityMixin {
             at = @At("HEAD"),
             ordinal = 0
     )
-    private float modify_setProperties_pitch(float pitchUnused, Entity user, float pitch, float yaw, float roll, float modifierZ, float modifierXYZ) {
-        if(!(user instanceof PlayerEntity)) return pitchUnused;
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) user;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+    private float modify_setProperties_pitch(float value, Entity user, float pitch, float yaw, float roll, float modifierZ, float modifierXYZ) {
+        Direction gravityDirection = ((EntityAccessor) user).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return value;
+        }
 
         return RotationUtil.rotPlayerToWorld(user.getYaw(), user.getPitch(), gravityDirection).y;
     }
@@ -30,10 +30,11 @@ public abstract class ProjectileEntityMixin {
             at = @At("HEAD"),
             ordinal = 1
     )
-    private float modify_setProperties_yaw(float yawUnused, Entity user, float pitch, float yaw, float roll, float modifierZ, float modifierXYZ) {
-        if(!(user instanceof PlayerEntity)) return yawUnused;
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) user;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+    private float modify_setProperties_yaw(float value, Entity user, float pitch, float yaw, float roll, float modifierZ, float modifierXYZ) {
+        Direction gravityDirection = ((EntityAccessor) user).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return value;
+        }
 
         return RotationUtil.rotPlayerToWorld(user.getYaw(), user.getPitch(), gravityDirection).x;
     }

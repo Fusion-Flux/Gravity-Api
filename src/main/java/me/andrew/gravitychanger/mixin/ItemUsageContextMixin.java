@@ -1,6 +1,6 @@
 package me.andrew.gravitychanger.mixin;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemUsageContext;
@@ -20,8 +20,10 @@ public abstract class ItemUsageContextMixin {
             )
     )
     private float redirect_getPlayerYaw_getYaw_0(PlayerEntity entity) {
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) entity;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return entity.getYaw();
+        }
 
         return RotationUtil.rotPlayerToWorld(entity.getYaw(), entity.getPitch(), gravityDirection).x;
     }

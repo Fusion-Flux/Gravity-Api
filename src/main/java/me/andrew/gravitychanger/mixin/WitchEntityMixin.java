@@ -1,10 +1,9 @@
 package me.andrew.gravitychanger.mixin;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.WitchEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,15 +22,13 @@ public abstract class WitchEntityMixin {
             ),
             ordinal = 0
     )
-    private Vec3d modify_attack_Vec3d_0(Vec3d vec3d, LivingEntity target, float pullProgress) {
-        if(target instanceof PlayerEntity) {
-            PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-            Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
-
-            vec3d = RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
+    private Vec3d modify_attack_Vec3d_0(Vec3d value, LivingEntity target, float pullProgress) {
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return value;
         }
 
-        return vec3d;
+        return RotationUtil.vecPlayerToWorld(value, gravityDirection);
     }
 
     @Redirect(
@@ -43,11 +40,10 @@ public abstract class WitchEntityMixin {
             )
     )
     private double redirect_attack_getX_0(LivingEntity target) {
-        if(!(target instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return target.getX();
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getStandingEyeHeight() - 1.100000023841858D, 0.0D, gravityDirection)).x;
     }
@@ -61,11 +57,10 @@ public abstract class WitchEntityMixin {
             )
     )
     private double redirect_attack_getEyeY_0(LivingEntity target) {
-        if(!(target instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return target.getEyeY();
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getStandingEyeHeight() - 1.100000023841858D, 0.0D, gravityDirection)).y + 1.100000023841858D;
     }
@@ -79,11 +74,10 @@ public abstract class WitchEntityMixin {
             )
     )
     private double redirect_attack_getZ_0(LivingEntity target) {
-        if(!(target instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return target.getZ();
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getStandingEyeHeight() - 1.100000023841858D, 0.0D, gravityDirection)).z;
     }
@@ -96,17 +90,11 @@ public abstract class WitchEntityMixin {
             )
     )
     private double redirect_attack_sqrt_0(double value, LivingEntity target, float pullProgress) {
-        value = Math.sqrt(value);
-
-        if(target instanceof PlayerEntity) {
-            PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-            Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
-
-            if(gravityDirection != Direction.DOWN) {
-                value = Math.sqrt(value);
-            }
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return Math.sqrt(value);
         }
 
-        return value;
+        return Math.sqrt(Math.sqrt(value));
     }
 }

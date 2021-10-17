@@ -1,10 +1,9 @@
 package me.andrew.gravitychanger.mixin;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,11 +20,10 @@ public abstract class MobEntityMixin {
             )
     )
     private float redirect_tryAttack_getYaw_0(MobEntity attacker, Entity target) {
-        if(!(target instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return attacker.getYaw();
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return RotationUtil.rotWorldToPlayer(attacker.getYaw(), attacker.getPitch(), gravityDirection).x;
     }
@@ -39,11 +37,10 @@ public abstract class MobEntityMixin {
             )
     )
     private float redirect_tryAttack_getYaw_1(MobEntity attacker, Entity target) {
-        if(!(target instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             return attacker.getYaw();
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         return RotationUtil.rotWorldToPlayer(attacker.getYaw(), attacker.getPitch(), gravityDirection).x;
     }

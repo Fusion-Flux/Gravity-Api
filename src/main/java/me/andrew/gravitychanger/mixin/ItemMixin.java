@@ -1,6 +1,6 @@
 package me.andrew.gravitychanger.mixin;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -23,8 +23,10 @@ public abstract class ItemMixin {
             )
     )
     private static Vec3d redirect_raycast_add_0(Vec3d vec3d, double x, double y, double z, World world, PlayerEntity player, RaycastContext.FluidHandling fluidHandling) {
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) player;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) player).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d.add(x, y, z);
+        }
 
         return vec3d.add(RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection));
     }

@@ -1,10 +1,9 @@
 package me.andrew.gravitychanger.mixin;
 
-import me.andrew.gravitychanger.accessor.PlayerEntityAccessor;
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.task.RamImpactTask;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,12 +24,11 @@ public abstract class RamImpactTaskMixin {
             )
     )
     private void redirect_keepRunning_takeKnockback_0(LivingEntity target, double strength, double x, double z) {
-        if(!(target instanceof PlayerEntity)) {
+        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
             target.takeKnockback(strength, x, z);
             return;
         }
-        PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) target;
-        Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
 
         Vec3d direction = RotationUtil.vecWorldToPlayer(this.direction, gravityDirection);
         target.takeKnockback(strength, direction.x, direction.z);
