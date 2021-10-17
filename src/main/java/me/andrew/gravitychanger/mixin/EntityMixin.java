@@ -26,9 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -607,5 +605,45 @@ public abstract class EntityMixin {
             Vec3d particleVelocity = RotationUtil.vecPlayerToWorld(playerVelocity.x * -4.0D, 1.5D, playerVelocity.z * -4.0D, gravityDirection);
             this.world.addParticle(new BlockStateParticleEffect(ParticleTypes.BLOCK, blockState), particlePos.x, particlePos.y, particlePos.z, particleVelocity.x, particleVelocity.y, particleVelocity.z);
         }
+    }
+
+    @ModifyVariable(
+            method = "updateMovementInFluid",
+            at = @At(
+                    value = "INVOKE_ASSIGN",
+                    target = "Lnet/minecraft/entity/Entity;getVelocity()Lnet/minecraft/util/math/Vec3d;",
+                    ordinal = 0
+            ),
+            ordinal = 1
+    )
+    private Vec3d modify_updateMovementInFluid_Vec3d_0(Vec3d vec3d) {
+        if((Object) this instanceof PlayerEntity) {
+            PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
+            Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+
+            vec3d = RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
+        }
+
+        return vec3d;
+    }
+
+    @ModifyArg(
+            method = "updateMovementInFluid",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/Vec3d;add(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
+                    ordinal = 1
+            ),
+            index = 0
+    )
+    private Vec3d modify_updateMovementInFluid_add_0(Vec3d vec3d) {
+        if((Object) this instanceof PlayerEntity) {
+            PlayerEntityAccessor playerEntityAccessor = (PlayerEntityAccessor) this;
+            Direction gravityDirection = playerEntityAccessor.gravitychanger$getGravityDirection();
+
+            vec3d = RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
+        }
+
+        return vec3d;
     }
 }
