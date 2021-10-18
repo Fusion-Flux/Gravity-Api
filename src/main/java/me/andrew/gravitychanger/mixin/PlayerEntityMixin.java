@@ -292,6 +292,23 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
     }
 
     @Redirect(
+            method = "method_30263",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/Box;offset(DDD)Lnet/minecraft/util/math/Box;",
+                    ordinal = 0
+            )
+    )
+    private Box redirect_method_30263_offset_0(Box box, double x, double y, double z) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return box.offset(x, y, z);
+        }
+
+        return box.offset(RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection));
+    }
+
+    @Redirect(
             method = "attack",
             at = @At(
                     value = "INVOKE",
