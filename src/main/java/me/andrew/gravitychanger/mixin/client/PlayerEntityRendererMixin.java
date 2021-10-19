@@ -24,6 +24,9 @@ public abstract class PlayerEntityRendererMixin {
     )
     private Vec3d modify_setupTransforms_Vec3d_0(Vec3d vec3d, AbstractClientPlayerEntity abstractClientPlayerEntity, MatrixStack matrixStack, float f, float g, float h) {
         Direction gravityDirection = ((EntityAccessor) abstractClientPlayerEntity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
 
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }

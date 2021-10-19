@@ -357,7 +357,7 @@ public abstract class LivingEntityMixin extends Entity {
     private double redirect_tick_getZ_0(LivingEntity livingEntity) {
         Direction gravityDirection = ((EntityAccessor) livingEntity).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) {
-            return livingEntity.getX();
+            return livingEntity.getZ();
         }
 
         return RotationUtil.vecWorldToPlayer(livingEntity.getX() - livingEntity.prevX, livingEntity.getY() - livingEntity.prevY, livingEntity.getZ() - livingEntity.prevZ, gravityDirection).z + livingEntity.prevZ;
