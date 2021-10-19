@@ -602,4 +602,58 @@ public abstract class LivingEntityMixin extends Entity {
         args.set(2, vec3d.y);
         args.set(3, vec3d.z);
     }
+
+    @ModifyVariable(
+            method = "blockedByShield",
+            at = @At(
+                    value = "INVOKE_ASSIGN",
+                    target = "Lnet/minecraft/entity/LivingEntity;getRotationVec(F)Lnet/minecraft/util/math/Vec3d;",
+                    ordinal = 0
+            ),
+            ordinal = 1
+    )
+    private Vec3d modify_blockedByShield_Vec3d_1(Vec3d vec3d) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
+
+        return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
+    }
+
+    @ModifyArg(
+            method = "blockedByShield",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/Vec3d;relativize(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
+                    ordinal = 0
+            ),
+            index = 0
+    )
+    private Vec3d modify_blockedByShield_relativize_0(Vec3d vec3d) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
+
+        return this.getEyePos();
+    }
+
+    @ModifyVariable(
+            method = "blockedByShield",
+            at = @At(
+                    value = "INVOKE_ASSIGN",
+                    target = "Lnet/minecraft/util/math/Vec3d;normalize()Lnet/minecraft/util/math/Vec3d;",
+                    ordinal = 0
+            ),
+            ordinal = 2
+    )
+    private Vec3d modify_blockedByShield_Vec3d_2(Vec3d vec3d) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
+
+        return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
+    }
 }
