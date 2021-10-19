@@ -167,6 +167,10 @@ public abstract class EntityMixin implements EntityAccessor {
 
     @Shadow public abstract void setVelocity(double x, double y, double z);
 
+    @Shadow public abstract boolean isConnectedThroughVehicle(Entity entity);
+
+    @Shadow public abstract void addVelocity(double deltaX, double deltaY, double deltaZ);
+
     @Override
     public Direction gravitychanger$getAppliedGravityDirection() {
         return Direction.DOWN;
@@ -648,5 +652,73 @@ public abstract class EntityMixin implements EntityAccessor {
         }
 
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
+    }
+
+    @Inject(
+            method = "pushAwayFrom",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void inject_pushAwayFrom(Entity entity, CallbackInfo ci) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction otherGravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+
+        if(gravityDirection == Direction.DOWN && otherGravityDirection == Direction.DOWN) return;
+
+        ci.cancel();
+
+        if (!this.isConnectedThroughVehicle(entity)) {
+            if (!entity.noClip && !this.noClip) {
+                Vec3d entityOffset = entity.getBoundingBox().getCenter().subtract(this.getBoundingBox().getCenter());
+
+                {
+                    Vec3d playerEntityOffset = RotationUtil.vecWorldToPlayer(entityOffset, gravityDirection);
+                    double dx = playerEntityOffset.x;
+                    double dz = playerEntityOffset.z;
+                    double f = MathHelper.absMax(dx, dz);
+                    if(f >= 0.009999999776482582D) {
+                        f = Math.sqrt(f);
+                        dx /= f;
+                        dz /= f;
+                        double g = 1.0D / f;
+                        if(g > 1.0D) {
+                            g = 1.0D;
+                        }
+
+                        dx *= g;
+                        dz *= g;
+                        dx *= 0.05000000074505806D;
+                        dz *= 0.05000000074505806D;
+                        if(!this.hasPassengers()) {
+                            this.addVelocity(-dx, 0.0D, -dz);
+                        }
+                    }
+                }
+
+                {
+                    Vec3d entityEntityOffset = RotationUtil.vecWorldToPlayer(entityOffset, otherGravityDirection);
+                    double dx = entityEntityOffset.x;
+                    double dz = entityEntityOffset.z;
+                    double f = MathHelper.absMax(dx, dz);
+                    if(f >= 0.009999999776482582D) {
+                        f = Math.sqrt(f);
+                        dx /= f;
+                        dz /= f;
+                        double g = 1.0D / f;
+                        if(g > 1.0D) {
+                            g = 1.0D;
+                        }
+
+                        dx *= g;
+                        dz *= g;
+                        dx *= 0.05000000074505806D;
+                        dz *= 0.05000000074505806D;
+                        if(!entity.hasPassengers()) {
+                            entity.addVelocity(dx, 0.0D, dz);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
