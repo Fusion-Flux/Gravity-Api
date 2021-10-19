@@ -16,6 +16,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -41,6 +42,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
 
     private static final TrackedData<Direction> gravitychanger$GRAVITY_DIRECTION = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.FACING);
 
+    @Nullable
     private Direction gravitychanger$prevGravityDirection;
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {

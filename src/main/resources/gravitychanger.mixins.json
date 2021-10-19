@@ -25,6 +25,7 @@
     "PlayerEntityMixin",
     "ProjectileEntityMixin",
     "RamImpactTaskMixin",
+    "ServerPlayerEntityMixin",
     "ServerPlayerInteractionManagerMixin",
     "ServerPlayNetworkHandlerMixin",
     "SnowGolemEntityMixin",
