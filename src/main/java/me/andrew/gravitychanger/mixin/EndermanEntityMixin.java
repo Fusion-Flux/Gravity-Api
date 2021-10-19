@@ -1,77 +1,76 @@
 package me.andrew.gravitychanger.mixin;
 
 import me.andrew.gravitychanger.accessor.EntityAccessor;
-import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.boss.WitherEntity;
+import net.minecraft.entity.mob.EndermanEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(WitherEntity.class)
-public abstract class WitherEntityMixin {
+@Mixin(EndermanEntity.class)
+public abstract class EndermanEntityMixin {
     @Redirect(
-            method = "shootSkullAt(ILnet/minecraft/entity/LivingEntity;)V",
+            method = "isPlayerStaring",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getX()D",
+                    target = "Lnet/minecraft/entity/player/PlayerEntity;getEyeY()D",
                     ordinal = 0
             )
     )
-    private double redirect_shootSkullAt_getX_0(LivingEntity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+    private double redirect_isPlayerStaring_getEyeY_0(PlayerEntity playerEntity) {
+        Direction gravityDirection = ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) {
-            return target.getX();
+            return playerEntity.getEyeY();
         }
 
-        return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getStandingEyeHeight() * 0.5D, 0.0D, gravityDirection)).x;
+        return playerEntity.getEyePos().y;
     }
 
     @Redirect(
-            method = "shootSkullAt(ILnet/minecraft/entity/LivingEntity;)V",
+            method = "isPlayerStaring",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getY()D",
+                    target = "Lnet/minecraft/entity/player/PlayerEntity;getX()D",
                     ordinal = 0
             )
     )
-    private double redirect_shootSkullAt_getY_0(LivingEntity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+    private double redirect_isPlayerStaring_getX_0(PlayerEntity playerEntity) {
+        Direction gravityDirection = ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) {
-            return target.getX();
+            return playerEntity.getX();
         }
 
-        return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getStandingEyeHeight() * 0.5D, 0.0D, gravityDirection)).y - target.getStandingEyeHeight() * 0.5D;
+        return playerEntity.getEyePos().x;
     }
 
     @Redirect(
-            method = "shootSkullAt(ILnet/minecraft/entity/LivingEntity;)V",
+            method = "isPlayerStaring",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getZ()D",
+                    target = "Lnet/minecraft/entity/player/PlayerEntity;getZ()D",
                     ordinal = 0
             )
     )
-    private double redirect_shootSkullAt_getZ_0(LivingEntity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+    private double redirect_isPlayerStaring_getZ_0(PlayerEntity playerEntity) {
+        Direction gravityDirection = ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) {
-            return target.getX();
+            return playerEntity.getZ();
         }
 
-        return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getStandingEyeHeight() * 0.5D, 0.0D, gravityDirection)).z;
+        return playerEntity.getEyePos().z;
     }
 
     @Redirect(
-            method = "tickMovement",
+            method = "teleportTo(Lnet/minecraft/entity/Entity;)Z",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/Entity;getEyeY()D",
                     ordinal = 0
             )
     )
-    private double redirect_tickMovement_getEyeY_0(Entity entity) {
+    private double redirect_teleportTo_getEyeY_0(Entity entity) {
         Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) {
             return entity.getEyeY();
@@ -81,14 +80,14 @@ public abstract class WitherEntityMixin {
     }
 
     @Redirect(
-            method = "tickMovement",
+            method = "teleportTo(Lnet/minecraft/entity/Entity;)Z",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/Entity;getX()D",
                     ordinal = 0
             )
     )
-    private double redirect_tickMovement_getX_0(Entity entity) {
+    private double redirect_teleportTo_getX_0(Entity entity) {
         Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) {
             return entity.getX();
@@ -98,14 +97,14 @@ public abstract class WitherEntityMixin {
     }
 
     @Redirect(
-            method = "tickMovement",
+            method = "teleportTo(Lnet/minecraft/entity/Entity;)Z",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/Entity;getZ()D",
                     ordinal = 0
             )
     )
-    private double redirect_tickMovement_getZ_0(Entity entity) {
+    private double redirect_teleportTo_getZ_0(Entity entity) {
         Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) {
             return entity.getZ();

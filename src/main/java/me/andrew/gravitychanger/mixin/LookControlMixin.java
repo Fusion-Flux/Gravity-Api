@@ -1,77 +1,41 @@
 package me.andrew.gravitychanger.mixin;
 
 import me.andrew.gravitychanger.accessor.EntityAccessor;
-import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.ai.control.LookControl;
 import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(MobEntity.class)
-public abstract class MobEntityMixin {
+@Mixin(LookControl.class)
+public abstract class LookControlMixin {
     @Redirect(
-            method = "tryAttack",
+            method = "getLookingHeightFor",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/mob/MobEntity;getYaw()F",
+                    target = "Lnet/minecraft/entity/Entity;getEyeY()D",
                     ordinal = 0
             )
     )
-    private float redirect_tryAttack_getYaw_0(MobEntity attacker, Entity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+    private static double redirect_getLookingHeightForgetEyeY_0(Entity entity) {
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) {
-            return attacker.getYaw();
+            return entity.getEyeY();
         }
 
-        return RotationUtil.rotWorldToPlayer(attacker.getYaw(), attacker.getPitch(), gravityDirection).x;
+        return entity.getEyePos().y;
     }
 
     @Redirect(
-            method = "tryAttack",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/mob/MobEntity;getYaw()F",
-                    ordinal = 1
-            )
-    )
-    private float redirect_tryAttack_getYaw_1(MobEntity attacker, Entity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
-            return attacker.getYaw();
-        }
-
-        return RotationUtil.rotWorldToPlayer(attacker.getYaw(), attacker.getPitch(), gravityDirection).x;
-    }
-
-    @Redirect(
-            method = "lookAtEntity",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getEyeY()D",
-                    ordinal = 0
-            )
-    )
-    private double redirect_lookAtEntity_getEyeY_0(LivingEntity livingEntity) {
-        Direction gravityDirection = ((EntityAccessor) livingEntity).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
-            return livingEntity.getEyeY();
-        }
-
-        return livingEntity.getEyePos().y;
-    }
-
-    @Redirect(
-            method = "lookAtEntity",
+            method = "lookAt(Lnet/minecraft/entity/Entity;)V",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/Entity;getX()D",
                     ordinal = 0
             )
     )
-    private double redirect_lookAtEntity_getX_0(Entity entity) {
+    private double redirect_lookAt_getX_0_0(Entity entity) {
         Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) {
             return entity.getX();
@@ -81,14 +45,48 @@ public abstract class MobEntityMixin {
     }
 
     @Redirect(
-            method = "lookAtEntity",
+            method = "lookAt(Lnet/minecraft/entity/Entity;)V",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/Entity;getZ()D",
                     ordinal = 0
             )
     )
-    private double redirect_lookAtEntity_getZ_0(Entity entity) {
+    private double redirect_lookAt_getZ_0_0(Entity entity) {
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return entity.getZ();
+        }
+
+        return entity.getEyePos().z;
+    }
+
+    @Redirect(
+            method = "lookAt(Lnet/minecraft/entity/Entity;FF)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/Entity;getX()D",
+                    ordinal = 0
+            )
+    )
+    private double redirect_lookAt_getX_0_1(Entity entity) {
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return entity.getX();
+        }
+
+        return entity.getEyePos().x;
+    }
+
+    @Redirect(
+            method = "lookAt(Lnet/minecraft/entity/Entity;FF)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/Entity;getZ()D",
+                    ordinal = 0
+            )
+    )
+    private double redirect_lookAt_getZ_0_1(Entity entity) {
         Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) {
             return entity.getZ();
