@@ -4,12 +4,16 @@
   "version": "${version}",
 
   "name": "GravityChanger",
-  "description": "Changes gravity",
+  "description": "Lets you change player gravity",
+  "contact": {
+    "issues": "https://github.com/Gaider10/GravityChanger/issues",
+    "sources": "https://github.com/Gaider10/GravityChanger"
+  },
   "authors": [
-    "andrew_10_"
+    "Gaider10"
   ],
-
   "license": "MIT",
+  "icon": "assets/gravitychanger/icon.png",
   
   "environment": "*",
   "entrypoints": {
