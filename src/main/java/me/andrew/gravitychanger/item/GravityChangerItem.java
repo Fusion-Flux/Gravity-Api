@@ -20,9 +20,7 @@ public class GravityChangerItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if(!world.isClient) {
-            ((RotatableEntityAccessor) user).gravitychanger$setGravityDirection(this.gravityDirection);
-        }
+        ((RotatableEntityAccessor) user).gravitychanger$setGravityDirection(this.gravityDirection);
 
         return TypedActionResult.success(user.getStackInHand(hand));
     }
