@@ -1,5 +1,6 @@
 package me.andrew.gravitychanger.mixin;
 
+import me.andrew.gravitychanger.GravityChangerMod;
 import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
@@ -103,7 +104,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
         this.setBoundingBox(this.calculateBoundingBox());
 
         // Keep world looking direction when changing gravity
-        if(this.gravitychanger$prevGravityDirection != null) {
+        if(this.gravitychanger$prevGravityDirection != null && this.world.isClient && (Object) this instanceof ClientPlayerEntity && GravityChangerMod.config.keepWorldLook) {
             Vec2f worldAngles = RotationUtil.rotPlayerToWorld(this.getYaw(), this.getPitch(), currentGravityDirection);
             Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, newGravityDirection);
             this.setYaw(newViewAngles.x);

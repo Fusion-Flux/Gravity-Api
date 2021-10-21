@@ -4,5 +4,10 @@
   "item.gravitychanger.gravity_changer_north": "North Gravity Changer",
   "item.gravitychanger.gravity_changer_south": "South Gravity Changer",
   "item.gravitychanger.gravity_changer_west": "West Gravity Changer",
-  "item.gravitychanger.gravity_changer_east": "East Gravity Changer"
+  "item.gravitychanger.gravity_changer_east": "East Gravity Changer",
+
+  "text.autoconfig.gravitychanger.title": "GravityChanger Config",
+  "text.autoconfig.gravitychanger.option.keepWorldLook": "Keep World Look",
+  "text.autoconfig.gravitychanger.option.keepWorldLook.@Tooltip[0]": "Makes it so that you keep your world relative",
+  "text.autoconfig.gravitychanger.option.keepWorldLook.@Tooltip[1]": "look direction when changing gravity"
 }
