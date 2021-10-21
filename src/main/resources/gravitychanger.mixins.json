@@ -23,6 +23,7 @@
     "PiglinEntityMixin",
     "PillagerEntityMixin",
     "PlayerEntityMixin",
+    "PointedDripstoneBlockMixin",
     "ProjectileEntityMixin",
     "RamImpactTaskMixin",
     "ServerPlayerEntityMixin",

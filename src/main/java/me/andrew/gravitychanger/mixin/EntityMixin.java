@@ -424,14 +424,15 @@ public abstract class EntityMixin implements EntityAccessor {
         if(gravityDirection == Direction.DOWN) return;
 
         BlockPos blockPos = new BlockPos(RotationUtil.vecPlayerToWorld(0.0D, -0.20000000298023224D, 0.0D, gravityDirection).add(this.pos));
-        if (this.world.getBlockState(blockPos).isAir()) {
-            BlockPos blockPos2 = blockPos.offset(gravityDirection);
-            BlockState blockState = this.world.getBlockState(blockPos2);
-            if (blockState.isIn(BlockTags.FENCES) || blockState.isIn(BlockTags.WALLS) || blockState.getBlock() instanceof FenceGateBlock) {
-                cir.setReturnValue(blockPos2);
-                return;
-            }
-        }
+        // Probably not needed since these blocks only extend up
+//        if (this.world.getBlockState(blockPos).isAir()) {
+//            BlockPos blockPos2 = blockPos.offset(gravityDirection);
+//            BlockState blockState = this.world.getBlockState(blockPos2);
+//            if (blockState.isIn(BlockTags.FENCES) || blockState.isIn(BlockTags.WALLS) || blockState.getBlock() instanceof FenceGateBlock) {
+//                cir.setReturnValue(blockPos2);
+//                return;
+//            }
+//        }
 
         cir.setReturnValue(blockPos);
     }
