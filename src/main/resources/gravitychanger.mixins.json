@@ -11,6 +11,7 @@
     "EndermanEntity$ChasePlayerGoalMixin",
     "EndermanEntityMixin",
     "EntityMixin",
+    "EntityShapeContextMixin",
     "ExplosionMixin",
     "IllusionerEntityMixin",
     "ItemMixin",
