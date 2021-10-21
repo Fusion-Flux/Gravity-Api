@@ -43,6 +43,7 @@
     "client.ClientPlayerEntityMixin",
     "client.ClientPlayNetworkHandlerMixin",
     "client.EntityRenderDispatcherMixin",
+    "client.FishingBobberEntityRendererMixin",
     "client.GameRendererMixin",
     "client.InGameOverlayRendererMixin",
     "client.ItemPickupParticleMixin",
