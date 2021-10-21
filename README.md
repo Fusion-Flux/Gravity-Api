@@ -6,8 +6,12 @@ This mod adds 6 items that let you change your gravity to any of the 6 axis dire
 These items are currently uncraftable and can be found in the tools tab of creative menu.  
 This mod can also be used as an api to let other mods change player gravity.
 
-## Dependencies
-This mod requires you to have any verion of fabric api.
+## Required Dependencies
+[Fabric Api]()  
+[Cloth Config]()
+
+## Optional Dependencies
+[Mod Menu]()
 
 ## Importing
 First clone this repo and run `gradlew build`.  
