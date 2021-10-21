@@ -307,7 +307,7 @@ public abstract class EntityMixin implements EntityAccessor {
 
             this.world.getProfiler().push("move");
             if (this.movementMultiplier.lengthSquared() > 1.0E-7D) {
-                movement = movement.multiply(RotationUtil.vecPlayerToWorld(this.movementMultiplier, gravityDirection));
+                movement = movement.multiply(RotationUtil.maskPlayerToWorld(this.movementMultiplier, gravityDirection));
                 this.movementMultiplier = Vec3d.ZERO;
                 this.setVelocity(Vec3d.ZERO);
             }
