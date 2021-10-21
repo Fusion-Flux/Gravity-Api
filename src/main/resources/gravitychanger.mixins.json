@@ -13,6 +13,7 @@
     "EntityMixin",
     "EntityShapeContextMixin",
     "ExplosionMixin",
+    "FireworkRocketEntityMixin",
     "IllusionerEntityMixin",
     "ItemMixin",
     "ItemUsageContextMixin",
