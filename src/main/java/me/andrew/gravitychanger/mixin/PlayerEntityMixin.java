@@ -85,7 +85,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
             this.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(this.getVelocity(), prevGravityDirection), gravityDirection));
 
             // Keep world looking direction when changing gravity
-            if(this.world.isClient && (Object) this instanceof ClientPlayerEntity && GravityChangerMod.config.keepWorldLook) {
+            if(GravityChangerMod.config.keepWorldLook) {
                 Vec2f worldAngles = RotationUtil.rotPlayerToWorld(this.getYaw(), this.getPitch(), prevGravityDirection);
                 Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, gravityDirection);
                 this.setYaw(newViewAngles.x);
