@@ -9,5 +9,8 @@
   "text.autoconfig.gravitychanger.title": "GravityChanger Config",
   "text.autoconfig.gravitychanger.option.keepWorldLook": "Keep World Look",
   "text.autoconfig.gravitychanger.option.keepWorldLook.@Tooltip[0]": "Makes it so that you keep your world relative",
-  "text.autoconfig.gravitychanger.option.keepWorldLook.@Tooltip[1]": "look direction when changing gravity"
+  "text.autoconfig.gravitychanger.option.keepWorldLook.@Tooltip[1]": "look direction when changing gravity",
+  "text.autoconfig.gravitychanger.option.resetGravityOnDimensionChange": "Reset Gravity On Dimension Change",
+  "text.autoconfig.gravitychanger.option.resetGravityOnDimensionChange.@Tooltip[0]": "Makes it so that your gravity is reset",
+  "text.autoconfig.gravitychanger.option.resetGravityOnDimensionChange.@Tooltip[1]": "to DOWN every time you change dimension"
 }

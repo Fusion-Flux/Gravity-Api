@@ -11,5 +11,10 @@ public class GravityChangerConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip(
             count = 2
     )
-    public boolean keepWorldLook = false;
+    public boolean keepWorldLook = true;
+
+    @ConfigEntry.Gui.Tooltip(
+            count = 2
+    )
+    public boolean resetGravityOnDimensionChange = true;
 }
