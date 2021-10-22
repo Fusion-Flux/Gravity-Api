@@ -17,7 +17,6 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -43,8 +42,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
 
     private static final TrackedData<Direction> gravitychanger$GRAVITY_DIRECTION = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.FACING);
 
-    @Nullable
-    private Direction gravitychanger$prevGravityDirection;
+    private Direction gravitychanger$prevGravityDirection = Direction.DOWN;
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -61,62 +59,62 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
     }
 
     @Override
-    public Direction gravitychanger$getGravityDirection() {
+    public void gravitychanger$onGravityChanged(Direction prevGravityDirection, boolean initialGraity) {
+        Direction gravityDirection = this.gravitychanger$getGravityDirection();
+
+        this.fallDistance = 0;
+
+        this.setBoundingBox(this.calculateBoundingBox());
+
+        if(!initialGraity) {
+            // Adjust position to avoid suffocation in blocks when changing gravity
+            EntityDimensions dimensions = this.getDimensions(this.getPose());
+            Direction relativeDirection = RotationUtil.dirWorldToPlayer(gravityDirection, prevGravityDirection);
+            Vec3d relativePosOffset = switch(relativeDirection) {
+                case DOWN -> Vec3d.ZERO;
+                case UP -> new Vec3d(0.0D, dimensions.height - 1.0E-6D, 0.0D);
+                default -> Vec3d.of(relativeDirection.getVector()).multiply(dimensions.width / 2 - (gravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D)).add(0.0D, dimensions.width / 2 - (prevGravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D), 0.0D);
+            };
+            this.setPosition(this.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, prevGravityDirection)));
+
+            if((Object) this instanceof ServerPlayerEntity serverPlayerEntity) {
+                serverPlayerEntity.networkHandler.syncWithPlayerPosition();
+            }
+
+            // Keep world velocity when changing gravity
+            this.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(this.getVelocity(), prevGravityDirection), gravityDirection));
+
+            // Keep world looking direction when changing gravity
+            if(this.world.isClient && (Object) this instanceof ClientPlayerEntity && GravityChangerMod.config.keepWorldLook) {
+                Vec2f worldAngles = RotationUtil.rotPlayerToWorld(this.getYaw(), this.getPitch(), prevGravityDirection);
+                Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, gravityDirection);
+                this.setYaw(newViewAngles.x);
+                this.setPitch(newViewAngles.y);
+            }
+        }
+    }
+
+    @Override
+    public Direction gravitychanger$getTrackedGravityDirection() {
         return this.getDataTracker().get(gravitychanger$GRAVITY_DIRECTION);
     }
 
     @Override
-    public void gravitychanger$setGravityDirection(Direction gravityDirection) {
+    public void gravitychanger$setTrackedGravityDirection(Direction gravityDirection) {
         this.getDataTracker().set(gravitychanger$GRAVITY_DIRECTION, gravityDirection);
     }
 
     @Override
     public void gravitychanger$onTrackedData(TrackedData<?> data) {
+        if(!this.world.isClient) return;
+
         if(gravitychanger$GRAVITY_DIRECTION.equals(data)) {
-            Direction newGravityDirection = this.gravitychanger$getGravityDirection();
-            if(this.gravitychanger$prevGravityDirection != newGravityDirection) {
-                gravitychanger$onGravityChanged(newGravityDirection);
+            Direction gravityDirection = this.gravitychanger$getGravityDirection();
+            if(this.gravitychanger$prevGravityDirection != gravityDirection) {
+                this.gravitychanger$onGravityChanged(this.gravitychanger$prevGravityDirection, true);
+                this.gravitychanger$prevGravityDirection = gravityDirection;
             }
         }
-    }
-
-    private void gravitychanger$onGravityChanged(Direction newGravityDirection) {
-        Direction currentGravityDirection = this.gravitychanger$prevGravityDirection == null ? Direction.DOWN : this.gravitychanger$prevGravityDirection;
-
-        this.fallDistance = 0;
-
-        // Adjust position to avoid suffocation in blocks when changing gravity
-        if(this.gravitychanger$prevGravityDirection != null) {
-            EntityDimensions dimensions = this.getDimensions(this.getPose());
-            Direction relativeDirection = RotationUtil.dirWorldToPlayer(newGravityDirection, currentGravityDirection);
-            Vec3d relativePosOffset = switch(relativeDirection) {
-                case DOWN -> Vec3d.ZERO;
-                case UP -> new Vec3d(0.0D, dimensions.height - 1.0E-6D, 0.0D);
-                default -> Vec3d.of(relativeDirection.getVector()).multiply(dimensions.width / 2 - (newGravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D)).add(0.0D, dimensions.width / 2 - (currentGravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D), 0.0D);
-            };
-            this.setPosition(this.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, currentGravityDirection)));
-
-            if((Object) this instanceof ServerPlayerEntity serverPlayerEntity) {
-                serverPlayerEntity.networkHandler.syncWithPlayerPosition();
-            }
-        }
-
-        this.setBoundingBox(this.calculateBoundingBox());
-
-        // Keep world looking direction when changing gravity
-        if(this.gravitychanger$prevGravityDirection != null && this.world.isClient && (Object) this instanceof ClientPlayerEntity && GravityChangerMod.config.keepWorldLook) {
-            Vec2f worldAngles = RotationUtil.rotPlayerToWorld(this.getYaw(), this.getPitch(), currentGravityDirection);
-            Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, newGravityDirection);
-            this.setYaw(newViewAngles.x);
-            this.setPitch(newViewAngles.y);
-        }
-
-        // Keep world velocity when changing gravity
-        if(this.gravitychanger$prevGravityDirection != null) {
-            this.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(this.getVelocity(), currentGravityDirection), newGravityDirection));
-        }
-
-        this.gravitychanger$prevGravityDirection = newGravityDirection;
     }
 
     @Inject(
@@ -134,10 +132,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
     private void inject_readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
         if(nbt.contains("GravityDirection", NbtElement.INT_TYPE)) {
             Direction gravityDirection = Direction.byId(nbt.getInt("GravityDirection"));
-            this.gravitychanger$setGravityDirection(gravityDirection);
-            if(gravityDirection == Direction.DOWN) {
-                this.gravitychanger$onGravityChanged(gravityDirection);
-            }
+            this.gravitychanger$setGravityDirection(gravityDirection, true);
         }
     }
 
@@ -155,12 +150,6 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
             cancellable = true
     )
     public void inject_travel(Vec3d movementInput, CallbackInfo ci) {
-        // Do not move until gravity is synced
-        if(this.gravitychanger$prevGravityDirection == null) {
-            ci.cancel();
-            return;
-        }
-
         Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) return;
 

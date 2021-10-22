@@ -26,6 +26,7 @@
     "PiglinEntityMixin",
     "PillagerEntityMixin",
     "PlayerEntityMixin",
+    "PlayerManagerMixin",
     "PointedDripstoneBlockMixin",
     "ProjectileEntityMixin",
     "RamImpactTaskMixin",
@@ -47,6 +48,7 @@
     "client.GameRendererMixin",
     "client.InGameOverlayRendererMixin",
     "client.ItemPickupParticleMixin",
+    "client.OtherClientPlayerEntityMixin",
     "client.PlayerEntityRendererMixin"
   ],
   "injectors": {

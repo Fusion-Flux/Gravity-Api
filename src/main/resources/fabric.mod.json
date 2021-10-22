@@ -20,6 +20,9 @@
     "main": [
       "me.andrew.gravitychanger.GravityChangerMod"
     ],
+    "client": [
+      "me.andrew.gravitychanger.ClientInit"
+    ],
     "modmenu": [
       "me.andrew.gravitychanger.ModMenuIntegration"
     ]
