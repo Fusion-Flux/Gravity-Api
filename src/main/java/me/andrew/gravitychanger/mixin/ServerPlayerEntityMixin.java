@@ -94,4 +94,16 @@ public abstract class ServerPlayerEntityMixin implements RotatableEntityAccessor
             this.gravitychanger$sendGravityPacket(gravityDirection, true);
         }
     }
+
+    @Inject(
+            method = "copyFrom",
+            at = @At("TAIL")
+    )
+    private void inject_copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
+        if(GravityChangerMod.config.resetGravityOnRespawn) {
+            ((RotatableEntityAccessor) oldPlayer).gravitychanger$setGravityDirection(Direction.DOWN, true);
+        } else {
+            this.gravitychanger$setGravityDirection(((RotatableEntityAccessor) oldPlayer).gravitychanger$getGravityDirection(), true);
+        }
+    }
 }
