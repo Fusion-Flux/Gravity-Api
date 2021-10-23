@@ -4,7 +4,6 @@ import me.andrew.gravitychanger.GravityChangerMod;
 import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;

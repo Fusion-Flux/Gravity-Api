@@ -44,6 +44,7 @@
     "client.ClientPlayerEntityMixin",
     "client.ClientPlayNetworkHandlerMixin",
     "client.EntityRenderDispatcherMixin",
+    "client.EntityRenderMixin",
     "client.FishingBobberEntityRendererMixin",
     "client.GameRendererMixin",
     "client.InGameOverlayRendererMixin",

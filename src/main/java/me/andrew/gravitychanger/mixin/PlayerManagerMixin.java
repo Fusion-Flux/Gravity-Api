@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(PlayerManager.class)
 public abstract class PlayerManagerMixin {
@@ -23,7 +22,7 @@ public abstract class PlayerManagerMixin {
                     shift = At.Shift.AFTER
             )
     )
-    private void inject_onPlayerConnect_sendPacket_1(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
+    private void inject_onPlayerConnect_sendPacket_0(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
         ((ServerPlayerEntityAccessor) player).gravitychanger$sendGravityPacket(((RotatableEntityAccessor) player).gravitychanger$getGravityDirection(), true);
     }
 
