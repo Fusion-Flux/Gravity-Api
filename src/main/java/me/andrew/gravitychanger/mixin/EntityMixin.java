@@ -1,5 +1,6 @@
 package me.andrew.gravitychanger.mixin;
 
+import me.andrew.gravitychanger.GravityChangerMod;
 import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
@@ -170,6 +171,8 @@ public abstract class EntityMixin implements EntityAccessor {
     @Shadow public abstract boolean isConnectedThroughVehicle(Entity entity);
 
     @Shadow public abstract void addVelocity(double deltaX, double deltaY, double deltaZ);
+
+    @Shadow protected abstract void tickInVoid();
 
     @Override
     public Direction gravitychanger$getAppliedGravityDirection() {
@@ -720,6 +723,16 @@ public abstract class EntityMixin implements EntityAccessor {
                     }
                 }
             }
+        }
+    }
+
+    @Inject(
+            method = "attemptTickInVoid",
+            at = @At("HEAD")
+    )
+    private void inject_attemptTickInVoid(CallbackInfo ci) {
+        if (GravityChangerMod.config.voidDamageAboveWorld && this.getY() > (double)(this.world.getTopY() + 256)) {
+            this.tickInVoid();
         }
     }
 }

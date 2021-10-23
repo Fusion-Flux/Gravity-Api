@@ -30,4 +30,9 @@ public class GravityChangerConfig implements ConfigData {
             count = 2
     )
     public boolean resetGravityOnRespawn = true;
+
+    @ConfigEntry.Gui.Tooltip(
+            count = 2
+    )
+    public boolean voidDamageAboveWorld = true;
 }

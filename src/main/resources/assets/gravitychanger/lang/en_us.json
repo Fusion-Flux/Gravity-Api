@@ -19,5 +19,8 @@
   "text.autoconfig.gravitychanger.option.resetGravityOnDimensionChange.@Tooltip[1]": "to DOWN every time you change dimension",
   "text.autoconfig.gravitychanger.option.resetGravityOnRespawn": "Reset Gravity On Respawn",
   "text.autoconfig.gravitychanger.option.resetGravityOnRespawn.@Tooltip[0]": "Makes it so that your gravity is reset",
-  "text.autoconfig.gravitychanger.option.resetGravityOnRespawn.@Tooltip[1]": "to DOWN every time you respawn"
+  "text.autoconfig.gravitychanger.option.resetGravityOnRespawn.@Tooltip[1]": "to DOWN every time you respawn",
+  "text.autoconfig.gravitychanger.option.voidDamageAboveWorld": "Void Damage Above World",
+  "text.autoconfig.gravitychanger.option.voidDamageAboveWorld.@Tooltip[0]": "Makes it so that you start taking void damage",
+  "text.autoconfig.gravitychanger.option.voidDamageAboveWorld.@Tooltip[1]": "if you are above y = max_world_height + 256"
 }
