@@ -13,6 +13,12 @@ This mod can also be used as an api to let other mods change player gravity.
 ## Optional Dependencies
 [Mod Menu]()
 
+## Config
+This mod has a config located in `.minecraft/config/gravitychanger.json`. You can edit it manually or in game using modmenu.  
+The config has 2 categories: `Client` and `Server`.  
+`Client` category contains options that only take effect on the client and need to be set on the client.  
+`Server` category contains options that only take effect on the server and need to be set in the server config. If you are playing in singleplayer your server uses the same config as your client and you can change it from modmenu. If you are playing on a server the server config is not updated when you change it on your client, it can only be edited using the server config file.
+
 ## Importing
 First clone this repo and run `gradlew build`.  
 Copy the resulting dev jar from `build/libs/` into `libs/` inside your project.  
