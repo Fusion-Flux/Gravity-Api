@@ -7,11 +7,11 @@ These items are currently uncraftable and can be found in the tools tab of creat
 This mod can also be used as an api to let other mods change player gravity.
 
 ## Required Dependencies
-[Fabric Api]()  
-[Cloth Config]()
+[Fabric Api](https://github.com/FabricMC/fabric)  
+[Cloth Config](https://github.com/shedaniel/cloth-config)
 
 ## Optional Dependencies
-[Mod Menu]()
+[Mod Menu](https://github.com/TerraformersMC/ModMenu)
 
 ## Config
 This mod has a config located in `.minecraft/config/gravitychanger.json`. You can edit it manually or in game using modmenu.  
