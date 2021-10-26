@@ -6,6 +6,18 @@
   "item.gravitychanger.gravity_changer_west": "West Gravity Changer",
   "item.gravitychanger.gravity_changer_east": "East Gravity Changer",
 
+  "direction.down": "Down",
+  "direction.up": "Up",
+  "direction.north": "North",
+  "direction.south": "South",
+  "direction.west": "West",
+  "direction.east": "East",
+
+  "commands.gravity.get.self": "Your gravity is %s",
+  "commands.gravity.get.other": "%s's gravity is %s",
+  "commands.gravity.set.self": "Set own gravity to %s",
+  "commands.gravity.set.other": "Set %s's gravity to %s",
+
   "text.autoconfig.gravitychanger.title": "GravityChanger Config",
 
   "text.autoconfig.gravitychanger.option.client.@PrefixText": "Client",
