@@ -286,136 +286,72 @@ public abstract class EntityMixin implements EntityAccessor {
         cir.setReturnValue(this.world.isPosLoaded(this.getBlockX(), this.getBlockZ()) ? this.world.getBrightness(new BlockPos(this.getEyePos())) : 0.0F);
     }
 
-    @Inject(
+    @ModifyVariable(
             method = "move",
             at = @At("HEAD"),
-            cancellable = true
+            ordinal = 0
     )
-    private void inject_move(MovementType movementType, Vec3d playerMovement, CallbackInfo ci) {
+    private Vec3d modify_move_Vec3d_0_0(Vec3d vec3d) {
         Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) return;
-
-        ci.cancel();
-
-        Vec3d movement = RotationUtil.vecPlayerToWorld(playerMovement, gravityDirection);
-        if (this.noClip) {
-            this.setPosition(this.getX() + movement.x, this.getY() + movement.y, this.getZ() + movement.z);
-        } else {
-            this.wasOnFire = this.isOnFire();
-            if (movementType == MovementType.PISTON) {
-                movement = this.adjustMovementForPiston(movement);
-                if (movement.equals(Vec3d.ZERO)) {
-                    return;
-                }
-            }
-
-            this.world.getProfiler().push("move");
-            if (this.movementMultiplier.lengthSquared() > 1.0E-7D) {
-                movement = movement.multiply(RotationUtil.maskPlayerToWorld(this.movementMultiplier, gravityDirection));
-                this.movementMultiplier = Vec3d.ZERO;
-                this.setVelocity(Vec3d.ZERO);
-            }
-
-            movement = this.adjustMovementForSneaking(movement, movementType);
-            Vec3d adjustedMovement = this.adjustMovementForCollisions(movement);
-            if (adjustedMovement.lengthSquared() > 1.0E-7D) {
-                this.setPosition(this.getX() + adjustedMovement.x, this.getY() + adjustedMovement.y, this.getZ() + adjustedMovement.z);
-            }
-
-            this.world.getProfiler().pop();
-            this.world.getProfiler().push("rest");
-            playerMovement = RotationUtil.vecWorldToPlayer(movement, gravityDirection);
-            Vec3d playerAdjustedMovement = RotationUtil.vecWorldToPlayer(adjustedMovement, gravityDirection);
-            this.horizontalCollision = !MathHelper.approximatelyEquals(playerMovement.x, playerAdjustedMovement.x) || !MathHelper.approximatelyEquals(playerMovement.z, playerAdjustedMovement.z);
-            this.verticalCollision = playerMovement.y != playerAdjustedMovement.y;
-            this.onGround = this.verticalCollision && playerMovement.y < 0.0D;
-            BlockPos blockPos = this.getLandingPos();
-            BlockState blockState = this.world.getBlockState(blockPos);
-            this.fall(playerAdjustedMovement.y, this.onGround, blockState, blockPos);
-            if (this.isRemoved()) {
-                this.world.getProfiler().pop();
-            } else {
-                Vec3d playerVelocity = this.getVelocity();
-                if (playerMovement.x != playerAdjustedMovement.x) {
-                    this.setVelocity(0.0D, playerVelocity.y, playerVelocity.z);
-                }
-
-                if (playerMovement.z != playerAdjustedMovement.z) {
-                    this.setVelocity(playerVelocity.x, playerVelocity.y, 0.0D);
-                }
-
-                Block block = blockState.getBlock();
-                if (playerMovement.y != playerAdjustedMovement.y) {
-                    block.onEntityLand(this.world, (Entity)(Object) this);
-                }
-
-                if (this.onGround && !this.bypassesSteppingEffects()) {
-                    block.onSteppedOn(this.world, blockPos, blockState, (Entity)(Object) this);
-                }
-
-                Entity.MoveEffect moveEffect = this.getMoveEffect();
-                if (moveEffect.hasAny() && !this.hasVehicle()) {
-                    double playerAdjustedMovementX = playerAdjustedMovement.x;
-                    double playerAdjustedMovementY = playerAdjustedMovement.y;
-                    double playerAdjustedMovementZ = playerAdjustedMovement.z;
-                    this.field_28627 = (float)((double)this.field_28627 + playerAdjustedMovement.length() * 0.6D);
-                    if (!blockState.isIn(BlockTags.CLIMBABLE) && !blockState.isOf(Blocks.POWDER_SNOW)) {
-                        playerAdjustedMovementY = 0.0D;
-                    }
-
-                    this.horizontalSpeed += (float) playerAdjustedMovement.horizontalLength() * 0.6F;
-                    this.distanceTraveled += (float)Math.sqrt(playerAdjustedMovementX * playerAdjustedMovementX + playerAdjustedMovementY * playerAdjustedMovementY + playerAdjustedMovementZ * playerAdjustedMovementZ) * 0.6F;
-                    if (this.distanceTraveled > this.nextStepSoundDistance && !blockState.isAir()) {
-                        this.nextStepSoundDistance = this.calculateNextStepSoundDistance();
-                        if (this.isTouchingWater()) {
-                            if (moveEffect.playsSounds()) {
-                                Entity primaryPassenger = this.hasPassengers() && this.getPrimaryPassenger() != null ? this.getPrimaryPassenger() : (Entity)(Object) this;
-                                float volumeMultiplier = primaryPassenger == (Object) this ? 0.35F : 0.4F;
-                                Vec3d primaryPassengerVelocity = primaryPassenger.getVelocity();
-                                float volume = Math.min(1.0F, (float)Math.sqrt(primaryPassengerVelocity.x * primaryPassengerVelocity.x * 0.20000000298023224D + primaryPassengerVelocity.y * primaryPassengerVelocity.y + primaryPassengerVelocity.z * primaryPassengerVelocity.z * 0.20000000298023224D) * volumeMultiplier);
-                                this.playSwimSound(volume);
-                            }
-
-                            if (moveEffect.emitsGameEvents()) {
-                                this.emitGameEvent(GameEvent.SWIM);
-                            }
-                        } else {
-                            if (moveEffect.playsSounds()) {
-                                this.playAmethystChimeSound(blockState);
-                                this.playStepSound(blockPos, blockState);
-                            }
-
-                            if (moveEffect.emitsGameEvents() && !blockState.isIn(BlockTags.OCCLUDES_VIBRATION_SIGNALS)) {
-                                this.emitGameEvent(GameEvent.STEP);
-                            }
-                        }
-                    } else if (blockState.isAir()) {
-                        this.addAirTravelEffects();
-                    }
-                }
-
-                this.tryCheckBlockCollision();
-                float velocityMultiplier = this.getVelocityMultiplier();
-                this.setVelocity(this.getVelocity().multiply(velocityMultiplier, 1.0D, velocityMultiplier));
-                if (this.world.getStatesInBoxIfLoaded(this.getBoundingBox().contract(1.0E-6D)).noneMatch((state) -> {
-                    return state.isIn(BlockTags.FIRE) || state.isOf(Blocks.LAVA);
-                })) {
-                    if (this.fireTicks <= 0) {
-                        this.setFireTicks(-this.getBurningDuration());
-                    }
-
-                    if (this.wasOnFire && (this.inPowderSnow || this.isWet())) {
-                        this.playExtinguishSound();
-                    }
-                }
-
-                if (this.isOnFire() && (this.inPowderSnow || this.isWet())) {
-                    this.setFireTicks(-this.getBurningDuration());
-                }
-
-                this.world.getProfiler().pop();
-            }
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
         }
+
+        return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
+    }
+
+    @ModifyArg(
+            method = "move",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/Vec3d;multiply(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
+                    ordinal = 0
+            ),
+            index = 0
+    )
+    private Vec3d modify_move_multiply_0(Vec3d vec3d) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
+
+        return RotationUtil.maskPlayerToWorld(vec3d, gravityDirection);
+    }
+
+    @ModifyVariable(
+            method = "move",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/profiler/Profiler;pop()V",
+                    ordinal = 0
+            ),
+            ordinal = 0
+    )
+    private Vec3d modify_move_Vec3d_0_1(Vec3d vec3d) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
+
+        return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
+    }
+
+    @ModifyVariable(
+            method = "move",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/profiler/Profiler;pop()V",
+                    ordinal = 0
+            ),
+            ordinal = 1
+    )
+    private Vec3d modify_move_Vec3d_1(Vec3d vec3d) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
+
+        return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }
 
     @Inject(
