@@ -4,17 +4,17 @@ import me.andrew.gravitychanger.GravityChangerMod;
 import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
-import net.minecraft.block.*;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.MovementType;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.collection.ReusableStream;
@@ -23,7 +23,6 @@ import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
-import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -70,91 +69,15 @@ public abstract class EntityMixin implements EntityAccessor {
 
     @Shadow @Nullable protected Tag<Fluid> submergedFluidTag;
 
-    @Shadow private static Vec3d movementInputToVelocity(Vec3d movementInput, float speed, float yaw) { return  null; };
-
-    @Shadow public abstract EntityDimensions getDimensions(EntityPose pose);
-
     @Shadow public boolean noClip;
-
-    @Shadow public abstract void setPosition(double x, double y, double z);
-
-    @Shadow public boolean wasOnFire;
-
-    @Shadow public abstract boolean isOnFire();
-
-    @Shadow protected abstract Vec3d adjustMovementForPiston(Vec3d movement);
-
-    @Shadow protected Vec3d movementMultiplier;
-
-    @Shadow public abstract void setVelocity(Vec3d velocity);
-
-    @Shadow protected abstract Vec3d adjustMovementForSneaking(Vec3d movement, MovementType type);
-
-    @Shadow protected abstract Vec3d adjustMovementForCollisions(Vec3d movement);
-
-    @Shadow public boolean horizontalCollision;
-
-    @Shadow public boolean verticalCollision;
 
     @Shadow protected boolean onGround;
 
-    @Shadow public abstract BlockPos getLandingPos();
-
-    @Shadow protected abstract void fall(double heightDifference, boolean onGround, BlockState landedState, BlockPos landedPosition);
-
-    @Shadow public abstract boolean isRemoved();
-
     @Shadow public abstract Vec3d getVelocity();
-
-    @Shadow public abstract boolean bypassesSteppingEffects();
-
-    @Shadow protected abstract Entity.MoveEffect getMoveEffect();
-
-    @Shadow public abstract boolean hasVehicle();
-
-    @Shadow public float field_28627;
-
-    @Shadow public float horizontalSpeed;
-
-    @Shadow public float distanceTraveled;
-
-    @Shadow private float nextStepSoundDistance;
-
-    @Shadow protected abstract float calculateNextStepSoundDistance();
-
-    @Shadow public abstract boolean isTouchingWater();
 
     @Shadow public abstract boolean hasPassengers();
 
-    @Shadow @Nullable public abstract Entity getPrimaryPassenger();
-
-    @Shadow protected abstract void playSwimSound(float volume);
-
-    @Shadow public abstract void emitGameEvent(GameEvent event);
-
-    @Shadow protected abstract void playAmethystChimeSound(BlockState state);
-
-    @Shadow protected abstract void playStepSound(BlockPos pos, BlockState state);
-
-    @Shadow protected abstract void addAirTravelEffects();
-
-    @Shadow protected abstract void tryCheckBlockCollision();
-
-    @Shadow protected abstract float getVelocityMultiplier();
-
     @Shadow public abstract Box getBoundingBox();
-
-    @Shadow private int fireTicks;
-
-    @Shadow public abstract void setFireTicks(int ticks);
-
-    @Shadow protected abstract int getBurningDuration();
-
-    @Shadow public boolean inPowderSnow;
-
-    @Shadow public abstract boolean isWet();
-
-    @Shadow protected abstract void playExtinguishSound();
 
     @Shadow public float stepHeight;
 
@@ -165,8 +88,6 @@ public abstract class EntityMixin implements EntityAccessor {
     @Shadow public abstract Vec3d getPos();
 
     @Shadow @Final protected Random random;
-
-    @Shadow public abstract void setVelocity(double x, double y, double z);
 
     @Shadow public abstract boolean isConnectedThroughVehicle(Entity entity);
 
