@@ -6,9 +6,11 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -102,5 +104,23 @@ public abstract class ServerPlayNetworkHandlerMixin {
         }
 
         return gravitychanger$onPlayerMove_playerMovementY;
+    }
+
+    @ModifyArg(
+            method = "onPlayerMove",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/server/network/ServerPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V",
+                    ordinal = 0
+            ),
+            index = 1
+    )
+    private Vec3d modify_onPlayerMove_move_0(Vec3d vec3d) {
+        Direction gravityDirection = ((EntityAccessor) this.player).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
+
+        return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }
 }

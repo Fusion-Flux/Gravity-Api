@@ -291,12 +291,13 @@ public abstract class EntityMixin implements EntityAccessor {
             at = @At("HEAD"),
             cancellable = true
     )
-    private void inject_move(MovementType movementType, Vec3d movement, CallbackInfo ci) {
+    private void inject_move(MovementType movementType, Vec3d playerMovement, CallbackInfo ci) {
         Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) return;
 
         ci.cancel();
 
+        Vec3d movement = RotationUtil.vecPlayerToWorld(playerMovement, gravityDirection);
         if (this.noClip) {
             this.setPosition(this.getX() + movement.x, this.getY() + movement.y, this.getZ() + movement.z);
         } else {
@@ -323,7 +324,7 @@ public abstract class EntityMixin implements EntityAccessor {
 
             this.world.getProfiler().pop();
             this.world.getProfiler().push("rest");
-            Vec3d playerMovement = RotationUtil.vecWorldToPlayer(movement, gravityDirection);
+            playerMovement = RotationUtil.vecWorldToPlayer(movement, gravityDirection);
             Vec3d playerAdjustedMovement = RotationUtil.vecWorldToPlayer(adjustedMovement, gravityDirection);
             this.horizontalCollision = !MathHelper.approximatelyEquals(playerMovement.x, playerAdjustedMovement.x) || !MathHelper.approximatelyEquals(playerMovement.z, playerAdjustedMovement.z);
             this.verticalCollision = playerMovement.y != playerAdjustedMovement.y;

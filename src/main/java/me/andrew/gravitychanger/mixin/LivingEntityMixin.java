@@ -108,7 +108,7 @@ public abstract class LivingEntityMixin extends Entity {
                 }
 
                 this.updateVelocity(movementSpeed, movementInput);
-                this.move(MovementType.SELF, RotationUtil.vecPlayerToWorld(this.getVelocity(), gravityDirection));
+                this.move(MovementType.SELF, this.getVelocity());
                 Vec3d playerVelocity = this.getVelocity();
                 if (this.horizontalCollision && this.isClimbing()) {
                     playerVelocity = new Vec3d(playerVelocity.x, 0.2D, playerVelocity.z);
@@ -124,7 +124,7 @@ public abstract class LivingEntityMixin extends Entity {
             } else if (this.isInLava() && this.shouldSwimInFluids() && !this.canWalkOnFluid(fluidState.getFluid())) {
                 playerY = RotationUtil.vecWorldToPlayer(this.getPos(), gravityDirection).y;
                 this.updateVelocity(0.02F, movementInput);
-                this.move(MovementType.SELF, RotationUtil.vecPlayerToWorld(this.getVelocity(), gravityDirection));
+                this.move(MovementType.SELF, this.getVelocity());
                 Vec3d playerVelocity;
                 if (this.getFluidHeight(FluidTags.LAVA) <= this.getSwimHeight()) {
                     this.setVelocity(this.getVelocity().multiply(0.5D, 0.800000011920929D, 0.5D));
@@ -173,7 +173,7 @@ public abstract class LivingEntityMixin extends Entity {
                 }
 
                 this.setVelocity(playerVelocity.multiply(0.9900000095367432D, 0.9800000190734863D, 0.9900000095367432D));
-                this.move(MovementType.SELF, RotationUtil.vecPlayerToWorld(this.getVelocity(), gravityDirection));
+                this.move(MovementType.SELF, this.getVelocity());
                 if (this.horizontalCollision && !this.world.isClient) {
                     playerHorizontalVelocityLength1 = this.getVelocity().horizontalLength();
                     double horizontalVelocityDelta = playerHorizontalVelocityLength - playerHorizontalVelocityLength1;
@@ -215,24 +215,6 @@ public abstract class LivingEntityMixin extends Entity {
         }
 
         this.updateLimbs((LivingEntity)(Object) this, this instanceof Flutterer);
-    }
-
-    @ModifyArg(
-            method = "method_26318",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V",
-                    ordinal = 0
-            ),
-            index = 1
-    )
-    private Vec3d modify_method_26318_move_1(Vec3d vec3d) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
-            return vec3d;
-        }
-
-        return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
     }
 
     @ModifyArg(
