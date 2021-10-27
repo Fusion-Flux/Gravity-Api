@@ -19,10 +19,7 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
@@ -30,8 +27,6 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements EntityAccessor, RotatableEntityAccessor {
     @Shadow @Final private PlayerAbilities abilities;
-
-    @Shadow public abstract void increaseTravelMotionStats(double dx, double dy, double dz);
 
     @Shadow public abstract EntityDimensions getDimensions(EntityPose pose);
 
@@ -143,45 +138,38 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
         nbt.putInt("GravityDirection", this.gravitychanger$getGravityDirection().getId());
     }
 
-    @Inject(
+    @Redirect(
             method = "travel",
-            at = @At("HEAD"),
-            cancellable = true
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/player/PlayerEntity;getRotationVector()Lnet/minecraft/util/math/Vec3d;",
+                    ordinal = 0
+            )
     )
-    public void inject_travel(Vec3d movementInput, CallbackInfo ci) {
+    private Vec3d redirect_travel_getRotationVector_0(PlayerEntity playerEntity) {
+        Direction gravityDirection = ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return playerEntity.getRotationVector();
+        }
+
+        return RotationUtil.vecWorldToPlayer(playerEntity.getRotationVector(), gravityDirection);
+    }
+
+    @Redirect(
+            method = "travel",
+            at = @At(
+                    value = "NEW",
+                    target = "(DDD)Lnet/minecraft/util/math/BlockPos;",
+                    ordinal = 0
+            )
+    )
+    private BlockPos redirect_travel_new_0(double x, double y, double z) {
         Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) return;
-
-        ci.cancel();
-
-        double xBefore = this.getX();
-        double yBefore = this.getY();
-        double zBefore = this.getZ();
-        double i;
-        if (this.isSwimming() && !this.hasVehicle()) {
-            i = RotationUtil.vecWorldToPlayer(this.getRotationVector(), gravityDirection).y;
-            double swimVelocityMultiplier = i < -0.2D ? 0.085D : 0.06D;
-            if (i <= 0.0D || this.jumping || !this.world.getBlockState(new BlockPos(RotationUtil.vecPlayerToWorld(RotationUtil.vecWorldToPlayer(this.getPos(), gravityDirection).add(0.0D, 1.0D - 0.1D, 0.0D), gravityDirection))).getFluidState().isEmpty()) {
-                Vec3d playerVelocity = this.getVelocity();
-                this.setVelocity(playerVelocity.add(0.0D, (i - playerVelocity.y) * swimVelocityMultiplier, 0.0D));
-            }
+        if(gravityDirection == Direction.DOWN) {
+            return new BlockPos(x, y, z);
         }
 
-        if (this.abilities.flying && !this.hasVehicle()) {
-            i = this.getVelocity().y;
-            float flyingSpeed = this.flyingSpeed;
-            this.flyingSpeed = this.abilities.getFlySpeed() * (float)(this.isSprinting() ? 2 : 1);
-            super.travel(movementInput);
-            Vec3d playerVelocity = this.getVelocity();
-            this.setVelocity(playerVelocity.x, i * 0.6D, playerVelocity.z);
-            this.flyingSpeed = flyingSpeed;
-            this.fallDistance = 0.0F;
-            this.setFlag(Entity.FALL_FLYING_FLAG_INDEX, false);
-        } else {
-            super.travel(movementInput);
-        }
-
-        this.increaseTravelMotionStats(this.getX() - xBefore, this.getY() - yBefore, this.getZ() - zBefore);
+        return new BlockPos(this.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, 1.0D - 0.1D, 0.0D, gravityDirection)));
     }
 
     @Redirect(
