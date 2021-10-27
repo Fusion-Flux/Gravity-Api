@@ -71,17 +71,11 @@ public abstract class EntityMixin implements EntityAccessor {
 
     @Shadow public boolean noClip;
 
-    @Shadow protected boolean onGround;
-
     @Shadow public abstract Vec3d getVelocity();
 
     @Shadow public abstract boolean hasPassengers();
 
     @Shadow public abstract Box getBoundingBox();
-
-    @Shadow public float stepHeight;
-
-    @Shadow public static Vec3d adjustMovementForCollisions(@Nullable Entity entity, Vec3d movement, Box entityBoundingBox, World world, ShapeContext context, ReusableStream<VoxelShape> collisions) { return null; };
 
     @Shadow public static Vec3d adjustMovementForCollisions(Vec3d movement, Box entityBoundingBox, ReusableStream<VoxelShape> collisions) { return null; };
 
@@ -298,46 +292,117 @@ public abstract class EntityMixin implements EntityAccessor {
         cir.setReturnValue(blockPos);
     }
 
+    @ModifyVariable(
+            method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
+            at = @At(
+                    value = "INVOKE_ASSIGN",
+                    target = "Lnet/minecraft/world/World;getEntityCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Box;Ljava/util/function/Predicate;)Ljava/util/stream/Stream;",
+                    ordinal = 0
+            ),
+            ordinal = 0
+    )
+    private Vec3d modify_adjustMovementForCollisions_Vec3d_0(Vec3d vec3d) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
+
+        return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
+    }
+
     @Inject(
             method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
-            at = @At("HEAD"),
+            at = @At("RETURN"),
             cancellable = true
     )
-    private void adjustMovementForCollisions(Vec3d movement, CallbackInfoReturnable<Vec3d> cir) {
+    private void inject_adjustMovementForCollisions(CallbackInfoReturnable<Vec3d> cir) {
         Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) return;
 
-        Box box = this.getBoundingBox();
-        ShapeContext shapeContext = ShapeContext.of((Entity)(Object) this);
-        VoxelShape voxelShape = this.world.getWorldBorder().asVoxelShape();
-        Stream<VoxelShape> stream = VoxelShapes.matchesAnywhere(voxelShape, VoxelShapes.cuboid(box.contract(1.0E-7D)), BooleanBiFunction.AND) ? Stream.empty() : Stream.of(voxelShape);
-        Stream<VoxelShape> stream2 = this.world.getEntityCollisions((Entity)(Object) this, box.stretch(movement), (entity) -> {
-            return true;
-        });
-        ReusableStream<VoxelShape> reusableStream = new ReusableStream<>(Stream.concat(stream2, stream));
-        Vec3d playerAdjustedMovement = movement.lengthSquared() == 0.0D ? movement : RotationUtil.vecWorldToPlayer(adjustMovementForCollisions((Entity)(Object) this, movement, box, this.world, shapeContext, reusableStream), gravityDirection);
-        Vec3d playerMovement = RotationUtil.vecWorldToPlayer(movement, gravityDirection);
-        boolean collidedX = playerMovement.x != playerAdjustedMovement.x;
-        boolean collidedY = playerMovement.y != playerAdjustedMovement.y;
-        boolean collidedZ = playerMovement.z != playerAdjustedMovement.z;
-        boolean onGround = this.onGround || collidedY && playerMovement.y < 0.0D;
-        if (this.stepHeight > 0.0F && onGround && (collidedX || collidedZ)) {
-            Vec3d playerAdjustedStepMovement1 = RotationUtil.vecWorldToPlayer(adjustMovementForCollisions((Entity)(Object) this, RotationUtil.vecPlayerToWorld(playerMovement.x, (double)this.stepHeight, playerMovement.z, gravityDirection), box, this.world, shapeContext, reusableStream), gravityDirection);
-            Vec3d playerAdjustedStepMovement2 = RotationUtil.vecWorldToPlayer(adjustMovementForCollisions((Entity)(Object) this, RotationUtil.vecPlayerToWorld(0.0D, (double)this.stepHeight, 0.0D, gravityDirection), box.stretch(RotationUtil.vecPlayerToWorld(playerMovement.x, 0.0D, playerMovement.z, gravityDirection)), this.world, shapeContext, reusableStream), gravityDirection);
-            if (playerAdjustedStepMovement2.y < (double)this.stepHeight) {
-                Vec3d playerAdjustedStepMovement3 = RotationUtil.vecWorldToPlayer(adjustMovementForCollisions((Entity)(Object) this, RotationUtil.vecPlayerToWorld(new Vec3d(playerMovement.x, 0.0D, playerMovement.z), gravityDirection), box.offset(RotationUtil.vecPlayerToWorld(playerAdjustedStepMovement2, gravityDirection)), this.world, shapeContext, reusableStream), gravityDirection).add(playerAdjustedStepMovement2);
-                if (playerAdjustedStepMovement3.horizontalLengthSquared() > playerAdjustedStepMovement1.horizontalLengthSquared()) {
-                    playerAdjustedStepMovement1 = playerAdjustedStepMovement3;
-                }
-            }
+        cir.setReturnValue(RotationUtil.vecPlayerToWorld(cir.getReturnValue(), gravityDirection));
+    }
 
-            if (playerAdjustedStepMovement1.horizontalLengthSquared() > playerAdjustedMovement.horizontalLengthSquared()) {
-                cir.setReturnValue(RotationUtil.vecPlayerToWorld(playerAdjustedStepMovement1, gravityDirection).add(adjustMovementForCollisions((Entity)(Object) this, RotationUtil.vecPlayerToWorld(0.0D, -playerAdjustedStepMovement1.y + playerMovement.y, 0.0D, gravityDirection), box.offset(RotationUtil.vecPlayerToWorld(playerAdjustedStepMovement1, gravityDirection)), this.world, shapeContext, reusableStream)));
-                return;
-            }
+    @Redirect(
+            method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/Box;stretch(DDD)Lnet/minecraft/util/math/Box;",
+                    ordinal = 0
+            )
+    )
+    private Box redirect_adjustMovementForCollisions_stretch_0(Box box, double x, double y, double z) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return box.stretch(x, y, z);
         }
 
-        cir.setReturnValue(RotationUtil.vecPlayerToWorld(playerAdjustedMovement, gravityDirection));
+        return box.stretch(RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection));
+    }
+
+    @Redirect(
+            method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/Box;offset(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Box;",
+                    ordinal = 0
+            )
+    )
+    private Box redirect_adjustMovementForCollisions_offset_0(Box box, Vec3d vec3d) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return box.offset(vec3d);
+        }
+
+        return box.offset(RotationUtil.vecPlayerToWorld(vec3d, gravityDirection));
+    }
+
+    @Redirect(
+            method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/Box;offset(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Box;",
+                    ordinal = 1
+            )
+    )
+    private Box redirect_adjustMovementForCollisions_offset_1(Box box, Vec3d vec3d) {
+        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return box.offset(vec3d);
+        }
+
+        return box.offset(RotationUtil.vecPlayerToWorld(vec3d, gravityDirection));
+    }
+
+    @ModifyVariable(
+            method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Lnet/minecraft/block/ShapeContext;Lnet/minecraft/util/collection/ReusableStream;)Lnet/minecraft/util/math/Vec3d;",
+            at = @At("HEAD"),
+            ordinal = 0
+    )
+    private static Vec3d modify_adjustMovementForCollisions_Vec3d_0(Vec3d vec3d, @Nullable Entity entity, Vec3d movement, Box entityBoundingBox, World world, ShapeContext context, ReusableStream<VoxelShape> collisions) {
+        if(entity == null) {
+            return vec3d;
+        }
+
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
+
+        return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
+    }
+
+    @Inject(
+            method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Lnet/minecraft/block/ShapeContext;Lnet/minecraft/util/collection/ReusableStream;)Lnet/minecraft/util/math/Vec3d;",
+            at = @At("RETURN"),
+            cancellable = true
+    )
+    private static void inject_adjustMovementForCollisions(@Nullable Entity entity, Vec3d movement, Box entityBoundingBox, World world, ShapeContext context, ReusableStream<VoxelShape> collisions, CallbackInfoReturnable<Vec3d> cir) {
+        if(entity == null) return;
+
+        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
+
+        cir.setReturnValue(RotationUtil.vecWorldToPlayer(cir.getReturnValue(), gravityDirection));
     }
 
     @Redirect(
