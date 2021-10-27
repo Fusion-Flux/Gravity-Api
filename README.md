@@ -19,6 +19,12 @@ The config has 2 categories: `Client` and `Server`.
 `Client` category contains options that only take effect on the client and need to be set on the client.  
 `Server` category contains options that only take effect on the server and need to be set in the server config. If you are playing in singleplayer your server uses the same config as your client and you can change it from modmenu. If you are playing on a server the server config is not updated when you change it on your client, it can only be edited using the server config file.
 
+## Commands
+`/gravity get <player>` - gets player's gravity, returns direction index(0-5)  
+`/gravity set <direction> <players>` - sets gravity for selected players  
+`/gravity rotate <direction> <players>` - rotates gravity for selected players relative to their look direction  
+`/gravity randomise <players>` - randomises gravity for selected players
+
 ## Importing
 First clone this repo and run `gradlew build`.  
 Copy the resulting dev jar from `build/libs/` into `libs/` inside your project.  
