@@ -1,8 +1,8 @@
 package me.andrew.gravitychanger.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
-import me.andrew.gravitychanger.command.argument.EnumArgumentType;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
@@ -19,6 +19,32 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class GravityCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        LiteralArgumentBuilder<ServerCommandSource> literalSet = literal("set");
+        for(Direction direction : Direction.values()) {
+            literalSet.then(literal(direction.getName())
+                    .executes(context -> {
+                        return executeSet(context.getSource(), direction, Collections.singleton(context.getSource().getPlayer()));
+                    }).then(argument("players", EntityArgumentType.players())
+                            .executes(context -> {
+                                return executeSet(context.getSource(), direction, EntityArgumentType.getPlayers(context, "players"));
+                            })
+                    )
+            );
+        }
+
+        LiteralArgumentBuilder<ServerCommandSource> literalRotate = literal("rotate");
+        for(FacingDirection facingDirection : FacingDirection.values()) {
+            literalRotate.then(literal(facingDirection.getName())
+                    .executes(context -> {
+                        return executeRotate(context.getSource(), facingDirection, Collections.singleton(context.getSource().getPlayer()));
+                    }).then(argument("players", EntityArgumentType.players())
+                            .executes(context -> {
+                                return executeRotate(context.getSource(), facingDirection, EntityArgumentType.getPlayers(context, "players"));
+                            })
+                    )
+            );
+        }
+
         dispatcher.register(literal("gravity").requires(source -> source.hasPermissionLevel(2))
                 .then(literal("get")
                         .executes(context -> {
@@ -28,27 +54,9 @@ public class GravityCommand {
                                     return executeGet(context.getSource(), EntityArgumentType.getPlayer(context, "player"));
                                 })
                         )
-                ).then(literal("set")
-                        .then(argument("direction", EnumArgumentType.enumeration(Direction.class))
-                                .executes(context -> {
-                                    return executeSet(context.getSource(), EnumArgumentType.getEnumeration(context, "direction", Direction.class), Collections.singleton(context.getSource().getPlayer()));
-                                }).then(argument("players", EntityArgumentType.players())
-                                        .executes(context -> {
-                                            return executeSet(context.getSource(), EnumArgumentType.getEnumeration(context, "direction", Direction.class), EntityArgumentType.getPlayers(context, "players"));
-                                        })
-                                )
-                        )
-                ).then(literal("rotate")
-                        .then(argument("direction", EnumArgumentType.enumeration(FacingDirection.class))
-                                .executes(context -> {
-                                    return executeRotate(context.getSource(), EnumArgumentType.getEnumeration(context, "direction", FacingDirection.class).direction, Collections.singleton(context.getSource().getPlayer()));
-                                }).then(argument("players", EntityArgumentType.players())
-                                        .executes(context -> {
-                                            return executeRotate(context.getSource(), EnumArgumentType.getEnumeration(context, "direction", FacingDirection.class).direction, EntityArgumentType.getPlayers(context, "players"));
-                                        })
-                                )
-                        )
-                ).then(literal("randomise")
+                ).then(literalSet)
+                .then(literalRotate)
+                .then(literal("randomise")
                         .executes(context -> {
                             return executeRandomise(context.getSource(), Collections.singleton(context.getSource().getPlayer()));
                         }).then(argument("players", EntityArgumentType.players())
@@ -100,15 +108,16 @@ public class GravityCommand {
         }
     }
 
-    private static int executeRotate(ServerCommandSource source, Direction relativeDirection, Collection<ServerPlayerEntity> players) {
+    private static int executeRotate(ServerCommandSource source, FacingDirection relativeDirection, Collection<ServerPlayerEntity> players) {
         int i = 0;
 
         for(ServerPlayerEntity player : players) {
             RotatableEntityAccessor rotatableEntityAccessor = (RotatableEntityAccessor) player;
             Direction gravityDirection = rotatableEntityAccessor.gravitychanger$getGravityDirection();
             Direction combinedRelativeDirection = switch(relativeDirection) {
-                case DOWN, UP -> relativeDirection;
-                case NORTH, SOUTH, WEST, EAST -> Direction.fromHorizontal(relativeDirection.getHorizontal() + Direction.fromRotation(player.getYaw()).getHorizontal());
+                case DOWN -> Direction.DOWN;
+                case UP -> Direction.UP;
+                case FORWARD, BACKWARD, LEFT, RIGHT -> Direction.fromHorizontal(relativeDirection.getHorizontalOffset() + Direction.fromRotation(player.getYaw()).getHorizontal());
             };
             Direction newGravityDirection = RotationUtil.dirPlayerToWorld(combinedRelativeDirection, gravityDirection);
             rotatableEntityAccessor.gravitychanger$setGravityDirection(newGravityDirection, false);
@@ -136,17 +145,27 @@ public class GravityCommand {
     }
 
     public enum FacingDirection {
-        DOWN(Direction.DOWN),
-        UP(Direction.UP),
-        FORWARD(Direction.SOUTH),
-        BACKWARD(Direction.NORTH),
-        LEFT(Direction.EAST),
-        RIGHT(Direction.WEST);
+        DOWN(-1, "down"),
+        UP(-1, "up"),
+        FORWARD(0, "forward"),
+        BACKWARD(2, "backward"),
+        LEFT(3, "left"),
+        RIGHT(1, "right");
 
-        public final Direction direction;
+        private final int horizontalOffset;
+        private final String name;
 
-        FacingDirection(Direction direction) {
-            this.direction = direction;
+        FacingDirection(int horizontalOffset, String name) {
+            this.horizontalOffset = horizontalOffset;
+            this.name = name;
+        }
+
+        public int getHorizontalOffset() {
+            return this.horizontalOffset;
+        }
+
+        public String getName() {
+            return this.name;
         }
     }
 }
