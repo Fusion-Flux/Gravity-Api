@@ -26,32 +26,35 @@ The config has 2 categories: `Client` and `Server`.
 `/gravity randomise <players>` - randomises gravity for selected players
 
 ## Importing
-First clone this repo and run `gradlew build`.  
-Copy the resulting dev jar from `build/libs/` into `libs/` inside your project.  
-Then add the following to your project:
+To import the mod you can use modrinth maven.  
+Add the following to your project:
 #### grable.properties
 ```properties
-gravitychanger_version = 0.0.1-1.17.1
+gravitychanger_version = 0.2.0
 ```
-Replace 0.0.1-1.17.1 with the version of the jar you have in `libs/`.
+Replace 0.2.0 with the version you want to use from [here](https://modrinth.com/mod/gravitychanger/versions).
 #### build.gradle
 ```gradle
 repositories {
-    flatDir {
-        dirs "libs"
-    }
+    maven {
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
+		content {
+			includeGroup "maven.modrinth"
+		}
+	}
 }
 
 dependencies {
-    modImplementation ":GravityChanger-${project.gravitychanger_version}-dev"
+    modImplementation "maven.modrinth:gravitychanger:${project.gravitychanger_version}"
 }
 ```
 #### fabric.mod.json
 ```json
 "depends": {
-    "gravitychanger": "^0.0.1"
+    "gravitychanger": "^0.2.0"
 }
 ```
-Replace 0.0.1 with the lowest version you need
+Replace 0.2.0 with the lowest version of the mod your mod works with
 
 Now you should be able to cast a `PlayerEntity` instance into `RotatableEntityAccessor` and use it's methods `gravitychanger$getGravityDirection` and `gravitychanger$setGravityDirection` to get and set gravity for that player.
