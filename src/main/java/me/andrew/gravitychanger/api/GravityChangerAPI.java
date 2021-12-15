@@ -1,5 +1,6 @@
 package me.andrew.gravitychanger.api;
 
+import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,6 +28,6 @@ public abstract class GravityChangerAPI {
      * Returns eye position offset from feet position for the given player
      */
     public static Vec3d getEyeOffset(PlayerEntity playerEntity) {
-        return RotationUtil.vecPlayerToWorld(0, (double) playerEntity.getStandingEyeHeight(), 0, ((RotatableEntityAccessor) playerEntity).gravitychanger$getGravityDirection());
+        return RotationUtil.vecPlayerToWorld(0, (double) playerEntity.getStandingEyeHeight(), 0, ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection());
     }
 }
