@@ -53,14 +53,14 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
     }
 
     @Override
-    public void gravitychanger$onGravityChanged(Direction prevGravityDirection, boolean initialGraity) {
+    public void gravitychanger$onGravityChanged(Direction prevGravityDirection, boolean initialGravity) {
         Direction gravityDirection = this.gravitychanger$getGravityDirection();
 
         this.fallDistance = 0;
 
         this.setBoundingBox(this.calculateBoundingBox());
 
-        if(!initialGraity) {
+        if(!initialGravity) {
             // Adjust position to avoid suffocation in blocks when changing gravity
             EntityDimensions dimensions = this.getDimensions(this.getPose());
             Direction relativeDirection = RotationUtil.dirWorldToPlayer(gravityDirection, prevGravityDirection);
