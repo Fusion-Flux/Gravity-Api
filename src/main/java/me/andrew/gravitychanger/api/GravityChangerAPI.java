@@ -37,6 +37,22 @@ public abstract class GravityChangerAPI {
     }
 
     /**
+     * Returns the world relative velocity for the given player
+     * Using minecraft's methods to get the velocity of a the player will return player relative velocity
+     */
+    public static Vec3d getWorldVelocity(PlayerEntity playerEntity) {
+        return RotationUtil.vecPlayerToWorld(playerEntity.getVelocity(), ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection());
+    }
+
+    /**
+     * Sets the world relative velocity for the given player
+     * Using minecraft's methods to set the velocity of a the player will set player relative velocity
+     */
+    public static void setWorldVelocity(PlayerEntity playerEntity, Vec3d worldVelocity) {
+        playerEntity.setVelocity(RotationUtil.vecWorldToPlayer(worldVelocity, ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection()));
+    }
+
+    /**
      * Returns eye position offset from feet position for the given player
      */
     public static Vec3d getEyeOffset(PlayerEntity playerEntity) {
