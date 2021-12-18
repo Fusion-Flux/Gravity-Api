@@ -17,8 +17,6 @@ import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.tag.Tag;
-import net.minecraft.util.collection.ReusableStream;
-import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -32,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
@@ -77,7 +76,7 @@ public abstract class EntityMixin implements EntityAccessor {
 
     @Shadow public abstract Box getBoundingBox();
 
-    @Shadow public static Vec3d adjustMovementForCollisions(Vec3d movement, Box entityBoundingBox, ReusableStream<VoxelShape> collisions) { return null; };
+    @Shadow public static Vec3d adjustMovementForCollisions(Vec3d movement, Box entityBoundingBox, List<VoxelShape> collisions) { return null; };
 
     @Shadow public abstract Vec3d getPos();
 
@@ -296,7 +295,7 @@ public abstract class EntityMixin implements EntityAccessor {
             method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
             at = @At(
                     value = "INVOKE_ASSIGN",
-                    target = "Lnet/minecraft/world/World;getEntityCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Box;Ljava/util/function/Predicate;)Ljava/util/stream/Stream;",
+                    target = "Lnet/minecraft/world/World;getEntityCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Box;)Ljava/util/List;",
                     ordinal = 0
             ),
             ordinal = 0
@@ -374,11 +373,11 @@ public abstract class EntityMixin implements EntityAccessor {
     }
 
     @ModifyVariable(
-            method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Lnet/minecraft/block/ShapeContext;Lnet/minecraft/util/collection/ReusableStream;)Lnet/minecraft/util/math/Vec3d;",
+            method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
             at = @At("HEAD"),
-            ordinal = 0
+            index = 1
     )
-    private static Vec3d modify_adjustMovementForCollisions_Vec3d_0(Vec3d vec3d, @Nullable Entity entity, Vec3d movement, Box entityBoundingBox, World world, ShapeContext context, ReusableStream<VoxelShape> collisions) {
+    private static Vec3d modify_adjustMovementForCollisions_Vec3d_0(Vec3d vec3d, Entity entity) {
         if(entity == null) {
             return vec3d;
         }
@@ -392,11 +391,11 @@ public abstract class EntityMixin implements EntityAccessor {
     }
 
     @Inject(
-            method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Lnet/minecraft/block/ShapeContext;Lnet/minecraft/util/collection/ReusableStream;)Lnet/minecraft/util/math/Vec3d;",
+            method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
             at = @At("RETURN"),
             cancellable = true
     )
-    private static void inject_adjustMovementForCollisions(@Nullable Entity entity, Vec3d movement, Box entityBoundingBox, World world, ShapeContext context, ReusableStream<VoxelShape> collisions, CallbackInfoReturnable<Vec3d> cir) {
+    private static void inject_adjustMovementForCollisions(Entity entity, Vec3d movement, Box entityBoundingBox, World world, List<VoxelShape> collisions, CallbackInfoReturnable<Vec3d> cir) {
         if(entity == null) return;
 
         Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
@@ -406,14 +405,14 @@ public abstract class EntityMixin implements EntityAccessor {
     }
 
     @Redirect(
-            method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Lnet/minecraft/block/ShapeContext;Lnet/minecraft/util/collection/ReusableStream;)Lnet/minecraft/util/math/Vec3d;",
+            method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/util/collection/ReusableStream;)Lnet/minecraft/util/math/Vec3d;",
+                    target = "Lnet/minecraft/entity/Entity;adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
                     ordinal = 0
             )
     )
-    private static Vec3d redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(Vec3d movement, Box entityBoundingBox, ReusableStream<VoxelShape> collisions, @Nullable Entity entity, Vec3d movementIgnored, Box entityBoundingBoxIgnored, World worldIgnored, ShapeContext contextIgnored, ReusableStream<VoxelShape> collisionsIgnored) {
+    private static Vec3d redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(Vec3d movement, Box entityBoundingBox, List<VoxelShape> collisions, Entity entity) {
         Direction gravityDirection;
         if(entity == null || (gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection()) == Direction.DOWN) {
             return adjustMovementForCollisions(movement, entityBoundingBox, collisions);
@@ -427,7 +426,7 @@ public abstract class EntityMixin implements EntityAccessor {
         Direction directionY = RotationUtil.dirPlayerToWorld(Direction.UP, gravityDirection);
         Direction directionZ = RotationUtil.dirPlayerToWorld(Direction.SOUTH, gravityDirection);
         if (playerMovementY != 0.0D) {
-            playerMovementY = VoxelShapes.calculateMaxOffset(directionY.getAxis(), entityBoundingBox, collisions.stream(), playerMovementY * directionY.getDirection().offset()) * directionY.getDirection().offset();
+            playerMovementY = VoxelShapes.calculateMaxOffset(directionY.getAxis(), entityBoundingBox, collisions, playerMovementY * directionY.getDirection().offset()) * directionY.getDirection().offset();
             if (playerMovementY != 0.0D) {
                 entityBoundingBox = entityBoundingBox.offset(RotationUtil.vecPlayerToWorld(0.0D, playerMovementY, 0.0D, gravityDirection));
             }
@@ -435,21 +434,21 @@ public abstract class EntityMixin implements EntityAccessor {
 
         boolean isZLargerThanX = Math.abs(playerMovementX) < Math.abs(playerMovementZ);
         if (isZLargerThanX && playerMovementZ != 0.0D) {
-            playerMovementZ = VoxelShapes.calculateMaxOffset(directionZ.getAxis(), entityBoundingBox, collisions.stream(), playerMovementZ * directionZ.getDirection().offset()) * directionZ.getDirection().offset();
+            playerMovementZ = VoxelShapes.calculateMaxOffset(directionZ.getAxis(), entityBoundingBox, collisions, playerMovementZ * directionZ.getDirection().offset()) * directionZ.getDirection().offset();
             if (playerMovementZ != 0.0D) {
                 entityBoundingBox = entityBoundingBox.offset(RotationUtil.vecPlayerToWorld(0.0D, 0.0D, playerMovementZ, gravityDirection));
             }
         }
 
         if (playerMovementX != 0.0D) {
-            playerMovementX = VoxelShapes.calculateMaxOffset(directionX.getAxis(), entityBoundingBox, collisions.stream(), playerMovementX * directionX.getDirection().offset()) * directionX.getDirection().offset();
+            playerMovementX = VoxelShapes.calculateMaxOffset(directionX.getAxis(), entityBoundingBox, collisions, playerMovementX * directionX.getDirection().offset()) * directionX.getDirection().offset();
             if (!isZLargerThanX && playerMovementX != 0.0D) {
                 entityBoundingBox = entityBoundingBox.offset(RotationUtil.vecPlayerToWorld(playerMovementX, 0.0D, 0.0D, gravityDirection));
             }
         }
 
         if (!isZLargerThanX && playerMovementZ != 0.0D) {
-            playerMovementZ = VoxelShapes.calculateMaxOffset(directionZ.getAxis(), entityBoundingBox, collisions.stream(), playerMovementZ * directionZ.getDirection().offset()) * directionZ.getDirection().offset();
+            playerMovementZ = VoxelShapes.calculateMaxOffset(directionZ.getAxis(), entityBoundingBox, collisions, playerMovementZ * directionZ.getDirection().offset()) * directionZ.getDirection().offset();
         }
 
         return RotationUtil.vecPlayerToWorld(playerMovementX, playerMovementY, playerMovementZ, gravityDirection);

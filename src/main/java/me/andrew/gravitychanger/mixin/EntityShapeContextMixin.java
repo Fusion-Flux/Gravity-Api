@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @Mixin(EntityShapeContext.class)
 public abstract class EntityShapeContextMixin {
-    @Shadow @Final private Optional<Entity> entity;
+    @Shadow @Final private Entity entity;
 
     @Shadow @Final private double minY;
 
@@ -47,9 +47,9 @@ public abstract class EntityShapeContextMixin {
             cancellable = true
     )
     private void inject_isAbove(VoxelShape shape, BlockPos pos, boolean defaultValue, CallbackInfoReturnable<Boolean> cir) {
-        if(this.entity.isEmpty()) return;
+        if(this.entity == null) return;
 
-        Direction gravityDirection = ((EntityAccessor) this.entity.get()).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = ((EntityAccessor) this.entity).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) return;
 
         cir.setReturnValue(this.minY > RotationUtil.boxWorldToPlayer(new Box(pos), gravityDirection).minY + RotationUtil.boxWorldToPlayer(shape.getBoundingBox().expand(-9.999999747378752E-6D), gravityDirection).maxX);
