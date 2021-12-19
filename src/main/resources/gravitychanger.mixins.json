@@ -43,6 +43,7 @@
     "WolfBegGoalMixin"
   ],
   "client": [
+    "client.BiomeEffectSoundPlayerMixin",
     "client.CameraMixin",
     "client.ClientPlayerEntityMixin",
     "client.ClientPlayNetworkHandlerMixin",
@@ -53,8 +54,7 @@
     "client.InGameOverlayRendererMixin",
     "client.ItemPickupParticleMixin",
     "client.OtherClientPlayerEntityMixin",
-    "client.PlayerEntityRendererMixin",
-    "client.BiomeEffectSoundPlayerMixin"
+    "client.PlayerEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

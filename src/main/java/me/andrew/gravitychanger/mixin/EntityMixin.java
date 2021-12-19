@@ -375,7 +375,7 @@ public abstract class EntityMixin implements EntityAccessor {
     @ModifyVariable(
             method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
             at = @At("HEAD"),
-            index = 1
+            ordinal = 0
     )
     private static Vec3d modify_adjustMovementForCollisions_Vec3d_0(Vec3d vec3d, Entity entity) {
         if(entity == null) {
