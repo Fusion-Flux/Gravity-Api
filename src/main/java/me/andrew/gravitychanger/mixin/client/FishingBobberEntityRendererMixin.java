@@ -29,7 +29,7 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
 
     @Shadow private static void vertex(VertexConsumer buffer, Matrix4f matrix, Matrix3f normalMatrix, int light, float x, int y, int u, int v) {}
 
-    @Shadow private static void method_23172(float x, float y, float z, VertexConsumer buffer, MatrixStack.Entry normal, float f, float g) {}
+    @Shadow private static void renderFishingLine(float x, float y, float z, VertexConsumer buffer, MatrixStack.Entry normal, float f, float g) {}
 
     @Shadow private static float percentage(int value, int max) { return 0.0F; }
 
@@ -57,8 +57,8 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         matrixStack.multiply(this.dispatcher.getRotation());
         matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
         MatrixStack.Entry entry = matrixStack.peek();
-        Matrix4f matrix4f = entry.getModel();
-        Matrix3f matrix3f = entry.getNormal();
+        Matrix4f matrix4f = entry.getPositionMatrix();
+        Matrix3f matrix3f = entry.getNormalMatrix();
         VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(LAYER);
         vertex(vertexConsumer, matrix4f, matrix3f, light, 0.0F, 0, 0, 1);
         vertex(vertexConsumer, matrix4f, matrix3f, light, 1.0F, 0, 1, 1);
@@ -111,7 +111,7 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         MatrixStack.Entry entry2 = matrixStack.peek();
 
         for(int i = 0; i <= 16; ++i) {
-            method_23172(relX, relY, relZ, vertexConsumer2, entry2, percentage(i, 16), percentage(i + 1, 16));
+            renderFishingLine(relX, relY, relZ, vertexConsumer2, entry2, percentage(i, 16), percentage(i + 1, 16));
         }
 
         matrixStack.pop();
