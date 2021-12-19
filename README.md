@@ -30,7 +30,7 @@ To import the mod you can use modrinth maven.
 Add the following to your project:
 #### grable.properties
 ```properties
-gravitychanger_version = 0.2.0
+gravitychanger_version = 0.3.0
 ```
 Replace 0.2.0 with the version you want to use from [here](https://modrinth.com/mod/gravitychanger/versions).
 #### build.gradle
@@ -52,9 +52,9 @@ dependencies {
 #### fabric.mod.json
 ```json
 "depends": {
-    "gravitychanger": "^0.2.0"
+    "gravitychanger": "^0.3.0"
 }
 ```
-Replace 0.2.0 with the lowest version of the mod your mod works with
+Replace 0.3.0 with the lowest version of the mod your mod works with
 
-Now you should be able to cast a `PlayerEntity` instance into `RotatableEntityAccessor` and use it's methods `gravitychanger$getGravityDirection` and `gravitychanger$setGravityDirection` to get and set gravity for that player.
+Now you should be able to use methods in `me.andrew.gravitychanger.api.GravityChangerAPI` class to manipulate player gravity.
