@@ -462,41 +462,6 @@ public abstract class EntityMixin implements EntityAccessor {
         return RotationUtil.vecPlayerToWorld(playerMovementX, playerMovementY, playerMovementZ, gravityDirection);
     }
 
-    @Inject(
-            method = "updateSubmergedInWaterState",
-            at = @At("HEAD"),
-            cancellable = true
-    )
-    private void inject_updateSubmergedInWaterState(CallbackInfo ci) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) return;
-
-        ci.cancel();
-        
-        this.submergedInWater = this.isSubmergedIn(FluidTags.WATER);
-        this.submergedFluidTag.clear();
-        
-        double d = this.getEyeY() - 0.1111111119389534D;
-        Entity entity = this.getVehicle();
-        if (entity instanceof BoatEntity) {
-            BoatEntity boatEntity = (BoatEntity)entity;
-            if (!boatEntity.isSubmergedInWater() && boatEntity.getBoundingBox().maxY >= d && boatEntity.getBoundingBox().minY <= d) {
-                return;
-            }
-        }
-    
-        BlockPos blockPos = new BlockPos(this.getX(), d, this.getZ());
-        FluidState fluidState = this.world.getFluidState(blockPos);
-        double e = (double)((float)blockPos.getY() + fluidState.getHeight(this.world, blockPos));
-        if (e > d) {
-            Stream var10000 = fluidState.streamTags();
-            Set var10001 = this.submergedFluidTag;
-            Objects.requireNonNull(var10001);
-            var10000.forEach(var10001::add);
-        }
-        
-    }
-
     @Redirect(
             method = "isInsideWall",
             at = @At(
