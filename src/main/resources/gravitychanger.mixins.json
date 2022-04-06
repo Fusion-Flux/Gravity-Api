@@ -43,6 +43,7 @@
     "WolfBegGoalMixin"
   ],
   "client": [
+    "client.BiomeEffectSoundPlayerMixin",
     "client.CameraMixin",
     "client.ClientPlayerEntityMixin",
     "client.ClientPlayNetworkHandlerMixin",
