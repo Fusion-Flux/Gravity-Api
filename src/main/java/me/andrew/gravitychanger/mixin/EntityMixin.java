@@ -11,12 +11,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -31,7 +33,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @Mixin(Entity.class)
@@ -64,10 +68,6 @@ public abstract class EntityMixin implements EntityAccessor {
 
     @Shadow protected boolean submergedInWater;
 
-    @Shadow public abstract boolean isSubmergedIn(Tag<Fluid> fluidTag);
-
-    @Shadow @Nullable protected Tag<Fluid> submergedFluidTag;
-
     @Shadow public boolean noClip;
 
     @Shadow public abstract Vec3d getVelocity();
@@ -87,7 +87,15 @@ public abstract class EntityMixin implements EntityAccessor {
     @Shadow public abstract void addVelocity(double deltaX, double deltaY, double deltaZ);
 
     @Shadow protected abstract void tickInVoid();
-
+    
+    @Shadow public abstract boolean isSubmergedIn(TagKey<Fluid> fluidTag);
+    
+    @Shadow @Final private Set<TagKey<Fluid>> submergedFluidTag;
+    
+    @Shadow public abstract double getEyeY();
+    
+    @Shadow @Nullable public abstract Entity getVehicle();
+    
     @Override
     public Direction gravitychanger$getAppliedGravityDirection() {
         return Direction.DOWN;
@@ -464,27 +472,29 @@ public abstract class EntityMixin implements EntityAccessor {
         if(gravityDirection == Direction.DOWN) return;
 
         ci.cancel();
-
+        
         this.submergedInWater = this.isSubmergedIn(FluidTags.WATER);
-        this.submergedFluidTag = null;
-        Vec3d mouthPos = this.getEyePos().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.1111111119389534D, 0.0D, gravityDirection));
-        BlockPos blockPos = new BlockPos(mouthPos);
-        FluidState fluidState = this.world.getFluidState(blockPos);
-        Iterator<Tag<Fluid>> var6 = FluidTags.getTags().iterator();
-
-        Tag<Fluid> tag;
-        do {
-            if (!var6.hasNext()) {
+        this.submergedFluidTag.clear();
+        
+        double d = this.getEyeY() - 0.1111111119389534D;
+        Entity entity = this.getVehicle();
+        if (entity instanceof BoatEntity) {
+            BoatEntity boatEntity = (BoatEntity)entity;
+            if (!boatEntity.isSubmergedInWater() && boatEntity.getBoundingBox().maxY >= d && boatEntity.getBoundingBox().minY <= d) {
                 return;
             }
-
-            tag = var6.next();
-        } while(!fluidState.isIn(tag));
-
-        Box box = new Box(blockPos.getX(), blockPos.getY(), blockPos.getZ(), blockPos.getX() + 1, blockPos.getY() + fluidState.getHeight(this.world, blockPos), blockPos.getZ() + 1);
-        if (box.contains(mouthPos)) {
-            this.submergedFluidTag = tag;
         }
+    
+        BlockPos blockPos = new BlockPos(this.getX(), d, this.getZ());
+        FluidState fluidState = this.world.getFluidState(blockPos);
+        double e = (double)((float)blockPos.getY() + fluidState.getHeight(this.world, blockPos));
+        if (e > d) {
+            Stream var10000 = fluidState.streamTags();
+            Set var10001 = this.submergedFluidTag;
+            Objects.requireNonNull(var10001);
+            var10000.forEach(var10001::add);
+        }
+        
     }
 
     @Redirect(
