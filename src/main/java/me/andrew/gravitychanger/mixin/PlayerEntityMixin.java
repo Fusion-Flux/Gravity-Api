@@ -84,6 +84,54 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
                 Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, gravityDirection);
                 this.setYaw(newViewAngles.x);
                 this.setPitch(newViewAngles.y);
+            }else {
+                if (prevGravityDirection == Direction.UP || prevGravityDirection == Direction.DOWN) {
+                    if (gravityDirection == Direction.EAST) {
+                        this.setYaw(this.getYaw() - 90);
+                    }
+                }
+
+                if (prevGravityDirection == Direction.EAST) {
+                    if (gravityDirection == Direction.UP || gravityDirection == Direction.DOWN) {
+                        this.setYaw(this.getYaw() + 90);
+                    }
+                }
+
+                if (prevGravityDirection == Direction.UP || prevGravityDirection == Direction.DOWN) {
+                    if (gravityDirection == Direction.WEST) {
+                        this.setYaw(this.getYaw() + 90);
+                    }
+                }
+
+                if (prevGravityDirection == Direction.WEST) {
+                    if (gravityDirection == Direction.UP || gravityDirection == Direction.DOWN) {
+                        this.setYaw(this.getYaw() - 90);
+                    }
+                }
+
+                if (prevGravityDirection == Direction.DOWN) {
+                    if (gravityDirection == Direction.SOUTH) {
+                        this.setYaw(this.getYaw() - 180);
+                    }
+                }
+
+                if (prevGravityDirection == Direction.UP) {
+                    if (gravityDirection == Direction.NORTH) {
+                        this.setYaw(this.getYaw() - 180);
+                    }
+                }
+
+                if (prevGravityDirection == Direction.SOUTH) {
+                    if (gravityDirection == Direction.DOWN) {
+                        this.setYaw(this.getYaw() + 180);
+                    }
+                }
+
+                if (prevGravityDirection == Direction.NORTH) {
+                    if (gravityDirection == Direction.UP) {
+                        this.setYaw(this.getYaw() + 180);
+                    }
+                }
             }
         }
     }
