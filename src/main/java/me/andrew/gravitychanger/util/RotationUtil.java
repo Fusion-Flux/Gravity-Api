@@ -177,26 +177,29 @@ public abstract class RotationUtil {
         return new Vec2f(MathHelper.wrapDegrees((float)(-radNegYaw) / 0.017453292F), (float)(radPitch) / 0.017453292F);
     }
 
-    private static final int EXPIRATION_TIME = 1000;
+    private static final int EXPIRATION_TIME = 250;
     private static final List<Rotation> ROTATION_QUEUE = new ArrayList<>();
-    private static Direction lastDirection;
+    private static Direction lastDirection = Direction.DOWN;
 
     private record Rotation(Quaternion quaternion, long expiration) {
     }
 
-    public static Quaternion getRotation(Direction direction) {
+    public static void applyNewRotation(Direction direction) {
         long now = System.currentTimeMillis();
 
-        if (lastDirection == null) {
-            lastDirection = direction;
-        } else if (lastDirection != direction) {
+
             // Queue change
             ROTATION_QUEUE.add(new Rotation(WORLD_ROTATION_QUATERNIONS[direction.getId()], now + EXPIRATION_TIME));
-            lastDirection = direction;
-        }
+
+        lastDirection = direction;
+    }
+
+    public static Quaternion getRotation() {
+        if(ROTATION_QUEUE.isEmpty()) return WORLD_ROTATION_QUATERNIONS[lastDirection.getId()];
+        long now = System.currentTimeMillis();
 
         // Start lerping rotations
-        Quaternion accumulator = Quaternion.IDENTITY.copy();
+        Quaternion accumulator = Quaternion.IDENTITY;
 
         Iterator<Rotation> iterator = ROTATION_QUEUE.iterator();
 
@@ -204,11 +207,11 @@ public abstract class RotationUtil {
             Rotation rotation = iterator.next();
 
             if (rotation.expiration > now) {
+                float delta = (rotation.expiration - now) / (float) EXPIRATION_TIME;
+                accumulator = lerp(rotation.quaternion, accumulator, delta);
+            } else {
                 iterator.remove();
             }
-
-            float delta = (rotation.expiration - now) / (float) EXPIRATION_TIME;
-            accumulator = lerp(accumulator, rotation.quaternion, delta);
         }
 
         return accumulator;

@@ -3,6 +3,7 @@ package me.andrew.gravitychanger.mixin.client;
 import com.mojang.authlib.GameProfile;
 import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
+import me.andrew.gravitychanger.api.GravityChangerAPI;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -41,7 +42,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     @Override
     public void gravitychanger$setGravityDirection(Direction gravityDirection, boolean initialGravity) {
         if(this.gravitychanger$gravityDirection == gravityDirection) return;
-
+        RotationUtil.applyNewRotation(gravityDirection);
         Direction prevGravityDirection = this.gravitychanger$gravityDirection;
         this.gravitychanger$gravityDirection = gravityDirection;
         this.gravitychanger$onGravityChanged(prevGravityDirection, initialGravity);
