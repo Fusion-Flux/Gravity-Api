@@ -28,9 +28,9 @@ public abstract class GameRendererMixin {
             )
     )
     private void inject_renderWorld(float tickDelta, long limitTime, MatrixStack matrix, CallbackInfo ci) {
-        //Direction gravityDirection = ((EntityAccessor) this.camera.getFocusedEntity()).gravitychanger$getAppliedGravityDirection();
-        //if(gravityDirection == Direction.DOWN) return;
+        Direction gravityDirection = ((EntityAccessor) this.camera.getFocusedEntity()).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) return;
 
-        matrix.multiply(RotationUtil.getRotation());
+        matrix.multiply(RotationUtil.getWorldRotationQuaternion(gravityDirection));
     }
 }
