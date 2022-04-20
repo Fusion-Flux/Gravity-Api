@@ -16,11 +16,11 @@ public abstract class ModItems {
     public static final Item GRAVITY_CHANGER_EAST = new GravityChangerItem(new Item.Settings().group(ItemGroup.TOOLS).maxCount(1), Direction.EAST);
 
     public static void init() {
-        Registry.register(Registry.ITEM, new Identifier(GravityChangerMod.MOD_ID, "gravity_changer_down"), GRAVITY_CHANGER_DOWN);
-        Registry.register(Registry.ITEM, new Identifier(GravityChangerMod.MOD_ID, "gravity_changer_up"), GRAVITY_CHANGER_UP);
-        Registry.register(Registry.ITEM, new Identifier(GravityChangerMod.MOD_ID, "gravity_changer_north"), GRAVITY_CHANGER_NORTH);
-        Registry.register(Registry.ITEM, new Identifier(GravityChangerMod.MOD_ID, "gravity_changer_south"), GRAVITY_CHANGER_SOUTH);
-        Registry.register(Registry.ITEM, new Identifier(GravityChangerMod.MOD_ID, "gravity_changer_west"), GRAVITY_CHANGER_WEST);
-        Registry.register(Registry.ITEM, new Identifier(GravityChangerMod.MOD_ID, "gravity_changer_east"), GRAVITY_CHANGER_EAST);
+        //Registry.register(Registry.ITEM, new Identifier(GravityChangerMod.MOD_ID, "gravity_changer_down"), GRAVITY_CHANGER_DOWN);
+        //Registry.register(Registry.ITEM, new Identifier(GravityChangerMod.MOD_ID, "gravity_changer_up"), GRAVITY_CHANGER_UP);
+        //Registry.register(Registry.ITEM, new Identifier(GravityChangerMod.MOD_ID, "gravity_changer_north"), GRAVITY_CHANGER_NORTH);
+        //Registry.register(Registry.ITEM, new Identifier(GravityChangerMod.MOD_ID, "gravity_changer_south"), GRAVITY_CHANGER_SOUTH);
+        //Registry.register(Registry.ITEM, new Identifier(GravityChangerMod.MOD_ID, "gravity_changer_west"), GRAVITY_CHANGER_WEST);
+        //Registry.register(Registry.ITEM, new Identifier(GravityChangerMod.MOD_ID, "gravity_changer_east"), GRAVITY_CHANGER_EAST);
     }
 }
