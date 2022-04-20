@@ -2,6 +2,10 @@ package me.andrew.gravitychanger.util;
 
 import net.minecraft.util.math.*;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 public abstract class RotationUtil {
     private static final Direction[][] DIR_WORLD_TO_PLAYER = new Direction[6][];
     static {
@@ -171,6 +175,79 @@ public abstract class RotationUtil {
         if(sinNegYaw < 0) radNegYaw = Math.PI * 2 - radNegYaw;
 
         return new Vec2f(MathHelper.wrapDegrees((float)(-radNegYaw) / 0.017453292F), (float)(radPitch) / 0.017453292F);
+    }
+
+    private static final int EXPIRATION_TIME = 1000;
+    private static final List<Rotation> ROTATION_QUEUE = new ArrayList<>();
+    private static Direction lastDirection;
+
+    private record Rotation(Quaternion quaternion, long expiration) {
+    }
+
+    public static Quaternion getRotation(Direction direction) {
+        long now = System.currentTimeMillis();
+
+        if (lastDirection == null) {
+            lastDirection = direction;
+        } else if (lastDirection != direction) {
+            // Queue change
+            ROTATION_QUEUE.add(new Rotation(WORLD_ROTATION_QUATERNIONS[direction.getId()], now + EXPIRATION_TIME));
+            lastDirection = direction;
+        }
+
+        // Start lerping rotations
+        Quaternion accumulator = Quaternion.IDENTITY.copy();
+
+        Iterator<Rotation> iterator = ROTATION_QUEUE.iterator();
+
+        while (iterator.hasNext()) {
+            Rotation rotation = iterator.next();
+
+            if (rotation.expiration > now) {
+                iterator.remove();
+            }
+
+            float delta = (rotation.expiration - now) / (float) EXPIRATION_TIME;
+            accumulator = lerp(accumulator, rotation.quaternion, delta);
+        }
+
+        return accumulator;
+    }
+
+    private static Quaternion lerp(Quaternion a, Quaternion b, float delta) {
+        float cos = dot(a, b);
+
+        if ((1.0f + cos) > 0.00001) {
+            float alpha, beta;
+
+            if ((1.0f - cos) > 0.00001) {
+                float omega = (float) Math.acos(cos);
+                float invSin = (float) (1.0d / Math.sin(omega));
+                alpha = (MathHelper.sin((1.0f - delta) * omega) * invSin);
+                beta = (MathHelper.sin(delta * omega) * invSin);
+            } else {
+                alpha = 1.0f - delta;
+                beta = delta;
+            }
+
+            return new Quaternion(alpha * a.getX() + beta * b.getX(),
+                    alpha * a.getY() + beta * b.getY(),
+                    alpha * a.getZ() + beta * b.getZ(),
+                    alpha * a.getW() + beta * b.getW());
+        } else {
+            float alpha = MathHelper.sin((1.0f - delta) * MathHelper.PI * 0.5f);
+            float beta = MathHelper.sin(delta * MathHelper.PI * 0.5f);
+
+            return new Quaternion(
+                    alpha * a.getX() - beta * a.getY(),
+                    alpha * a.getY() + beta * a.getX(),
+                    alpha * a.getZ() - beta * a.getW(),
+                    a.getZ());
+        }
+    }
+
+    private static float dot(Quaternion a, Quaternion b) {
+        return a.getX() * b.getX() + a.getY() * b.getY() + a.getZ() * b.getZ() + a.getW() * b.getW();
     }
 
     private static final Quaternion[] WORLD_ROTATION_QUATERNIONS = new Quaternion[6];
