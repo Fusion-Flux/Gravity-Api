@@ -32,6 +32,19 @@ public class GravityCommand {
             );
         }
 
+        LiteralArgumentBuilder<ServerCommandSource> literalSetDefault = literal("setdefualt");
+        for(Direction direction : Direction.values()) {
+            literalSetDefault.then(literal(direction.getName())
+                    .executes(context -> {
+                        return executeSetDefault(context.getSource(), direction, Collections.singleton(context.getSource().getPlayer()));
+                    }).then(argument("players", EntityArgumentType.players())
+                            .executes(context -> {
+                                return executeSetDefault(context.getSource(), direction, EntityArgumentType.getPlayers(context, "players"));
+                            })
+                    )
+            );
+        }
+
         LiteralArgumentBuilder<ServerCommandSource> literalRotate = literal("rotate");
         for(FacingDirection facingDirection : FacingDirection.values()) {
             literalRotate.then(literal(facingDirection.getName())
@@ -55,6 +68,7 @@ public class GravityCommand {
                                 })
                         )
                 ).then(literalSet)
+                .then(literalSetDefault)
                 .then(literalRotate)
                 .then(literal("randomise")
                         .executes(context -> {
@@ -91,6 +105,22 @@ public class GravityCommand {
             RotatableEntityAccessor rotatableEntityAccessor = (RotatableEntityAccessor) player;
             if(rotatableEntityAccessor.gravitychanger$getGravityDirection() != gravityDirection) {
                 rotatableEntityAccessor.gravitychanger$setGravityDirection(gravityDirection, false);
+                setSendFeedback(source, player, gravityDirection);
+                i++;
+            }
+        }
+
+        return i;
+    }
+
+    private static int executeSetDefault(ServerCommandSource source, Direction gravityDirection, Collection<ServerPlayerEntity> players) {
+        int i = 0;
+
+        for(ServerPlayerEntity player : players) {
+            RotatableEntityAccessor rotatableEntityAccessor = (RotatableEntityAccessor) player;
+            if(rotatableEntityAccessor.gravitychanger$getDefaultGravityDirection() != gravityDirection) {
+                rotatableEntityAccessor.gravitychanger$setGravityDirection(gravityDirection, false);
+                rotatableEntityAccessor.gravitychanger$setDefaultGravityDirection(gravityDirection, false);
                 setSendFeedback(source, player, gravityDirection);
                 i++;
             }

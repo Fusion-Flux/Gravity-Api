@@ -3,6 +3,7 @@ package me.andrew.gravitychanger.api;
 import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -26,14 +27,24 @@ public abstract class GravityChangerAPI {
         return ((RotatableEntityAccessor) playerEntity).gravitychanger$getGravityDirection();
     }
 
+    public static Direction getDefaultGravityDirection(PlayerEntity playerEntity) {
+        return ((RotatableEntityAccessor) playerEntity).gravitychanger$getDefaultGravityDirection();
+    }
+
+
     /**
      * Sets the main gravity direction for the given player
      * If the player is a ServerPlayerEntity and gravity direction changed also syncs the direction to the clients
      * If the player is either a ServerPlayerEntity or a ClientPlayerEntity also slightly adjusts player position
      * This may not immediately change the applied gravity direction for the player, see GravityChangerAPI#getAppliedGravityDirection
      */
-    public static void setGravityDirection(PlayerEntity playerEntity, Direction gravityDirection) {
+    public static void setGravityDirection(Entity playerEntity, Direction gravityDirection) {
         ((RotatableEntityAccessor) playerEntity).gravitychanger$setGravityDirection(gravityDirection, false);
+    }
+
+
+    public static void setDefaultGravityDirection(Entity playerEntity, Direction gravityDirection) {
+        ((RotatableEntityAccessor) playerEntity).gravitychanger$setDefaultGravityDirection(gravityDirection, false);
     }
 
     /**

@@ -20,7 +20,16 @@ public class GravityChangerItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ((RotatableEntityAccessor) user).gravitychanger$setGravityDirection(this.gravityDirection, false);
+        if(!user.isSneaking()) {
+            if(((RotatableEntityAccessor) user).gravitychanger$getGravityDirection() == this.gravityDirection) {
+                ((RotatableEntityAccessor) user).gravitychanger$setDefaultGravityDirection(this.gravityDirection, false);
+            }else {
+                ((RotatableEntityAccessor) user).gravitychanger$setGravityDirection(this.gravityDirection, false);
+            }
+            }else{
+            ((RotatableEntityAccessor) user).gravitychanger$setGravityDirection(((RotatableEntityAccessor) user).gravitychanger$getDefaultGravityDirection(), false);
+        }
+
 
         return TypedActionResult.success(user.getStackInHand(hand));
     }

@@ -1,6 +1,7 @@
 package me.andrew.gravitychanger.mixin.client;
 
 import me.andrew.gravitychanger.accessor.EntityAccessor;
+import me.andrew.gravitychanger.api.GravityChangerAPI;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -30,7 +31,6 @@ public abstract class GameRendererMixin {
     private void inject_renderWorld(float tickDelta, long limitTime, MatrixStack matrix, CallbackInfo ci) {
         Direction gravityDirection = ((EntityAccessor) this.camera.getFocusedEntity()).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) return;
-
         matrix.multiply(RotationUtil.getWorldRotationQuaternion(gravityDirection));
     }
 }

@@ -36,6 +36,8 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
 
     private static final TrackedData<Direction> gravitychanger$GRAVITY_DIRECTION = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.FACING);
 
+    private static final TrackedData<Direction> gravitychanger$DEFAULT_GRAVITY_DIRECTION = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.FACING);
+
     private Direction gravitychanger$prevGravityDirection = Direction.DOWN;
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
@@ -146,6 +148,17 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
         this.getDataTracker().set(gravitychanger$GRAVITY_DIRECTION, gravityDirection);
     }
 
+
+    @Override
+    public Direction gravitychanger$getDefaultTrackedGravityDirection() {
+        return this.getDataTracker().get(gravitychanger$DEFAULT_GRAVITY_DIRECTION);
+    }
+
+    @Override
+    public void gravitychanger$setDefaultTrackedGravityDirection(Direction gravityDirection) {
+        this.getDataTracker().set(gravitychanger$DEFAULT_GRAVITY_DIRECTION, gravityDirection);
+    }
+
     @Override
     public void gravitychanger$onTrackedData(TrackedData<?> data) {
         if(!this.world.isClient) return;
@@ -165,6 +178,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
     )
     private void inject_initDataTracker(CallbackInfo ci) {
         this.dataTracker.startTracking(gravitychanger$GRAVITY_DIRECTION, Direction.DOWN);
+        this.dataTracker.startTracking(gravitychanger$DEFAULT_GRAVITY_DIRECTION, Direction.DOWN);
     }
 
     @Inject(
@@ -176,6 +190,10 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
             Direction gravityDirection = Direction.byId(nbt.getInt("GravityDirection"));
             this.gravitychanger$setGravityDirection(gravityDirection, true);
         }
+        if(nbt.contains("DefaultGravityDirection", NbtElement.INT_TYPE)) {
+            Direction gravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
+            this.gravitychanger$setDefaultGravityDirection(gravityDirection, true);
+        }
     }
 
     @Inject(
@@ -184,6 +202,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
     )
     private void inject_writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
         nbt.putInt("GravityDirection", this.gravitychanger$getGravityDirection().getId());
+        nbt.putInt("DefaultGravityDirection", this.gravitychanger$getDefaultGravityDirection().getId());
     }
 
     @Redirect(
