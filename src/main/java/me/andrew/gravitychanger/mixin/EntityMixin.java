@@ -26,6 +26,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -649,4 +650,30 @@ public abstract class EntityMixin implements EntityAccessor {
 
         return box.offset(RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection));
     }
+
+    @Overwrite
+    private void updateSubmergedInWaterState() {
+        this.submergedInWater = this.isSubmergedIn(FluidTags.WATER);
+        this.submergedFluidTag.clear();
+        double d = this.getEyePos().getY();
+        Entity entity = this.getVehicle();
+        if (entity instanceof BoatEntity) {
+            BoatEntity boatEntity = (BoatEntity)entity;
+            if (!boatEntity.isSubmergedInWater() && boatEntity.getBoundingBox().maxY >= d && boatEntity.getBoundingBox().minY <= d) {
+                return;
+            }
+        }
+
+        BlockPos blockPos = new BlockPos(this.getEyePos());
+        FluidState fluidState = this.world.getFluidState(blockPos);
+        double e = (double)((float)blockPos.getY() + fluidState.getHeight(this.world, blockPos));
+        if (e > d) {
+            Stream var10000 = fluidState.streamTags();
+            Set var10001 = this.submergedFluidTag;
+            Objects.requireNonNull(var10001);
+            var10000.forEach(var10001::add);
+        }
+
+    }
+
 }

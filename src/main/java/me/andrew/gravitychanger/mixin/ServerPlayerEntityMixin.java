@@ -89,6 +89,7 @@ public abstract class ServerPlayerEntityMixin implements RotatableEntityAccessor
     private void inject_teleport_sendPacket_0(CallbackInfo ci) {
         Direction gravityDirection = this.gravitychanger$getGravityDirection();
         if(gravityDirection != this.gravitychanger$getDefaultGravityDirection() && GravityChangerMod.config.resetGravityOnDimensionChange) {
+            this.gravitychanger$setDefaultGravityDirection(this.gravitychanger$getDefaultGravityDirection(), true);
             this.gravitychanger$setGravityDirection(this.gravitychanger$getDefaultGravityDirection(), true);
         } else {
             this.gravitychanger$sendGravityPacket(gravityDirection, true);
@@ -101,7 +102,8 @@ public abstract class ServerPlayerEntityMixin implements RotatableEntityAccessor
     )
     private void inject_copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
         if(GravityChangerMod.config.resetGravityOnRespawn) {
-            ((RotatableEntityAccessor) oldPlayer).gravitychanger$setGravityDirection(((RotatableEntityAccessor) oldPlayer).gravitychanger$getDefaultGravityDirection(), true);
+            this.gravitychanger$setDefaultGravityDirection(((RotatableEntityAccessor) oldPlayer).gravitychanger$getDefaultGravityDirection(), true);
+            this.gravitychanger$setGravityDirection(((RotatableEntityAccessor) oldPlayer).gravitychanger$getDefaultGravityDirection(), true);
         } else {
             this.gravitychanger$setGravityDirection(((RotatableEntityAccessor) oldPlayer).gravitychanger$getGravityDirection(), true);
         }
