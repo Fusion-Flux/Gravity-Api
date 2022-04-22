@@ -18,6 +18,7 @@
     "FireworkRocketEntityMixin",
     "FishingBobberEntityMixin",
     "IllusionerEntityMixin",
+    "ItemEntityMixin",
     "ItemMixin",
     "ItemUsageContextMixin",
     "LivingEntityMixin",
