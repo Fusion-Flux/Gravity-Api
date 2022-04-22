@@ -74,6 +74,7 @@ public abstract class LivingEntityMixin extends Entity implements EntityAccessor
             }*/
 
             // Keep world velocity when changing gravity
+            if(GravityChangerMod.config.worldVelocity)
             this.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(this.getVelocity(), prevGravityDirection), gravityDirection));
 
             // Keep world looking direction when changing gravity

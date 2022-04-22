@@ -24,6 +24,11 @@ public class GravityChangerConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip(
             count = 2
     )
+    public boolean worldVelocity = true;
+
+    @ConfigEntry.Gui.Tooltip(
+            count = 2
+    )
     public boolean resetGravityOnDimensionChange = true;
 
     @ConfigEntry.Gui.Tooltip(
