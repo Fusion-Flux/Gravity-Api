@@ -9,6 +9,7 @@
     "CrossbowItemMixin",
     "DirectionMixin",
     "DrownedEntityMixin",
+    "EndCrystalEntityMixin",
     "EndermanEntity$ChasePlayerGoalMixin",
     "EndermanEntityMixin",
     "EntityMixin",

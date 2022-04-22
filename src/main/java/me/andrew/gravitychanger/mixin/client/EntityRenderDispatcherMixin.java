@@ -10,6 +10,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.util.math.*;
@@ -41,7 +42,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_0(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof ProjectileEntity)) {
+        if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity)) {
             Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
             if (gravityDirection == Direction.DOWN) return;
             if (!this.renderShadows) return;
@@ -60,7 +61,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_1(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof ProjectileEntity)) {
+        if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity)) {
             Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
             if (gravityDirection == Direction.DOWN) return;
             if (!this.renderShadows) return;

@@ -158,12 +158,12 @@ public abstract class LivingEntityMixin extends Entity implements EntityAccessor
 
     @Override
     public void gravitychanger$onTrackedData(TrackedData<?> data) {
-        if(!this.world.isClient) return;
+        if(this.world.isClient) return;
 
         if(gravitychanger$GRAVITY_DIRECTION.equals(data)) {
             Direction gravityDirection = this.gravitychanger$getGravityDirection();
             if(this.gravitychanger$prevGravityDirection != gravityDirection) {
-                this.gravitychanger$onGravityChanged(this.gravitychanger$prevGravityDirection, true);
+                this.gravitychanger$onGravityChanged(this.gravitychanger$prevGravityDirection, false);
                 this.gravitychanger$prevGravityDirection = gravityDirection;
             }
         }
