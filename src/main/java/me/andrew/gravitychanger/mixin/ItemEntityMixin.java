@@ -28,11 +28,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ItemEntity.class)
 public abstract class ItemEntityMixin  extends Entity implements RotatableEntityAccessor,EntityAccessor {
 
-    private static final TrackedData<Direction> gravitychanger$GRAVITY_DIRECTION = DataTracker.registerData(PersistentProjectileEntity.class, TrackedDataHandlerRegistry.FACING);
+    private static final TrackedData<Direction> gravitychanger$GRAVITY_DIRECTION = DataTracker.registerData(ItemEntity.class, TrackedDataHandlerRegistry.FACING);
 
-    private static final TrackedData<Direction> gravitychanger$DEFAULT_GRAVITY_DIRECTION = DataTracker.registerData(PersistentProjectileEntity.class, TrackedDataHandlerRegistry.FACING);
+    private static final TrackedData<Direction> gravitychanger$DEFAULT_GRAVITY_DIRECTION = DataTracker.registerData(ItemEntity.class, TrackedDataHandlerRegistry.FACING);
 
-    private Direction gravitychanger$prevGravityDirection = Direction.NORTH;
+    private Direction gravitychanger$prevGravityDirection = Direction.DOWN;
 
     public ItemEntityMixin(EntityType<?> type, World world) {
         super(type, world);
@@ -64,7 +64,7 @@ public abstract class ItemEntityMixin  extends Entity implements RotatableEntity
             EntityDimensions dimensions = this.getDimensions(this.getPose());
             Direction relativeDirection = RotationUtil.dirWorldToPlayer(gravityDirection, prevGravityDirection);
             Vec3d relativePosOffset = switch(relativeDirection) {
-                case NORTH -> Vec3d.ZERO;
+                case DOWN -> Vec3d.ZERO;
                 case UP -> new Vec3d(0.0D, dimensions.height - 1.0E-6D, 0.0D);
                 default -> Vec3d.of(relativeDirection.getVector()).multiply(dimensions.width / 2 - (gravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D)).add(0.0D, dimensions.width / 2 - (prevGravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D), 0.0D);
             };
@@ -115,8 +115,8 @@ public abstract class ItemEntityMixin  extends Entity implements RotatableEntity
             at = @At("RETURN")
     )
     private void inject_initDataTracker(CallbackInfo ci) {
-        this.dataTracker.startTracking(gravitychanger$GRAVITY_DIRECTION, Direction.NORTH);
-        this.dataTracker.startTracking(gravitychanger$DEFAULT_GRAVITY_DIRECTION, Direction.NORTH);
+        this.dataTracker.startTracking(gravitychanger$GRAVITY_DIRECTION, Direction.DOWN);
+        this.dataTracker.startTracking(gravitychanger$DEFAULT_GRAVITY_DIRECTION, Direction.DOWN);
     }
 
     @Inject(
