@@ -239,7 +239,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
         return new BlockPos(this.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, 1.0D - 0.1D, 0.0D, gravityDirection)));
     }
 
-  /*  @Redirect(
+    @Redirect(
             method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;",
             at = @At(
                     value = "NEW",
@@ -258,7 +258,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
         return new ItemEntity(world, vec3d.x, vec3d.y, vec3d.z, stack);
     }
 
-    @Redirect(
+    /*@Redirect(
             method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;",
             at = @At(
                     value = "INVOKE",
