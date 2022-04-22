@@ -10,6 +10,8 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.WorldView;
@@ -39,12 +41,14 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_0(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) return;
-        if(!this.renderShadows) return;
+        if(!(entity instanceof ProjectileEntity)) {
+            Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+            if (gravityDirection == Direction.DOWN) return;
+            if (!this.renderShadows) return;
 
-        matrices.push();
-        matrices.multiply(RotationUtil.getCameraRotationQuaternion(gravityDirection));
+            matrices.push();
+            matrices.multiply(RotationUtil.getCameraRotationQuaternion(gravityDirection));
+        }
     }
 
     @Inject(
@@ -56,11 +60,13 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_1(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) return;
-        if(!this.renderShadows) return;
+        if(!(entity instanceof ProjectileEntity)) {
+            Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+            if (gravityDirection == Direction.DOWN) return;
+            if (!this.renderShadows) return;
 
-        matrices.pop();
+            matrices.pop();
+        }
     }
 
     @Inject(
@@ -73,11 +79,13 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_2(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) return;
-        if(!this.renderShadows) return;
+        if(!(entity instanceof ProjectileEntity)) {
+            Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+            if (gravityDirection == Direction.DOWN) return;
+            if (!this.renderShadows) return;
 
-        matrices.multiply(RotationUtil.getCameraRotationQuaternion(gravityDirection));
+            matrices.multiply(RotationUtil.getCameraRotationQuaternion(gravityDirection));
+        }
     }
 
     @Inject(

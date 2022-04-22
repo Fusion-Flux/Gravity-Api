@@ -1,6 +1,7 @@
 package me.andrew.gravitychanger.mixin;
 
 import me.andrew.gravitychanger.accessor.EntityAccessor;
+import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -9,12 +10,34 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(ThrownEntity.class)
 public abstract class ThrownEntityMixin {
+
+    @Shadow protected abstract float getGravity();
+
+    @ModifyVariable(
+            method = "tick",
+            at = @At(
+                    value = "STORE"
+            )
+            ,ordinal = 0
+    )
+    public Vec3d tick(Vec3d modify){
+        if(this instanceof RotatableEntityAccessor) {
+            modify = new Vec3d(modify.x, modify.y + this.getGravity(), modify.z);
+            modify = RotationUtil.vecWorldToPlayer(modify, ((RotatableEntityAccessor) this).gravitychanger$getGravityDirection());
+            modify = new Vec3d(modify.x, modify.y - this.getGravity(), modify.z);
+            modify = RotationUtil.vecPlayerToWorld(modify, ((RotatableEntityAccessor) this).gravitychanger$getGravityDirection());
+        }
+        return  modify;
+    }
+
     @ModifyArgs(
             method = "<init>(Lnet/minecraft/entity/EntityType;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;)V",
             at = @At(

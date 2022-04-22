@@ -1,6 +1,5 @@
 package me.andrew.gravitychanger.mixin;
 
-import me.andrew.gravitychanger.GravityChangerMod;
 import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
@@ -12,12 +11,11 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.thrown.ThrownEntity;
+import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,18 +26,20 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
-@Mixin(PersistentProjectileEntity.class)
-public abstract class PersistentProjectileEntityMixin extends Entity implements RotatableEntityAccessor,EntityAccessor {
-    private static final TrackedData<Direction> gravitychanger$GRAVITY_DIRECTION = DataTracker.registerData(PersistentProjectileEntity.class, TrackedDataHandlerRegistry.FACING);
+@Mixin(ThrownItemEntity.class)
+public abstract class ThrownItemEntityMixin extends ThrownEntity implements EntityAccessor, RotatableEntityAccessor {
 
-    private static final TrackedData<Direction> gravitychanger$DEFAULT_GRAVITY_DIRECTION = DataTracker.registerData(PersistentProjectileEntity.class, TrackedDataHandlerRegistry.FACING);
+
+    private static final TrackedData<Direction> gravitychanger$GRAVITY_DIRECTION = DataTracker.registerData(ThrownItemEntity.class, TrackedDataHandlerRegistry.FACING);
+
+    private static final TrackedData<Direction> gravitychanger$DEFAULT_GRAVITY_DIRECTION = DataTracker.registerData(ThrownItemEntity.class, TrackedDataHandlerRegistry.FACING);
 
     private Direction gravitychanger$prevGravityDirection = Direction.DOWN;
 
-    public PersistentProjectileEntityMixin(EntityType<?> type, World world) {
-        super(type, world);
-    }
 
+    protected ThrownItemEntityMixin(EntityType<? extends ThrownEntity> entityType, World world) {
+        super(entityType, world);
+    }
 
     @Override
     public Direction gravitychanger$getAppliedGravityDirection() {
@@ -147,37 +147,6 @@ public abstract class PersistentProjectileEntityMixin extends Entity implements 
 
 
 
-    @ModifyVariable(
-            method = "tick",
-            at = @At(
-                    value = "STORE"
-            )
-            ,ordinal = 0
-    )
-    public Vec3d tick(Vec3d modify){
-        modify = new Vec3d(modify.x, modify.y+0.05, modify.z);
-        modify = RotationUtil.vecWorldToPlayer(modify,gravitychanger$getGravityDirection());
-        modify = new Vec3d(modify.x, modify.y-0.05, modify.z);
-        modify = RotationUtil.vecPlayerToWorld(modify,gravitychanger$getGravityDirection());
-        return  modify;
-    }
 
 
-    @ModifyArgs(
-            method = "<init>(Lnet/minecraft/entity/EntityType;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;)V",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/projectile/PersistentProjectileEntity;<init>(Lnet/minecraft/entity/EntityType;DDDLnet/minecraft/world/World;)V",
-                    ordinal = 0
-            )
-    )
-    private static void modifyargs_init_init_0(Args args, EntityType<? extends ThrownEntity> type, LivingEntity owner, World world) {
-        Direction gravityDirection = ((EntityAccessor) owner).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) return;
-
-        Vec3d pos = owner.getEyePos().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.10000000149011612D, 0.0D, gravityDirection));
-        args.set(1, pos.x);
-        args.set(2, pos.y);
-        args.set(3, pos.z);
-    }
 }

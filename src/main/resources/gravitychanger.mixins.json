@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "AbstractSkeletonEntityMixin",
+    "AreaEffectCloudEntityMixin",
     "CrossbowItemMixin",
     "DirectionMixin",
     "DrownedEntityMixin",
@@ -12,6 +13,7 @@
     "EndermanEntityMixin",
     "EntityMixin",
     "EntityShapeContextMixin",
+    "ExperienceBottleItemMixin",
     "ExplosionMixin",
     "FireworkRocketEntityMixin",
     "FishingBobberEntityMixin",
@@ -37,7 +39,9 @@
     "ShulkerBoxBlockEntityMixin",
     "ShulkerEntityMixin",
     "SnowGolemEntityMixin",
+    "ThrowablePotionItemMixin",
     "ThrownEntityMixin",
+    "ThrownItemEntityMixin",
     "WitchEntityMixin",
     "WitherEntityMixin",
     "WolfBegGoalMixin"

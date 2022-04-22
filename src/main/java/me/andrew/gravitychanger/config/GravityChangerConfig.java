@@ -15,7 +15,7 @@ public class GravityChangerConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip(
             count = 2
     )
-    public boolean keepWorldLook = true;
+    public boolean keepWorldLook = false;
 
     @ConfigEntry.Gui.PrefixText
     @ConfigEntry.Gui.Excluded

@@ -6,18 +6,17 @@ import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.tag.FluidTags;
-import net.minecraft.tag.Tag;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
@@ -32,7 +31,6 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -118,6 +116,9 @@ public abstract class EntityMixin implements EntityAccessor {
             cancellable = true
     )
     private void inject_calculateBoundingBox(CallbackInfoReturnable<Box> cir) {
+        Entity entity = ((Entity)(Object)this);
+        if(entity instanceof ProjectileEntity) return;
+
         Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) return;
 
@@ -651,29 +652,29 @@ public abstract class EntityMixin implements EntityAccessor {
         return box.offset(RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection));
     }
 
-    @Overwrite
-    private void updateSubmergedInWaterState() {
-        this.submergedInWater = this.isSubmergedIn(FluidTags.WATER);
-        this.submergedFluidTag.clear();
-        double d = this.getEyePos().getY();
-        Entity entity = this.getVehicle();
-        if (entity instanceof BoatEntity) {
-            BoatEntity boatEntity = (BoatEntity)entity;
-            if (!boatEntity.isSubmergedInWater() && boatEntity.getBoundingBox().maxY >= d && boatEntity.getBoundingBox().minY <= d) {
-                return;
-            }
-        }
 
-        BlockPos blockPos = new BlockPos(this.getEyePos());
-        FluidState fluidState = this.world.getFluidState(blockPos);
-        double e = (double)((float)blockPos.getY() + fluidState.getHeight(this.world, blockPos));
-        if (e > d) {
-            Stream var10000 = fluidState.streamTags();
-            Set var10001 = this.submergedFluidTag;
-            Objects.requireNonNull(var10001);
-            var10000.forEach(var10001::add);
-        }
+    @ModifyVariable(
+            method = "updateSubmergedInWaterState",
+            at = @At(
+                    value = "STORE"
+            ),
+            ordinal = 0
+    )
+    private double submergedInWaterEyeFix(double d) {
+        d = this.getEyePos().getY();
+        return d;
+    }
 
+    @ModifyVariable(
+            method = "updateSubmergedInWaterState",
+            at = @At(
+                    value = "STORE"
+            ),
+            ordinal = 0
+    )
+    private BlockPos submergedInWaterPosFix(BlockPos blockpos) {
+        blockpos = new BlockPos(this.getEyePos());
+        return blockpos;
     }
 
 }
