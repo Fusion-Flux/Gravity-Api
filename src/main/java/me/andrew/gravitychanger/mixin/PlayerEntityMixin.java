@@ -73,9 +73,9 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
             };
             this.setPosition(this.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, prevGravityDirection)));
 
-            if((Object) this instanceof ServerPlayerEntity serverPlayerEntity) {
-                serverPlayerEntity.networkHandler.syncWithPlayerPosition();
-            }
+            //if((Object) this instanceof ServerPlayerEntity serverPlayerEntity) {
+            //    serverPlayerEntity.networkHandler.syncWithPlayerPosition();
+            //}
 
             // Keep world velocity when changing gravity
             if(GravityChangerMod.config.worldVelocity)
