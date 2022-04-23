@@ -1,48 +1,37 @@
 package me.andrew.gravitychanger.mixin;
 
-import com.google.common.collect.Lists;
 import me.andrew.gravitychanger.GravityChangerMod;
 import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
-import net.minecraft.entity.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.potion.Potion;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+@Mixin(EnderDragonEntity.class)
+public abstract class EnderDragonEntityMixin extends Entity implements EntityAccessor, RotatableEntityAccessor {
 
-@Mixin(EndCrystalEntity.class)
-public abstract class EndCrystalEntityMixin extends Entity implements EntityAccessor, RotatableEntityAccessor {
+    private static final TrackedData<Direction> gravitychanger$GRAVITY_DIRECTION = DataTracker.registerData(EnderDragonEntity.class, TrackedDataHandlerRegistry.FACING);
 
-    private static final TrackedData<Direction> gravitychanger$GRAVITY_DIRECTION = DataTracker.registerData(EndCrystalEntity.class, TrackedDataHandlerRegistry.FACING);
-
-    private static final TrackedData<Direction> gravitychanger$DEFAULT_GRAVITY_DIRECTION = DataTracker.registerData(EndCrystalEntity.class, TrackedDataHandlerRegistry.FACING);
+    private static final TrackedData<Direction> gravitychanger$DEFAULT_GRAVITY_DIRECTION = DataTracker.registerData(EnderDragonEntity.class, TrackedDataHandlerRegistry.FACING);
 
     private Direction gravitychanger$prevGravityDirection = Direction.DOWN;
 
-    public EndCrystalEntityMixin(EntityType<?> type, World world) {
+    public EnderDragonEntityMixin(EntityType<?> type, World world) {
         super(type, world);
     }
 
@@ -70,7 +59,7 @@ public abstract class EndCrystalEntityMixin extends Entity implements EntityAcce
         if(!initialGravity) {
             // Adjust position to avoid suffocation in blocks when changing gravity
             EntityDimensions dimensions = this.getDimensions(this.getPose());
-            this.setPosition(this.getPos().subtract(RotationUtil.vecWorldToPlayer(new Vec3d(0,(dimensions.height/2)+.5,0), prevGravityDirection)));
+            //this.setPosition(this.getPos().subtract(RotationUtil.vecWorldToPlayer(new Vec3d(0,(dimensions.height/2)+.5,0), prevGravityDirection)));
             Direction relativeDirection = RotationUtil.dirWorldToPlayer(gravityDirection, prevGravityDirection);
             Vec3d relativePosOffset = switch(relativeDirection) {
                 case DOWN -> Vec3d.ZERO;
@@ -79,7 +68,7 @@ public abstract class EndCrystalEntityMixin extends Entity implements EntityAcce
             };
             //relativePosOffset = relativePosOffset.add(0,dimensions.height/2,0);
             //Vec3d test = RotationUtil.vecPlayerToWorld(RotationUtil.vecWorldToPlayer(new Vec3d(0,(dimensions.height/2)+.5,0), prevGravityDirection), gravityDirection);
-            this.setPosition(this.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, prevGravityDirection)).add(RotationUtil.vecPlayerToWorld(new Vec3d(0,(dimensions.height/2)+.5,0), gravityDirection)));
+            this.setPosition(this.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, prevGravityDirection)));
             if(GravityChangerMod.config.worldVelocity)
             this.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(this.getVelocity(), prevGravityDirection), gravityDirection));
 

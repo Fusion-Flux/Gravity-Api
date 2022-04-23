@@ -185,11 +185,11 @@ public abstract class LivingEntityMixin extends Entity implements EntityAccessor
     private void inject_readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
         if(nbt.contains("GravityDirection", NbtElement.INT_TYPE)) {
             Direction gravityDirection = Direction.byId(nbt.getInt("GravityDirection"));
-            this.gravitychanger$setGravityDirection(gravityDirection, true);
+            this.gravitychanger$setGravityDirection(gravityDirection, false);
         }
         if(nbt.contains("DefaultGravityDirection", NbtElement.INT_TYPE)) {
             Direction gravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
-            this.gravitychanger$setDefaultGravityDirection(gravityDirection, true);
+            this.gravitychanger$setDefaultGravityDirection(gravityDirection, false);
         }
     }
 
