@@ -74,6 +74,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
             this.setPosition(this.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, prevGravityDirection)));
             PlayerEntity player = (PlayerEntity)(Object) this;
             if(player instanceof ServerPlayerEntity serverPlayerEntity) {
+                if(serverPlayerEntity.networkHandler != null)
                 serverPlayerEntity.networkHandler.syncWithPlayerPosition();
             }
 
