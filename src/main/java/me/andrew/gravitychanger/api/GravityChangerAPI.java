@@ -15,7 +15,7 @@ public abstract class GravityChangerAPI {
      * If the player is riding a vehicle this will be the applied gravity direction of the vehicle
      * Otherwise it will be the main gravity gravity direction of the player itself
      */
-    public static Direction getAppliedGravityDirection(Entity playerEntity) {
+    public static Direction getAppliedGravityDirection(PlayerEntity playerEntity) {
         return ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
     }
 
@@ -57,7 +57,7 @@ public abstract class GravityChangerAPI {
      * Returns the world relative velocity for the given player
      * Using minecraft's methods to get the velocity of a the player will return player relative velocity
      */
-    public static Vec3d getWorldVelocity(Entity playerEntity) {
+    public static Vec3d getWorldVelocity(PlayerEntity playerEntity) {
         return RotationUtil.vecPlayerToWorld(playerEntity.getVelocity(), ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection());
     }
 
@@ -65,14 +65,14 @@ public abstract class GravityChangerAPI {
      * Sets the world relative velocity for the given player
      * Using minecraft's methods to set the velocity of a the player will set player relative velocity
      */
-    public static void setWorldVelocity(Entity playerEntity, Vec3d worldVelocity) {
+    public static void setWorldVelocity(PlayerEntity playerEntity, Vec3d worldVelocity) {
         playerEntity.setVelocity(RotationUtil.vecWorldToPlayer(worldVelocity, ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection()));
     }
 
     /**
      * Returns eye position offset from feet position for the given player
      */
-    public static Vec3d getEyeOffset(Entity playerEntity) {
+    public static Vec3d getEyeOffset(PlayerEntity playerEntity) {
         return RotationUtil.vecPlayerToWorld(0, (double) playerEntity.getStandingEyeHeight(), 0, ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection());
     }
 }
