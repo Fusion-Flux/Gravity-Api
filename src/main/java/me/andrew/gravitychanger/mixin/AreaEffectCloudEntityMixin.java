@@ -28,8 +28,10 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.util.Iterator;
 import java.util.List;
@@ -183,164 +185,39 @@ public abstract class AreaEffectCloudEntityMixin extends Entity implements Entit
 
 
 
-
-
-    @Overwrite
-    public void tick() {
-        super.tick();
+    @ModifyArgs(
+            method = "tick",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/World;addImportantParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"
+            )
+    )
+    private void modify_move_multiply_0(Args args) {
         boolean bl = this.isWaiting();
         float f = this.getRadius();
-        if (this.world.isClient) {
-            if (bl && this.random.nextBoolean()) {
-                return;
-            }
 
-            ParticleEffect particleEffect = this.getParticleType();
-            int i;
-            float g;
-            if (bl) {
-                i = 2;
-                g = 0.2F;
-            } else {
-                i = MathHelper.ceil(3.1415927F * f * f);
-                g = f;
-            }
-
-            for(int j = 0; j < i; ++j) {
-                float h = this.random.nextFloat() * 6.2831855F;
-                float k = MathHelper.sqrt(this.random.nextFloat()) * g;
-                double d = this.getX() ;
-                double e = this.getY();
-                double l = this.getZ() ;
-                Vec3d modify = RotationUtil.vecWorldToPlayer(d,e,l,gravitychanger$getGravityDirection());
-                d = modify.x+ (double)(MathHelper.cos(h) * k);
-                e = modify.y;
-                l = modify.z+ (double)(MathHelper.sin(h) * k);
-                modify = RotationUtil.vecPlayerToWorld(d,e,l,gravitychanger$getGravityDirection());
-                d = modify.x;
-                e = modify.y;
-                l = modify.z;
-                double n;
-                double o;
-                double p;
-                if (particleEffect.getType() != ParticleTypes.ENTITY_EFFECT) {
-                    if (bl) {
-                        n = 0.0D;
-                        o = 0.0D;
-                        p = 0.0D;
-                    } else {
-                        n = (0.5D - this.random.nextDouble()) * 0.15D;
-                        o = 0.009999999776482582D;
-                        p = (0.5D - this.random.nextDouble()) * 0.15D;
-                    }
-                } else {
-                    int m = bl && this.random.nextBoolean() ? 16777215 : this.getColor();
-                    n = (double)((float)(m >> 16 & 255) / 255.0F);
-                    o = (double)((float)(m >> 8 & 255) / 255.0F);
-                    p = (double)((float)(m & 255) / 255.0F);
-                }
-
-                this.world.addImportantParticle(particleEffect, d, e, l, n, o, p);
-            }
+        float g;
+        if (bl) {
+            g = 0.2F;
         } else {
-            if (this.age >= this.waitTime + this.duration) {
-                this.discard();
-                return;
-            }
-
-            boolean bl2 = this.age < this.waitTime;
-            if (bl != bl2) {
-                this.setWaiting(bl2);
-            }
-
-            if (bl2) {
-                return;
-            }
-
-            if (this.radiusGrowth != 0.0F) {
-                f += this.radiusGrowth;
-                if (f < 0.5F) {
-                    this.discard();
-                    return;
-                }
-
-                this.setRadius(f);
-            }
-
-            if (this.age % 5 == 0) {
-                this.affectedEntities.entrySet().removeIf((entry) -> {
-                    return this.age >= (Integer)entry.getValue();
-                });
-                List<StatusEffectInstance> list = Lists.newArrayList();
-                Iterator var24 = this.potion.getEffects().iterator();
-
-                while(var24.hasNext()) {
-                    StatusEffectInstance statusEffectInstance = (StatusEffectInstance)var24.next();
-                    list.add(new StatusEffectInstance(statusEffectInstance.getEffectType(), statusEffectInstance.getDuration() / 4, statusEffectInstance.getAmplifier(), statusEffectInstance.isAmbient(), statusEffectInstance.shouldShowParticles()));
-                }
-
-                list.addAll(this.effects);
-                if (list.isEmpty()) {
-                    this.affectedEntities.clear();
-                } else {
-                    List<LivingEntity> list2 = this.world.getNonSpectatingEntities(LivingEntity.class, this.getBoundingBox());
-                    if (!list2.isEmpty()) {
-                        Iterator var27 = list2.iterator();
-
-                        while(true) {
-                            double s;
-                            LivingEntity livingEntity;
-                            do {
-                                do {
-                                    do {
-                                        if (!var27.hasNext()) {
-                                            return;
-                                        }
-
-                                        livingEntity = (LivingEntity)var27.next();
-                                    } while(this.affectedEntities.containsKey(livingEntity));
-                                } while(!livingEntity.isAffectedBySplashPotions());
-
-                                double q = livingEntity.getX() - this.getX();
-                                double r = livingEntity.getZ() - this.getZ();
-                                s = q * q + r * r;
-                            } while(!(s <= (double)(f * f)));
-
-                            this.affectedEntities.put(livingEntity, this.age + this.reapplicationDelay);
-                            Iterator var14 = list.iterator();
-
-                            while(var14.hasNext()) {
-                                StatusEffectInstance statusEffectInstance2 = (StatusEffectInstance)var14.next();
-                                if (statusEffectInstance2.getEffectType().isInstant()) {
-                                    statusEffectInstance2.getEffectType().applyInstantEffect(this, this.getOwner(), livingEntity, statusEffectInstance2.getAmplifier(), 0.5D);
-                                } else {
-                                    livingEntity.addStatusEffect(new StatusEffectInstance(statusEffectInstance2), this);
-                                }
-                            }
-
-                            if (this.radiusOnUse != 0.0F) {
-                                f += this.radiusOnUse;
-                                if (f < 0.5F) {
-                                    this.discard();
-                                    return;
-                                }
-
-                                this.setRadius(f);
-                            }
-
-                            if (this.durationOnUse != 0) {
-                                this.duration += this.durationOnUse;
-                                if (this.duration <= 0) {
-                                    this.discard();
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            g = f;
         }
 
+        float h = this.random.nextFloat() * 6.2831855F;
+        float k = MathHelper.sqrt(this.random.nextFloat()) * g;
+
+        double d = this.getX() ;
+        double e = this.getY();
+        double l = this.getZ() ;
+        Vec3d modify = RotationUtil.vecWorldToPlayer(d,e,l,gravitychanger$getGravityDirection());
+        d = modify.x+ (double)(MathHelper.cos(h) * k);
+        e = modify.y;
+        l = modify.z+ (double)(MathHelper.sin(h) * k);
+        modify = RotationUtil.vecPlayerToWorld(d,e,l,gravitychanger$getGravityDirection());
+
+        args.set(1,modify.x);
+        args.set(2,modify.y);
+        args.set(3,modify.z);
     }
 
 
