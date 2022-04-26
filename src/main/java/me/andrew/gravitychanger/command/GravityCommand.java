@@ -32,7 +32,7 @@ public class GravityCommand {
             );
         }
 
-        LiteralArgumentBuilder<ServerCommandSource> literalSetDefault = literal("setdefualt");
+        LiteralArgumentBuilder<ServerCommandSource> literalSetDefault = literal("setdefault");
         for(Direction direction : Direction.values()) {
             literalSetDefault.then(literal(direction.getName())
                     .executes(context -> {
