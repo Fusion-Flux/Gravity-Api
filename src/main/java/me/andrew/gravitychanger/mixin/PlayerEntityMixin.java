@@ -225,22 +225,38 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
         return RotationUtil.vecWorldToPlayer(playerEntity.getRotationVector(), gravityDirection);
     }
 
-    @Redirect(
+
+    @ModifyArgs(
             method = "travel",
             at = @At(
-                    value = "NEW",
-                    target = "(DDD)Lnet/minecraft/util/math/BlockPos;",
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/BlockPos;<init>(DDD)V",
                     ordinal = 0
             )
     )
-    private BlockPos redirect_travel_new_0(double x, double y, double z) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
-            return new BlockPos(x, y, z);
-        }
-
-        return new BlockPos(this.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, 1.0D - 0.1D, 0.0D, gravityDirection)));
+    private void modify_move_multiply_0(Args args) {
+        Vec3d rotate = new Vec3d(0.0D, 1.0D - 0.1D, 0.0D);
+        rotate = RotationUtil.vecPlayerToWorld(rotate,((EntityAccessor) this).gravitychanger$getAppliedGravityDirection());
+        args.set(0,(double)args.get(0)-rotate.x);
+        args.set(1,(double)args.get(1)-rotate.y + (1.0D - 0.1D));
+        args.set(2,(double)args.get(2)-rotate.z);
     }
+    //@Redirect(
+    //        method = "travel",
+    //        at = @At(
+    //                value = "NEW",
+    //                target = "Lnet/minecraft/util/math/BlockPos;<init>(DDD)V",
+    //                ordinal = 0
+    //        )
+    //)
+    //private BlockPos redirect_travel_new_0(double x, double y, double z) {
+    //    Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+    //    if(gravityDirection == Direction.DOWN) {
+    //        return new BlockPos(x, y, z);
+    //    }
+//
+    //    return new BlockPos(this.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, 1.0D - 0.1D, 0.0D, gravityDirection)));
+    //}
 
     @Redirect(
             method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;",

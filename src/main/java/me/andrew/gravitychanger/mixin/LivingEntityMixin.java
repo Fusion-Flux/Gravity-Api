@@ -277,23 +277,6 @@ public abstract class LivingEntityMixin extends Entity implements EntityAccessor
             method = "travel",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getRotationVector()Lnet/minecraft/util/math/Vec3d;",
-                    ordinal = 0
-            )
-    )
-    private Vec3d redirect_travel_getRotationVector_0(LivingEntity instance) {
-        Direction gravityDirection = ((EntityAccessor) instance).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
-            return instance.getRotationVector();
-        }
-
-        return RotationUtil.vecWorldToPlayer(instance.getRotationVector(), gravityDirection);
-    }
-
-    @Redirect(
-            method = "travel",
-            at = @At(
-                    value = "INVOKE",
                     target = "Lnet/minecraft/entity/LivingEntity;getY()D",
                     ordinal = 3
             )

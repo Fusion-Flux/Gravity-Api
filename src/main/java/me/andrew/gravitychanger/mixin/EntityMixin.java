@@ -94,7 +94,7 @@ public abstract class EntityMixin implements EntityAccessor {
     @Shadow public abstract double getEyeY();
     
     @Shadow @Nullable public abstract Entity getVehicle();
-    
+
     @Override
     public Direction gravitychanger$getAppliedGravityDirection() {
         return Direction.DOWN;
@@ -223,6 +223,7 @@ public abstract class EntityMixin implements EntityAccessor {
 
         return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
     }
+
 
     @ModifyArg(
             method = "move",
@@ -556,6 +557,8 @@ public abstract class EntityMixin implements EntityAccessor {
 
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }
+
+
 
     @Inject(
             method = "pushAwayFrom",
