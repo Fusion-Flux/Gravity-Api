@@ -11,12 +11,9 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.tag.FluidTags;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
@@ -25,17 +22,15 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Stream;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements EntityAccessor {
@@ -332,24 +327,22 @@ public abstract class EntityMixin implements EntityAccessor {
         cir.setReturnValue(RotationUtil.vecPlayerToWorld(cir.getReturnValue(), gravityDirection));
     }
 
-    @Redirect(
+    @ModifyArgs(
             method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/util/math/Box;stretch(DDD)Lnet/minecraft/util/math/Box;",
-                    ordinal = 0
+                    target = "Lnet/minecraft/util/math/Box;stretch(DDD)Lnet/minecraft/util/math/Box;"
             )
     )
-    private Box redirect_adjustMovementForCollisions_stretch_0(Box box, double x, double y, double z) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
-            return box.stretch(x, y, z);
-        }
-
-        return box.stretch(RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection));
+    private void redirect_adjustMovementForCollisions_stretch_0(Args args) {
+        Vec3d rotate = new Vec3d(args.get(0), args.get(1), args.get(2));
+        rotate = RotationUtil.vecPlayerToWorld(rotate,((EntityAccessor) this).gravitychanger$getAppliedGravityDirection());
+        args.set(0,rotate.x);
+        args.set(1,rotate.y);
+        args.set(2,rotate.z);
     }
 
-    @Redirect(
+    @ModifyArgs(
             method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
             at = @At(
                     value = "INVOKE",
@@ -357,16 +350,13 @@ public abstract class EntityMixin implements EntityAccessor {
                     ordinal = 0
             )
     )
-    private Box redirect_adjustMovementForCollisions_offset_0(Box box, Vec3d vec3d) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
-            return box.offset(vec3d);
-        }
-
-        return box.offset(RotationUtil.vecPlayerToWorld(vec3d, gravityDirection));
+    private void redirect_adjustMovementForCollisions_offset_0(Args args) {
+        Vec3d rotate = args.get(0);
+        rotate = RotationUtil.vecPlayerToWorld(rotate,((EntityAccessor) this).gravitychanger$getAppliedGravityDirection());
+        args.set(0,rotate);
     }
 
-    @Redirect(
+    @ModifyArgs(
             method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
             at = @At(
                     value = "INVOKE",
@@ -374,13 +364,10 @@ public abstract class EntityMixin implements EntityAccessor {
                     ordinal = 1
             )
     )
-    private Box redirect_adjustMovementForCollisions_offset_1(Box box, Vec3d vec3d) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
-            return box.offset(vec3d);
-        }
-
-        return box.offset(RotationUtil.vecPlayerToWorld(vec3d, gravityDirection));
+    private void redirect_adjustMovementForCollisions_offset_1(Args args) {
+        Vec3d rotate = args.get(0);
+        rotate = RotationUtil.vecPlayerToWorld(rotate,((EntityAccessor) this).gravitychanger$getAppliedGravityDirection());
+        args.set(0,rotate);
     }
 
     @ModifyVariable(
@@ -465,7 +452,7 @@ public abstract class EntityMixin implements EntityAccessor {
         return RotationUtil.vecPlayerToWorld(playerMovementX, playerMovementY, playerMovementZ, gravityDirection);
     }
 
-    @Redirect(
+    @ModifyArgs(
             method = "isInsideWall",
             at = @At(
                     value = "INVOKE",
@@ -473,13 +460,12 @@ public abstract class EntityMixin implements EntityAccessor {
                     ordinal = 0
             )
     )
-    private Box redirect_isInsideWall_of_0(Vec3d center, double dx, double dy, double dz) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
-            return Box.of(center, dx, dy, dz);
-        }
-
-        return RotationUtil.boxPlayerToWorld(Box.of(Vec3d.ZERO, dx, dy, dz), gravityDirection).offset(center);
+    private void modify_isInsideWall_of_0(Args args) {
+        Vec3d rotate = new Vec3d(args.get(1), args.get(2), args.get(3));
+        rotate = RotationUtil.vecPlayerToWorld(rotate,((EntityAccessor) this).gravitychanger$getAppliedGravityDirection());
+        args.set(1,rotate.x);
+        args.set(2,rotate.y);
+        args.set(3,rotate.z);
     }
 
     @Redirect(
@@ -638,7 +624,7 @@ public abstract class EntityMixin implements EntityAccessor {
         }
     }
 
-    @Redirect(
+    @ModifyArgs(
             method = "doesNotCollide(DDD)Z",
             at = @At(
                     value = "INVOKE",
@@ -646,13 +632,12 @@ public abstract class EntityMixin implements EntityAccessor {
                     ordinal = 0
             )
     )
-    private Box redirect_doesNotCollide_offset_0(Box box, double x, double y, double z) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
-            return box.offset(x, y, z);
-        }
-
-        return box.offset(RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection));
+    private void redirect_doesNotCollide_offset_0(Args args) {
+        Vec3d rotate = new Vec3d(args.get(0), args.get(1), args.get(2));
+        rotate = RotationUtil.vecPlayerToWorld(rotate,((EntityAccessor) this).gravitychanger$getAppliedGravityDirection());
+        args.set(0,rotate.x);
+        args.set(1,rotate.y);
+        args.set(2,rotate.z);
     }
 
 
