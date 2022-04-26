@@ -537,10 +537,10 @@ public abstract class EntityMixin implements EntityAccessor {
     private double redirect_getHorizontalFacing_getYaw_0(double rotation) {
         Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
         if(gravityDirection == Direction.DOWN) {
-            return this.getYaw();
+            return rotation;
         }
 
-        return RotationUtil.rotPlayerToWorld(this.getYaw(), this.getPitch(), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld((float)rotation, this.getPitch(), gravityDirection).x;
     }
 
     @Inject(
