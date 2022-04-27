@@ -37,5 +37,11 @@
     "minecraft": "1.18.2",
     "java": ">=17",
     "cloth-config2": "*"
+  },
+  "custom": {
+    "lithium:options": {
+      "mixin.entity.collisions": false,
+      "mixin.entity.fast_suffocation_check": false
+    }
   }
 }
