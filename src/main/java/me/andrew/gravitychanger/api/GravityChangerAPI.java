@@ -1,6 +1,12 @@
 package me.andrew.gravitychanger.api;
 
+import java.util.Optional;
+
+import org.jetbrains.annotations.Nullable;
+
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.GravityComponent;
@@ -23,6 +29,18 @@ public abstract class GravityChangerAPI {
     public static Direction getAppliedGravityDirection(PlayerEntity playerEntity) {
         return ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
     }
+    
+    // workaround for a CCA bug; maybeGet throws an NPE in internal code if the DataTracker isn't initialized
+    // null check the component container to avoid it
+    private static <C extends Component, V> Optional<C> maybeGetSafe(ComponentKey<C> key, @Nullable V provider) {
+        if (provider instanceof ComponentProvider p) {
+            var cc = p.getComponentContainer();
+            if (cc != null) {
+                return Optional.ofNullable(key.getInternal(cc));
+            }
+        }
+        return Optional.empty();
+    }
 
     /**
      * Returns the main gravity direction for the given player
@@ -31,7 +49,7 @@ public abstract class GravityChangerAPI {
     public static Direction getGravityDirection(Entity playerEntity) {
         //if(playerEntity instanceof RotatableEntityAccessor)
         //if(playerEntity != null)
-        return GRAVITY_COMPONENT.maybeGet(playerEntity).map(GravityComponent::getTrackedGravityDirection).orElse(Direction.DOWN);
+        return maybeGetSafe(GRAVITY_COMPONENT, playerEntity).map(GravityComponent::getTrackedGravityDirection).orElse(Direction.DOWN);
        // return ((RotatableEntityAccessor) playerEntity).gravitychanger$getGravityDirection();
         //return  Direction.DOWN;
     }
@@ -39,7 +57,7 @@ public abstract class GravityChangerAPI {
     public static Direction getDefaultGravityDirection(Entity playerEntity) {
         //if(playerEntity instanceof RotatableEntityAccessor)
        //if(playerEntity != null)
-        return GRAVITY_COMPONENT.maybeGet(playerEntity).map(GravityComponent::getDefaultTrackedGravityDirection).orElse(Direction.DOWN);
+        return maybeGetSafe(GRAVITY_COMPONENT, playerEntity).map(GravityComponent::getDefaultTrackedGravityDirection).orElse(Direction.DOWN);
         //return ((RotatableEntityAccessor) playerEntity).gravitychanger$getDefaultGravityDirection();
         //return  Direction.DOWN;
     }
@@ -53,14 +71,14 @@ public abstract class GravityChangerAPI {
      */
     public static void setGravityDirection(Entity playerEntity, Direction gravityDirection) {
         //if(playerEntity instanceof RotatableEntityAccessor)
-        GRAVITY_COMPONENT.maybeGet(playerEntity).ifPresent(gc -> gc.setTrackedGravityDirection(gravityDirection));
+        maybeGetSafe(GRAVITY_COMPONENT, playerEntity).ifPresent(gc -> gc.setTrackedGravityDirection(gravityDirection));
         //((RotatableEntityAccessor) playerEntity).gravitychanger$setGravityDirection(gravityDirection, false);
     }
 
 
     public static void setDefaultGravityDirection(Entity playerEntity, Direction gravityDirection) {
         //if(playerEntity instanceof RotatableEntityAccessor)
-        GRAVITY_COMPONENT.maybeGet(playerEntity).ifPresent(gc -> gc.setDefaultTrackedGravityDirection(gravityDirection));
+        maybeGetSafe(GRAVITY_COMPONENT, playerEntity).ifPresent(gc -> gc.setDefaultTrackedGravityDirection(gravityDirection));
         //((RotatableEntityAccessor) playerEntity).gravitychanger$setDefaultGravityDirection(gravityDirection, false);
     }
 
