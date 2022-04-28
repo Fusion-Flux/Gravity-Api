@@ -42,12 +42,12 @@
     "cloth-config2": "*"
   },
   "custom": {
+    "cardinal-components": [
+      "gravitychanger:gravity_direction"
+    ],
     "lithium:options": {
       "mixin.entity.collisions": false,
       "mixin.entity.fast_suffocation_check": false
-    },
-    "cardinal-components": [
-      "gravitychanger:gravity_direction"
-    ]
+    }
   }
 }

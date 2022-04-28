@@ -1,6 +1,6 @@
 package me.andrew.gravitychanger;
 
-import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
+import me.andrew.gravitychanger.api.GravityChangerAPI;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.util.math.Direction;
@@ -13,8 +13,8 @@ public class ClientInit implements ClientModInitializer {
             boolean initialGravity = buf.readBoolean();
             client.execute(() -> {
                 if(client.player == null) return;
-
-                ((RotatableEntityAccessor) client.player).gravitychanger$setGravityDirection(gravityDirection, initialGravity);
+                GravityChangerAPI.setGravityDirection(client.player,gravityDirection);
+               // ((RotatableEntityAccessor) client.player).gravitychanger$setGravityDirection(gravityDirection, initialGravity);
             });
         });
     }

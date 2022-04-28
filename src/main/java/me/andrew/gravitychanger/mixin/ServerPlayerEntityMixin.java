@@ -1,8 +1,8 @@
 package me.andrew.gravitychanger.mixin;
 
 import me.andrew.gravitychanger.GravityChangerMod;
-import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
 import me.andrew.gravitychanger.accessor.ServerPlayerEntityAccessor;
+import me.andrew.gravitychanger.api.GravityChangerAPI;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.network.PacketByteBuf;
@@ -18,36 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin implements RotatableEntityAccessor, ServerPlayerEntityAccessor {
+public abstract class ServerPlayerEntityMixin implements  ServerPlayerEntityAccessor {
     @Shadow public ServerPlayNetworkHandler networkHandler;
-
-    private Direction gravitychanger$gravityDirection = Direction.DOWN;
-
-    @Override
-    public Direction gravitychanger$getGravityDirection() {
-        if(this.gravitychanger$gravityDirection == null) {
-            return Direction.DOWN;
-        }
-
-        return this.gravitychanger$gravityDirection;
-    }
-
-    @Override
-    public void gravitychanger$setGravityDirection(Direction gravityDirection, boolean initialGravity) {
-        if(this.gravitychanger$gravityDirection == gravityDirection) return;
-
-        this.gravitychanger$sendGravityPacket(gravityDirection, initialGravity);
-        this.gravitychanger$setTrackedGravityDirection(gravityDirection);
-
-        Direction prevGravityDirection = this.gravitychanger$gravityDirection;
-        this.gravitychanger$gravityDirection = gravityDirection;
-        this.gravitychanger$onGravityChanged(prevGravityDirection, initialGravity);
-    }
-
-    @Override
-    public void gravitychanger$onTrackedData(TrackedData<?> data) {
-
-    }
 
     @Override
     public void gravitychanger$sendGravityPacket(Direction gravityDirection, boolean initialGravity) {
@@ -69,9 +41,9 @@ public abstract class ServerPlayerEntityMixin implements RotatableEntityAccessor
             )
     )
     private void inject_moveToWorld_sendPacket_1(CallbackInfoReturnable<ServerPlayerEntity> cir) {
-        Direction gravityDirection = this.gravitychanger$getGravityDirection();
-        if(gravityDirection != this.gravitychanger$getDefaultGravityDirection() && GravityChangerMod.config.resetGravityOnDimensionChange) {
-            this.gravitychanger$setGravityDirection(this.gravitychanger$getDefaultGravityDirection(), true);
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this);
+        if(gravityDirection != GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
+            GravityChangerAPI.setGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this));
         } else {
             this.gravitychanger$sendGravityPacket(gravityDirection, true);
         }
@@ -87,10 +59,10 @@ public abstract class ServerPlayerEntityMixin implements RotatableEntityAccessor
             )
     )
     private void inject_teleport_sendPacket_0(CallbackInfo ci) {
-        Direction gravityDirection = this.gravitychanger$getGravityDirection();
-        if(gravityDirection != this.gravitychanger$getDefaultGravityDirection() && GravityChangerMod.config.resetGravityOnDimensionChange) {
-            this.gravitychanger$setDefaultGravityDirection(this.gravitychanger$getDefaultGravityDirection(), true);
-            this.gravitychanger$setGravityDirection(this.gravitychanger$getDefaultGravityDirection(), true);
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this);
+        if(gravityDirection != GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
+            GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this));
+            GravityChangerAPI.setGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this));
         } else {
             this.gravitychanger$sendGravityPacket(gravityDirection, true);
         }
@@ -102,10 +74,10 @@ public abstract class ServerPlayerEntityMixin implements RotatableEntityAccessor
     )
     private void inject_copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
         if(GravityChangerMod.config.resetGravityOnRespawn) {
-            this.gravitychanger$setDefaultGravityDirection(((RotatableEntityAccessor) oldPlayer).gravitychanger$getDefaultGravityDirection(), true);
-            this.gravitychanger$setGravityDirection(((RotatableEntityAccessor) oldPlayer).gravitychanger$getDefaultGravityDirection(), true);
+            GravityChangerAPI.setDefaultGravityDirection(oldPlayer, GravityChangerAPI.getDefaultGravityDirection(oldPlayer));
+            GravityChangerAPI.setGravityDirection(oldPlayer, GravityChangerAPI.getDefaultGravityDirection(oldPlayer));
         } else {
-            this.gravitychanger$setGravityDirection(((RotatableEntityAccessor) oldPlayer).gravitychanger$getGravityDirection(), true);
+            GravityChangerAPI.setGravityDirection(oldPlayer, GravityChangerAPI.getGravityDirection(oldPlayer));
         }
     }
 }

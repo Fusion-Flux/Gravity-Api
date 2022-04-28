@@ -14,6 +14,6 @@ public class GravityChangerComponents implements EntityComponentInitializer {
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        registry.registerFor(Entity.class, GRAVITY_MODIFIER, e -> new GravityDirectionComponent());
+        registry.registerFor(Entity.class, GRAVITY_MODIFIER, GravityDirectionComponent::new);
     }
 }

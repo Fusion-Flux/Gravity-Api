@@ -2,7 +2,7 @@ package me.andrew.gravitychanger.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
+import me.andrew.gravitychanger.api.GravityChangerAPI;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
@@ -83,7 +83,7 @@ public class GravityCommand {
     }
 
     private static int executeGet(ServerCommandSource source, ServerPlayerEntity player) {
-        Direction gravityDirection = ((RotatableEntityAccessor) player).gravitychanger$getGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         getSendFeedback(source, player, gravityDirection);
 
         return gravityDirection.getId();
@@ -102,9 +102,9 @@ public class GravityCommand {
         int i = 0;
 
         for(ServerPlayerEntity player : players) {
-            RotatableEntityAccessor rotatableEntityAccessor = (RotatableEntityAccessor) player;
-            if(rotatableEntityAccessor.gravitychanger$getGravityDirection() != gravityDirection) {
-                rotatableEntityAccessor.gravitychanger$setGravityDirection(gravityDirection, false);
+            //RotatableEntityAccessor rotatableEntityAccessor = (RotatableEntityAccessor) player;
+            if(GravityChangerAPI.getGravityDirection(player) != gravityDirection) {
+                GravityChangerAPI.setGravityDirection(player, gravityDirection);
                 setSendFeedback(source, player, gravityDirection);
                 i++;
             }
@@ -117,10 +117,10 @@ public class GravityCommand {
         int i = 0;
 
         for(ServerPlayerEntity player : players) {
-            RotatableEntityAccessor rotatableEntityAccessor = (RotatableEntityAccessor) player;
-            if(rotatableEntityAccessor.gravitychanger$getDefaultGravityDirection() != gravityDirection) {
-                rotatableEntityAccessor.gravitychanger$setGravityDirection(gravityDirection, false);
-                rotatableEntityAccessor.gravitychanger$setDefaultGravityDirection(gravityDirection, false);
+            //RotatableEntityAccessor rotatableEntityAccessor = (RotatableEntityAccessor) player;
+            if(GravityChangerAPI.getDefaultGravityDirection(player) != gravityDirection) {
+                GravityChangerAPI.setGravityDirection(player, gravityDirection);
+                GravityChangerAPI.setDefaultGravityDirection(player, gravityDirection);
                 setSendFeedback(source, player, gravityDirection);
                 i++;
             }
@@ -142,15 +142,15 @@ public class GravityCommand {
         int i = 0;
 
         for(ServerPlayerEntity player : players) {
-            RotatableEntityAccessor rotatableEntityAccessor = (RotatableEntityAccessor) player;
-            Direction gravityDirection = rotatableEntityAccessor.gravitychanger$getGravityDirection();
+            //RotatableEntityAccessor rotatableEntityAccessor = (RotatableEntityAccessor) player;
+            Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
             Direction combinedRelativeDirection = switch(relativeDirection) {
                 case DOWN -> Direction.DOWN;
                 case UP -> Direction.UP;
                 case FORWARD, BACKWARD, LEFT, RIGHT -> Direction.fromHorizontal(relativeDirection.getHorizontalOffset() + Direction.fromRotation(player.getYaw()).getHorizontal());
             };
             Direction newGravityDirection = RotationUtil.dirPlayerToWorld(combinedRelativeDirection, gravityDirection);
-            rotatableEntityAccessor.gravitychanger$setGravityDirection(newGravityDirection, false);
+            GravityChangerAPI.setGravityDirection(player, newGravityDirection);
             setSendFeedback(source, player, newGravityDirection);
             i++;
         }
@@ -162,10 +162,10 @@ public class GravityCommand {
         int i = 0;
 
         for(ServerPlayerEntity player : players) {
-            RotatableEntityAccessor rotatableEntityAccessor = (RotatableEntityAccessor) player;
+            //RotatableEntityAccessor rotatableEntityAccessor = (RotatableEntityAccessor) player;
             Direction gravityDirection = Direction.random(source.getWorld().random);
-            if(rotatableEntityAccessor.gravitychanger$getGravityDirection() != gravityDirection) {
-                rotatableEntityAccessor.gravitychanger$setGravityDirection(gravityDirection, false);
+            if(GravityChangerAPI.getGravityDirection(player) != gravityDirection) {
+                GravityChangerAPI.setGravityDirection(player, gravityDirection);
                 setSendFeedback(source, player, gravityDirection);
                 i++;
             }

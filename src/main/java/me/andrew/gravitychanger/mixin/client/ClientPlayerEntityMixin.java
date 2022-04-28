@@ -2,8 +2,6 @@ package me.andrew.gravitychanger.mixin.client;
 
 import com.mojang.authlib.GameProfile;
 import me.andrew.gravitychanger.accessor.EntityAccessor;
-import me.andrew.gravitychanger.accessor.RotatableEntityAccessor;
-import me.andrew.gravitychanger.api.GravityChangerAPI;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -21,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayerEntity.class)
-public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity implements RotatableEntityAccessor {
+public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
     @Shadow protected abstract boolean wouldCollideAt(BlockPos pos);
 
     public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
@@ -30,28 +28,28 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     private Direction gravitychanger$gravityDirection = Direction.DOWN;
 
-    @Override
-    public Direction gravitychanger$getGravityDirection() {
-        if(this.gravitychanger$gravityDirection == null) {
-            return Direction.DOWN;
-        }
-
-        return this.gravitychanger$gravityDirection;
-    }
-
-    @Override
-    public void gravitychanger$setGravityDirection(Direction gravityDirection, boolean initialGravity) {
-        if(this.gravitychanger$gravityDirection == gravityDirection) return;
-        //RotationUtil.applyNewRotation(gravityDirection);
-        Direction prevGravityDirection = this.gravitychanger$gravityDirection;
-        this.gravitychanger$gravityDirection = gravityDirection;
-        this.gravitychanger$onGravityChanged(prevGravityDirection, initialGravity);
-    }
-
-    @Override
-    public void gravitychanger$onTrackedData(TrackedData<?> data) {
-
-    }
+    //@Override
+    //public Direction gravitychanger$getGravityDirection() {
+    //    if(this.gravitychanger$gravityDirection == null) {
+    //        return Direction.DOWN;
+    //    }
+//
+    //    return this.gravitychanger$gravityDirection;
+    //}
+//
+    //@Override
+    //public void gravitychanger$setGravityDirection(Direction gravityDirection, boolean initialGravity) {
+    //    if(this.gravitychanger$gravityDirection == gravityDirection) return;
+    //    //RotationUtil.applyNewRotation(gravityDirection);
+    //    Direction prevGravityDirection = this.gravitychanger$gravityDirection;
+    //    this.gravitychanger$gravityDirection = gravityDirection;
+    //    this.gravitychanger$onGravityChanged(prevGravityDirection, initialGravity);
+    //}
+//
+    //@Override
+    //public void gravitychanger$onTrackedData(TrackedData<?> data) {
+//
+    //}
 
     @Redirect(
             method = "wouldCollideAt",
