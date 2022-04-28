@@ -25,6 +25,9 @@
     ],
     "modmenu": [
       "me.andrew.gravitychanger.ModMenuIntegration"
+    ],
+    "cardinal-components": [
+      "me.andrew.gravitychanger.util.GravityChangerComponents"
     ]
   },
   "mixins": [
@@ -42,6 +45,9 @@
     "lithium:options": {
       "mixin.entity.collisions": false,
       "mixin.entity.fast_suffocation_check": false
-    }
+    },
+    "cardinal-components": [
+      "gravitychanger:gravity_direction"
+    ]
   }
 }

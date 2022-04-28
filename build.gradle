@@ -17,6 +17,14 @@ repositories {
 	maven {
 		url "https://maven.terraformersmc.com/"
 	}
+	maven {
+		name = "Ladysnake Mods"
+		url = 'https://ladysnake.jfrog.io/artifactory/mods'
+		content {
+			includeGroup 'io.github.ladysnake'
+			includeGroupByRegex 'io\\.github\\.onyxstudios.*'
+		}
+	}
 }
 
 dependencies {
@@ -29,6 +37,16 @@ dependencies {
 		exclude(group: "net.fabricmc.fabric-api")
 	}
 	modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
+
+	// Replace modImplementation with modApi if you expose components in your own API
+	modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:4.0.0"
+	// Includes Cardinal Components API as a Jar-in-Jar dependency (optional but recommended)
+	include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:4.0.0"
+
+	// Replace modImplementation with modApi if you expose components in your own API
+	modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:4.0.0"
+	// Includes Cardinal Components API as a Jar-in-Jar dependency (optional but recommended)
+	include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:4.0.0"
 }
 
 processResources {

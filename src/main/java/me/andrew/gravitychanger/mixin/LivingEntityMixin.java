@@ -29,9 +29,9 @@ public abstract class LivingEntityMixin extends Entity implements EntityAccessor
 
     @Shadow public abstract float getYaw(float tickDelta);
 
-    private static final TrackedData<Direction> gravitychanger$GRAVITY_DIRECTION = DataTracker.registerData(LivingEntity.class, TrackedDataHandlerRegistry.FACING);
+private static final TrackedData<Direction> gravitychanger$GRAVITY_DIRECTION = DataTracker.registerData(LivingEntity.class, TrackedDataHandlerRegistry.FACING);
 
-    private static final TrackedData<Direction> gravitychanger$DEFAULT_GRAVITY_DIRECTION = DataTracker.registerData(LivingEntity.class, TrackedDataHandlerRegistry.FACING);
+private static final TrackedData<Direction> gravitychanger$DEFAULT_GRAVITY_DIRECTION = DataTracker.registerData(LivingEntity.class, TrackedDataHandlerRegistry.FACING);
 
     private Direction gravitychanger$prevGravityDirection = Direction.DOWN;
 
@@ -180,47 +180,47 @@ public abstract class LivingEntityMixin extends Entity implements EntityAccessor
         }
     }
 
-    @Inject(
-            method = "initDataTracker",
-            at = @At("RETURN")
-    )
-    private void inject_initDataTracker(CallbackInfo ci) {
-        LivingEntity testval = (LivingEntity) (Object) this;
-        if(!(testval instanceof PlayerEntity)) {
-            this.dataTracker.startTracking(gravitychanger$GRAVITY_DIRECTION, Direction.DOWN);
-            this.dataTracker.startTracking(gravitychanger$DEFAULT_GRAVITY_DIRECTION, Direction.DOWN);
-        }
-    }
-
-    @Inject(
-            method = "readCustomDataFromNbt",
-            at = @At("RETURN")
-    )
-    private void inject_readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
-        LivingEntity testval = (LivingEntity) (Object) this;
-        if(!(testval instanceof PlayerEntity)) {
-            if (nbt.contains("GravityDirection", NbtElement.INT_TYPE)) {
-                Direction gravityDirection = Direction.byId(nbt.getInt("GravityDirection"));
-                this.gravitychanger$setGravityDirection(gravityDirection, false);
-            }
-            if (nbt.contains("DefaultGravityDirection", NbtElement.INT_TYPE)) {
-                Direction gravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
-                this.gravitychanger$setDefaultGravityDirection(gravityDirection, false);
-            }
-        }
-    }
-
-    @Inject(
-            method = "writeCustomDataToNbt",
-            at = @At("RETURN")
-    )
-    private void inject_writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
-        LivingEntity testval = (LivingEntity) (Object) this;
-        if(!(testval instanceof PlayerEntity)) {
-            nbt.putInt("GravityDirection", this.gravitychanger$getGravityDirection().getId());
-            nbt.putInt("DefaultGravityDirection", this.gravitychanger$getDefaultGravityDirection().getId());
-        }
-    }
+  //  @Inject(
+  //          method = "initDataTracker",
+  //          at = @At("RETURN")
+  //  )
+  //  private void inject_initDataTracker(CallbackInfo ci) {
+  //      LivingEntity testval = (LivingEntity) (Object) this;
+  //      if(!(testval instanceof PlayerEntity)) {
+  //          this.dataTracker.startTracking(gravitychanger$GRAVITY_DIRECTION, Direction.DOWN);
+  //          this.dataTracker.startTracking(gravitychanger$DEFAULT_GRAVITY_DIRECTION, Direction.DOWN);
+  //      }
+  //  }
+//
+  //  @Inject(
+  //          method = "readCustomDataFromNbt",
+  //          at = @At("RETURN")
+  //  )
+  //  private void inject_readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
+  //      LivingEntity testval = (LivingEntity) (Object) this;
+  //      if(!(testval instanceof PlayerEntity)) {
+  //          if (nbt.contains("GravityDirection", NbtElement.INT_TYPE)) {
+  //              Direction gravityDirection = Direction.byId(nbt.getInt("GravityDirection"));
+  //              this.gravitychanger$setGravityDirection(gravityDirection, false);
+  //          }
+  //          if (nbt.contains("DefaultGravityDirection", NbtElement.INT_TYPE)) {
+  //              Direction gravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
+  //              this.gravitychanger$setDefaultGravityDirection(gravityDirection, false);
+  //          }
+  //      }
+  //  }
+//
+  //  @Inject(
+  //          method = "writeCustomDataToNbt",
+  //          at = @At("RETURN")
+  //  )
+  //  private void inject_writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
+  //      LivingEntity testval = (LivingEntity) (Object) this;
+  //      if(!(testval instanceof PlayerEntity)) {
+  //          nbt.putInt("GravityDirection", this.gravitychanger$getGravityDirection().getId());
+  //          nbt.putInt("DefaultGravityDirection", this.gravitychanger$getDefaultGravityDirection().getId());
+  //      }
+  //  }
 
     @Redirect(
             method = "travel",
