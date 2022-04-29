@@ -18,10 +18,10 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class GravityChangerItem extends Item {
+public class GravityChangerItemAOE extends Item {
     public final Direction gravityDirection;
 
-    public GravityChangerItem(Settings settings, Direction gravityDirection) {
+    public GravityChangerItemAOE(Settings settings, Direction gravityDirection) {
         super(settings);
 
         this.gravityDirection = gravityDirection;
@@ -29,15 +29,16 @@ public class GravityChangerItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (!user.isSneaking()) {
-            if (GravityChangerAPI.getGravityDirection(user) == this.gravityDirection) {
-                GravityChangerAPI.setDefaultGravityDirection(user, this.gravityDirection);
-            } else {
-                GravityChangerAPI.setGravityDirection(user, this.gravityDirection);
-            }
-        } else {
-            GravityChangerAPI.setGravityDirection(user, GravityChangerAPI.getDefaultGravityDirection(user));
+        Box box = user.getBoundingBox().expand(3);
+        List<Entity> list = world.getEntitiesByClass(Entity.class, box, e -> !(e instanceof PlayerEntity && ((PlayerEntity) e).getAbilities().flying));
+        for (Entity entity : list) {
+            if(entity!=user)
+            GravityChangerAPI.setGravityDirection(entity, this.gravityDirection);
         }
+
         return TypedActionResult.success(user.getStackInHand(hand));
     }
+
+
+
 }

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "gravitychanger:item/gravity_changer_south_aoe"
+  }
+}

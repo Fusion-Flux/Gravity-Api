@@ -6,6 +6,13 @@
   "item.gravitychanger.gravity_changer_west": "West Gravity Changer",
   "item.gravitychanger.gravity_changer_east": "East Gravity Changer",
 
+  "item.gravitychanger.gravity_changer_down_aoe": "Down Gravity Changer AOE",
+  "item.gravitychanger.gravity_changer_up_aoe": "Up Gravity Changer AOE",
+  "item.gravitychanger.gravity_changer_north_aoe": "North Gravity Changer AOE",
+  "item.gravitychanger.gravity_changer_south_aoe": "South Gravity Changer AOE",
+  "item.gravitychanger.gravity_changer_west_aoe": "West Gravity Changer AOE",
+  "item.gravitychanger.gravity_changer_east_aoe": "East Gravity Changer AOE",
+
   "direction.down": "Down",
   "direction.up": "Up",
   "direction.north": "North",
