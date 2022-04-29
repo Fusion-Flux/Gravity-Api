@@ -45,7 +45,7 @@ public abstract class ServerPlayerEntityMixin implements  ServerPlayerEntityAcce
         if(gravityDirection != GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
             GravityChangerAPI.setGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this));
         } else {
-            this.gravitychanger$sendGravityPacket(gravityDirection, true);
+            this.gravitychanger$sendGravityPacket(gravityDirection, false);
         }
     }
 
@@ -64,7 +64,7 @@ public abstract class ServerPlayerEntityMixin implements  ServerPlayerEntityAcce
             GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this));
             GravityChangerAPI.setGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this));
         } else {
-            this.gravitychanger$sendGravityPacket(gravityDirection, true);
+            this.gravitychanger$sendGravityPacket(gravityDirection, false);
         }
     }
 

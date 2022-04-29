@@ -2,6 +2,7 @@ package me.andrew.gravitychanger.mixin;
 
 import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.util.RotationUtil;
+import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -123,4 +124,73 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }
+
+    @Redirect(
+            method = "onVehicleMove",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/Entity;getY()D",
+                    ordinal = 0
+            )
+    )
+    private double redirect_onVehicleMove_getY_0(Entity instance) {
+        Direction gravityDirection = ((EntityAccessor) instance).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return instance.getY();
+        }
+
+        return RotationUtil.vecWorldToPlayer(instance.getPos(), gravityDirection).y;
+    }
+
+    @Redirect(
+            method = "onVehicleMove",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/Entity;getY()D",
+                    ordinal = 2
+            )
+    )
+    private double redirect_onVehicleMove_getY_2(Entity instance) {
+        Direction gravityDirection = ((EntityAccessor) instance).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return instance.getY();
+        }
+
+        return RotationUtil.vecWorldToPlayer(instance.getPos(), gravityDirection).y;
+    }
+
+    @ModifyArg(
+            method = "onVehicleMove",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/Entity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"
+            ),
+            index = 1
+    )
+    private Vec3d modify_onVehicleMove_move_0(Vec3d vec3d) {
+        Direction gravityDirection = ((EntityAccessor) this.player).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
+
+        return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
+    }
+
+    @ModifyVariable(
+            method = "onVehicleMove",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/Entity;getX()D",
+                    ordinal = 1
+            ),ordinal = 0
+    )
+    private double modify_onVehicleMove_double_12(double value) {
+        Direction gravityDirection = ((EntityAccessor) this.player).gravitychanger$getAppliedGravityDirection();
+        if(gravityDirection == Direction.DOWN) {
+            return value;
+        }
+
+        return gravitychanger$onPlayerMove_playerMovementY;
+    }
+
 }

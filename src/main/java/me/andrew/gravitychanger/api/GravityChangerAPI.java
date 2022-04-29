@@ -71,6 +71,7 @@ public abstract class GravityChangerAPI {
      */
     public static void setGravityDirection(Entity playerEntity, Direction gravityDirection) {
         //if(playerEntity instanceof RotatableEntityAccessor)
+        //GRAVITY_COMPONENT.sync();
         maybeGetSafe(GRAVITY_COMPONENT, playerEntity).ifPresent(gc -> gc.setTrackedGravityDirection(gravityDirection));
         //((RotatableEntityAccessor) playerEntity).gravitychanger$setGravityDirection(gravityDirection, false);
     }

@@ -138,6 +138,7 @@ public abstract class EntityMixin implements EntityAccessor {
     public Direction gravitychanger$getAppliedGravityDirection() {
         Entity vehicle = this.getVehicle();
         if(vehicle != null) {
+            GravityChangerAPI.setGravityDirection((Entity)(Object)this,GravityChangerAPI.getGravityDirection(vehicle));
             return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
         }
 
