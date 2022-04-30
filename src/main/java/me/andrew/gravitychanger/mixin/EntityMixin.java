@@ -17,6 +17,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -133,6 +134,8 @@ public abstract class EntityMixin implements EntityAccessor {
 
     @Shadow
     public abstract float getPitch();
+
+    @Shadow private Vec3d trackedPosition;
 
     @Override
     public Direction gravitychanger$getAppliedGravityDirection() {
@@ -452,55 +455,55 @@ public abstract class EntityMixin implements EntityAccessor {
         cir.setReturnValue(RotationUtil.vecWorldToPlayer(cir.getReturnValue(), gravityDirection));
     }
 
-    //@Redirect(
-    //        method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
-    //        at = @At(
-    //                value = "INVOKE",
-    //                target = "Lnet/minecraft/entity/Entity;adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
-    //                ordinal = 0
-    //        )
-    //)
-    //private static Vec3d redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(Vec3d movement, Box entityBoundingBox, List<VoxelShape> collisions, Entity entity) {
-    //    Direction gravityDirection;
-    //    if(entity == null || (gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection()) == Direction.DOWN) {
-    //        return adjustMovementForCollisions(movement, entityBoundingBox, collisions);
-    //    }
-//
-    //    Vec3d playerMovement = RotationUtil.vecWorldToPlayer(movement, gravityDirection);
-    //    double playerMovementX = playerMovement.x;
-    //    double playerMovementY = playerMovement.y;
-    //    double playerMovementZ = playerMovement.z;
-    //    Direction directionX = RotationUtil.dirPlayerToWorld(Direction.EAST, gravityDirection);
-    //    Direction directionY = RotationUtil.dirPlayerToWorld(Direction.UP, gravityDirection);
-    //    Direction directionZ = RotationUtil.dirPlayerToWorld(Direction.SOUTH, gravityDirection);
-    //    if (playerMovementY != 0.0D) {
-    //        playerMovementY = VoxelShapes.calculateMaxOffset(directionY.getAxis(), entityBoundingBox, collisions, playerMovementY * directionY.getDirection().offset()) * directionY.getDirection().offset();
-    //        if (playerMovementY != 0.0D) {
-    //            entityBoundingBox = entityBoundingBox.offset(RotationUtil.vecPlayerToWorld(0.0D, playerMovementY, 0.0D, gravityDirection));
-    //        }
-    //    }
-//
-    //    boolean isZLargerThanX = Math.abs(playerMovementX) < Math.abs(playerMovementZ);
-    //    if (isZLargerThanX && playerMovementZ != 0.0D) {
-    //        playerMovementZ = VoxelShapes.calculateMaxOffset(directionZ.getAxis(), entityBoundingBox, collisions, playerMovementZ * directionZ.getDirection().offset()) * directionZ.getDirection().offset();
-    //        if (playerMovementZ != 0.0D) {
-    //            entityBoundingBox = entityBoundingBox.offset(RotationUtil.vecPlayerToWorld(0.0D, 0.0D, playerMovementZ, gravityDirection));
-    //        }
-    //    }
-//
-    //    if (playerMovementX != 0.0D) {
-    //        playerMovementX = VoxelShapes.calculateMaxOffset(directionX.getAxis(), entityBoundingBox, collisions, playerMovementX * directionX.getDirection().offset()) * directionX.getDirection().offset();
-    //        if (!isZLargerThanX && playerMovementX != 0.0D) {
-    //            entityBoundingBox = entityBoundingBox.offset(RotationUtil.vecPlayerToWorld(playerMovementX, 0.0D, 0.0D, gravityDirection));
-    //        }
-    //    }
-//
-    //    if (!isZLargerThanX && playerMovementZ != 0.0D) {
-    //        playerMovementZ = VoxelShapes.calculateMaxOffset(directionZ.getAxis(), entityBoundingBox, collisions, playerMovementZ * directionZ.getDirection().offset()) * directionZ.getDirection().offset();
-    //    }
-//
-    //    return RotationUtil.vecPlayerToWorld(playerMovementX, playerMovementY, playerMovementZ, gravityDirection);
-    //}
+    @Redirect(
+            method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/Entity;adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
+                    ordinal = 0
+            )
+    )
+    private static Vec3d redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(Vec3d movement, Box entityBoundingBox, List<VoxelShape> collisions, Entity entity) {
+        Direction gravityDirection;
+        if(entity == null || (gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection()) == Direction.DOWN) {
+            return adjustMovementForCollisions(movement, entityBoundingBox, collisions);
+        }
+
+        Vec3d playerMovement = RotationUtil.vecWorldToPlayer(movement, gravityDirection);
+        double playerMovementX = playerMovement.x;
+        double playerMovementY = playerMovement.y;
+        double playerMovementZ = playerMovement.z;
+        Direction directionX = RotationUtil.dirPlayerToWorld(Direction.EAST, gravityDirection);
+        Direction directionY = RotationUtil.dirPlayerToWorld(Direction.UP, gravityDirection);
+        Direction directionZ = RotationUtil.dirPlayerToWorld(Direction.SOUTH, gravityDirection);
+        if (playerMovementY != 0.0D) {
+            playerMovementY = VoxelShapes.calculateMaxOffset(directionY.getAxis(), entityBoundingBox, collisions, playerMovementY * directionY.getDirection().offset()) * directionY.getDirection().offset();
+            if (playerMovementY != 0.0D) {
+                entityBoundingBox = entityBoundingBox.offset(RotationUtil.vecPlayerToWorld(0.0D, playerMovementY, 0.0D, gravityDirection));
+            }
+        }
+
+        boolean isZLargerThanX = Math.abs(playerMovementX) < Math.abs(playerMovementZ);
+        if (isZLargerThanX && playerMovementZ != 0.0D) {
+            playerMovementZ = VoxelShapes.calculateMaxOffset(directionZ.getAxis(), entityBoundingBox, collisions, playerMovementZ * directionZ.getDirection().offset()) * directionZ.getDirection().offset();
+            if (playerMovementZ != 0.0D) {
+                entityBoundingBox = entityBoundingBox.offset(RotationUtil.vecPlayerToWorld(0.0D, 0.0D, playerMovementZ, gravityDirection));
+            }
+        }
+
+        if (playerMovementX != 0.0D) {
+            playerMovementX = VoxelShapes.calculateMaxOffset(directionX.getAxis(), entityBoundingBox, collisions, playerMovementX * directionX.getDirection().offset()) * directionX.getDirection().offset();
+            if (!isZLargerThanX && playerMovementX != 0.0D) {
+                entityBoundingBox = entityBoundingBox.offset(RotationUtil.vecPlayerToWorld(playerMovementX, 0.0D, 0.0D, gravityDirection));
+            }
+        }
+
+        if (!isZLargerThanX && playerMovementZ != 0.0D) {
+            playerMovementZ = VoxelShapes.calculateMaxOffset(directionZ.getAxis(), entityBoundingBox, collisions, playerMovementZ * directionZ.getDirection().offset()) * directionZ.getDirection().offset();
+        }
+
+        return RotationUtil.vecPlayerToWorld(playerMovementX, playerMovementY, playerMovementZ, gravityDirection);
+    }
 
     //@Inject(
     //        method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",

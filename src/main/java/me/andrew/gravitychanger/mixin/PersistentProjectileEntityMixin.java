@@ -30,15 +30,15 @@ public abstract class PersistentProjectileEntityMixin extends Entity implements 
     }
 
 
-        @Override
-    public Direction gravitychanger$getAppliedGravityDirection() {
-        Entity vehicle = this.getVehicle();
-        if(vehicle != null) {
-            return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
-        }
-
-        return GravityChangerAPI.getGravityDirection((PersistentProjectileEntity)(Object)this);
-    }
+   //     @Override
+   // public Direction gravitychanger$getAppliedGravityDirection() {
+   //     Entity vehicle = this.getVehicle();
+   //     if(vehicle != null) {
+   //         return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
+   //     }
+//
+   //     return GravityChangerAPI.getGravityDirection((PersistentProjectileEntity)(Object)this);
+   // }
 //
 //
 //

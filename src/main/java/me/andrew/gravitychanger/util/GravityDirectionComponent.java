@@ -17,6 +17,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.RegistryEntry;
 
 public class GravityDirectionComponent implements GravityComponent, AutoSyncedComponent {
 
@@ -38,7 +39,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
 
         entity.setBoundingBox(((AccessorEntity)entity).gravity$calculateBoundingBox());
 
-       // if(!entity.world.isClient) {
+        if(!initialGravity) {
             // Adjust position to avoid suffocation in blocks when changing gravity
             EntityDimensions dimensions = entity.getDimensions(entity.getPose());
             Direction relativeDirection = RotationUtil.dirWorldToPlayer(gravityDirection, prevGravityDirection);
@@ -59,14 +60,11 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                 entity.setPosition(entity.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, prevGravityDirection)).add(RotationUtil.vecPlayerToWorld(new Vec3d(0,(dimensions.height/2)+.5,0), gravityDirection)));
             }
 
-            if(entity instanceof ServerPlayerEntity serverPlayerEntity) {
-                if(serverPlayerEntity.networkHandler != null)
-                    serverPlayerEntity.networkHandler.syncWithPlayerPosition();
-            }
 
             // Keep world velocity when changing gravity
-            if(GravityChangerMod.config.worldVelocity)
-                entity.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection), gravityDirection));
+            if(!GravityChangerMod.config.worldVelocity)
+                if(entity.isLogicalSideForUpdatingMovement())
+                entity.setVelocity(RotationUtil.vecPlayerToWorld(RotationUtil.vecWorldToPlayer(entity.getVelocity(), prevGravityDirection), gravityDirection));
 
             // Keep world looking direction when changing gravity
             if(GravityChangerMod.config.keepWorldLook) {
@@ -76,7 +74,10 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                 entity.setPitch(newViewAngles.y);
             }else {
                 if (prevGravityDirection == gravityDirection.getOpposite()){
-                        entity.setYaw(entity.getYaw() - 180);
+                    Vec2f worldAngles = RotationUtil.rotPlayerToWorld(entity.getYaw(), entity.getPitch(), prevGravityDirection);
+                    Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, gravityDirection);
+                    entity.setYaw(newViewAngles.x);
+                    entity.setPitch(newViewAngles.y);
                 }
 
 
@@ -129,41 +130,51 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                 }
             }
         GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
-       // }
+        }
     }
 
     @Override
     public Direction getTrackedGravityDirection() {
-        return gravityDirection;
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            return gravityDirection;
+        }
+        return Direction.DOWN;
     }
 
     @Override
     public Direction getDefaultTrackedGravityDirection() {
-        return defaultGravityDirection;
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            return defaultGravityDirection;
+        }
+        return Direction.DOWN;
     }
 
     @Override
-    public void setTrackedGravityDirection(Direction gravityDirection) {
-        if (this.prevGravityDirection != gravityDirection) {
+    public void setTrackedGravityDirection(Direction gravityDirection, boolean initalGravity) {
+        if(!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            if (this.prevGravityDirection != gravityDirection) {
+                this.gravityDirection = gravityDirection;
+                this.onGravityChanged(this.prevGravityDirection, initalGravity);
+                this.prevGravityDirection = gravityDirection;
+            }
             this.gravityDirection = gravityDirection;
-            this.onGravityChanged(this.prevGravityDirection, false);
-            this.prevGravityDirection = gravityDirection;
+            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
-            this.gravityDirection = gravityDirection;
-        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
     }
 
     @Override
     public void setDefaultTrackedGravityDirection(Direction gravityDirection) {
+        if(!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
             this.defaultGravityDirection = gravityDirection;
-        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+        }
     }
 
     @Override
     public void readFromNbt(NbtCompound nbt) {
         if (nbt.contains("GravityDirection", NbtElement.INT_TYPE)) {
             Direction gravityDirection = Direction.byId(nbt.getInt("GravityDirection"));
-            this.setTrackedGravityDirection(gravityDirection);
+            this.setTrackedGravityDirection(gravityDirection,true);
         }
         if (nbt.contains("DefaultGravityDirection", NbtElement.INT_TYPE)) {
             Direction gravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));

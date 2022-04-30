@@ -2,6 +2,7 @@ package me.andrew.gravitychanger.api;
 
 import java.util.Optional;
 
+import me.andrew.gravitychanger.util.EntityTags;
 import org.jetbrains.annotations.Nullable;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
@@ -26,8 +27,8 @@ public abstract class GravityChangerAPI {
      * If the player is riding a vehicle this will be the applied gravity direction of the vehicle
      * Otherwise it will be the main gravity gravity direction of the player itself
      */
-    public static Direction getAppliedGravityDirection(PlayerEntity playerEntity) {
-        return ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
+    public static Direction getAppliedGravityDirection(Entity entity) {
+        return ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
     }
     
     // workaround for a CCA bug; maybeGet throws an NPE in internal code if the DataTracker isn't initialized
@@ -46,21 +47,19 @@ public abstract class GravityChangerAPI {
      * Returns the main gravity direction for the given player
      * This may not be the applied gravity direction for the player, see GravityChangerAPI#getAppliedGravityDirection
      */
-    public static Direction getGravityDirection(Entity playerEntity) {
-        //if(playerEntity instanceof RotatableEntityAccessor)
-        //if(playerEntity != null)
-        return maybeGetSafe(GRAVITY_COMPONENT, playerEntity).map(GravityComponent::getTrackedGravityDirection).orElse(Direction.DOWN);
-       // return ((RotatableEntityAccessor) playerEntity).gravitychanger$getGravityDirection();
-        //return  Direction.DOWN;
+    public static Direction getGravityDirection(Entity entity) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getTrackedGravityDirection).orElse(Direction.DOWN);
+        }
+        return Direction.DOWN;
     }
 
-    public static Direction getDefaultGravityDirection(Entity playerEntity) {
-        //if(playerEntity instanceof RotatableEntityAccessor)
-       //if(playerEntity != null)
-        return maybeGetSafe(GRAVITY_COMPONENT, playerEntity).map(GravityComponent::getDefaultTrackedGravityDirection).orElse(Direction.DOWN);
-        //return ((RotatableEntityAccessor) playerEntity).gravitychanger$getDefaultGravityDirection();
-        //return  Direction.DOWN;
-    }
+    public static Direction getDefaultGravityDirection(Entity entity) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getDefaultTrackedGravityDirection).orElse(Direction.DOWN);
+        }
+        return Direction.DOWN;
+        }
 
 
     /**
@@ -69,25 +68,23 @@ public abstract class GravityChangerAPI {
      * If the player is either a ServerPlayerEntity or a ClientPlayerEntity also slightly adjusts player position
      * This may not immediately change the applied gravity direction for the player, see GravityChangerAPI#getAppliedGravityDirection
      */
-    public static void setGravityDirection(Entity playerEntity, Direction gravityDirection) {
-        //if(playerEntity instanceof RotatableEntityAccessor)
-        //GRAVITY_COMPONENT.sync();
-        maybeGetSafe(GRAVITY_COMPONENT, playerEntity).ifPresent(gc -> gc.setTrackedGravityDirection(gravityDirection));
-        //((RotatableEntityAccessor) playerEntity).gravitychanger$setGravityDirection(gravityDirection, false);
+    public static void setGravityDirection(Entity entity, Direction gravityDirection) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.setTrackedGravityDirection(gravityDirection,false));
+        }
     }
 
-
-    public static void setDefaultGravityDirection(Entity playerEntity, Direction gravityDirection) {
-        //if(playerEntity instanceof RotatableEntityAccessor)
-        maybeGetSafe(GRAVITY_COMPONENT, playerEntity).ifPresent(gc -> gc.setDefaultTrackedGravityDirection(gravityDirection));
-        //((RotatableEntityAccessor) playerEntity).gravitychanger$setDefaultGravityDirection(gravityDirection, false);
+    public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.setDefaultTrackedGravityDirection(gravityDirection));
+        }
     }
 
     /**
      * Returns the world relative velocity for the given player
      * Using minecraft's methods to get the velocity of a the player will return player relative velocity
      */
-    public static Vec3d getWorldVelocity(PlayerEntity playerEntity) {
+    public static Vec3d getWorldVelocity(Entity playerEntity) {
         return RotationUtil.vecPlayerToWorld(playerEntity.getVelocity(), ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection());
     }
 
@@ -95,14 +92,14 @@ public abstract class GravityChangerAPI {
      * Sets the world relative velocity for the given player
      * Using minecraft's methods to set the velocity of a the player will set player relative velocity
      */
-    public static void setWorldVelocity(PlayerEntity playerEntity, Vec3d worldVelocity) {
-        playerEntity.setVelocity(RotationUtil.vecWorldToPlayer(worldVelocity, ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection()));
+    public static void setWorldVelocity(Entity entity, Vec3d worldVelocity) {
+        entity.setVelocity(RotationUtil.vecWorldToPlayer(worldVelocity, ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection()));
     }
 
     /**
      * Returns eye position offset from feet position for the given player
      */
-    public static Vec3d getEyeOffset(PlayerEntity playerEntity) {
-        return RotationUtil.vecPlayerToWorld(0, (double) playerEntity.getStandingEyeHeight(), 0, ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection());
+    public static Vec3d getEyeOffset(Entity entity) {
+        return RotationUtil.vecPlayerToWorld(0, (double) entity.getStandingEyeHeight(), 0, ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection());
     }
 }

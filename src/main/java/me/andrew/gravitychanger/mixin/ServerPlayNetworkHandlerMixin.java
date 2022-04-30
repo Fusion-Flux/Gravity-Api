@@ -10,10 +10,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public abstract class ServerPlayNetworkHandlerMixin {
@@ -191,6 +189,25 @@ public abstract class ServerPlayNetworkHandlerMixin {
         }
 
         return gravitychanger$onPlayerMove_playerMovementY;
+    }
+
+
+    @ModifyArgs(
+            method = "isEntityOnAir",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/Box;stretch(DDD)Lnet/minecraft/util/math/Box;"
+            )
+    )
+    private void modify_onVehicleMove_move_0(Args args) {
+        Direction gravityDirection = ((EntityAccessor) this.player).gravitychanger$getAppliedGravityDirection();
+        Vec3d argVec = new Vec3d(args.get(0),args.get(1),args.get(2));
+        argVec = RotationUtil.vecWorldToPlayer(argVec, gravityDirection);
+
+        args.set(0,argVec.x);
+        args.set(1,argVec.y);
+        args.set(2,argVec.z);
+
     }
 
 }

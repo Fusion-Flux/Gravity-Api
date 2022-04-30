@@ -12,7 +12,7 @@ public interface GravityComponent extends Component {
 
     Direction getDefaultTrackedGravityDirection();
 
-    void setTrackedGravityDirection(Direction gravityDirection);
+    void setTrackedGravityDirection(Direction gravityDirection, boolean initalGravity);
 
     void setDefaultTrackedGravityDirection(Direction gravityDirection);
 

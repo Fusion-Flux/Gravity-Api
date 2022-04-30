@@ -24,7 +24,7 @@ public class GravityChangerConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip(
             count = 2
     )
-    public boolean worldVelocity = true;
+    public boolean worldVelocity = false;
 
     @ConfigEntry.Gui.Tooltip(
             count = 2
@@ -39,5 +39,5 @@ public class GravityChangerConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip(
             count = 2
     )
-    public boolean voidDamageAboveWorld = true;
+    public boolean voidDamageAboveWorld = false;
 }

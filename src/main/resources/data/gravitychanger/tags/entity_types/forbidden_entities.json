@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "create:contraption",
+    "create:stationary_contraption",
+    "create:gantry_contraption",
+    "create:super_glue",
+    "create:crafting_blueprint",
+    "create:seat"
+  ]
+}

@@ -1,6 +1,7 @@
 package me.andrew.gravitychanger.mixin.client;
 
 import me.andrew.gravitychanger.accessor.EntityAccessor;
+import me.andrew.gravitychanger.util.EntityTags;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -42,7 +43,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_0(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity)) {
+        if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity) && !entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
             Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
             if (gravityDirection == Direction.DOWN) return;
             if (!this.renderShadows) return;
@@ -61,7 +62,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_1(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity)) {
+        if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity) && !entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
             Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
             if (gravityDirection == Direction.DOWN) return;
             if (!this.renderShadows) return;
