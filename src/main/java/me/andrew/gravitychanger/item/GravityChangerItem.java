@@ -27,20 +27,33 @@ public class GravityChangerItem extends Item {
         this.gravityDirection = gravityDirection;
     }
 
-
     @Override
-    public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-        if(!(entity instanceof PlayerEntity))
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if (!user.isSneaking()) {
-            if (GravityChangerAPI.getGravityDirection(entity) == this.gravityDirection) {
-                GravityChangerAPI.setDefaultGravityDirection(entity, this.gravityDirection);
+            if (GravityChangerAPI.getGravityDirection(user) == this.gravityDirection) {
+                GravityChangerAPI.setDefaultGravityDirection(user, this.gravityDirection);
             } else {
-                GravityChangerAPI.setGravityDirection(entity, this.gravityDirection);
+                GravityChangerAPI.setGravityDirection(user, this.gravityDirection);
             }
         } else {
-            GravityChangerAPI.setGravityDirection(entity, GravityChangerAPI.getDefaultGravityDirection(entity));
+            GravityChangerAPI.setGravityDirection(user, GravityChangerAPI.getDefaultGravityDirection(user));
         }
-        return ActionResult.PASS;
+        return TypedActionResult.success(user.getStackInHand(hand));
     }
+
+   // @Override
+   // public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
+   //     if(!(entity instanceof PlayerEntity))
+   //     if (!user.isSneaking()) {
+   //         if (GravityChangerAPI.getGravityDirection(entity) == this.gravityDirection) {
+   //             GravityChangerAPI.setDefaultGravityDirection(entity, this.gravityDirection);
+   //         } else {
+   //             GravityChangerAPI.setGravityDirection(entity, this.gravityDirection);
+   //         }
+   //     } else {
+   //         GravityChangerAPI.setGravityDirection(entity, GravityChangerAPI.getDefaultGravityDirection(entity));
+   //     }
+   //     return ActionResult.PASS;
+   // }
 
 }
