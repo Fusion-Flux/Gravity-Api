@@ -9,6 +9,7 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.entity.vehicle.MinecartEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -24,7 +25,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     Direction gravityDirection = Direction.DOWN;
     Direction defaultGravityDirection = Direction.DOWN;
     Direction prevGravityDirection = Direction.DOWN;
-
+    Direction trackedPrevGravityDirection = Direction.DOWN;
 
     private final Entity entity;
     public GravityDirectionComponent(Entity entity) {
@@ -62,9 +63,13 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
 
 
             // Keep world velocity when changing gravity
-            if(!GravityChangerMod.config.worldVelocity)
-                if(entity.isLogicalSideForUpdatingMovement())
-                entity.setVelocity(RotationUtil.vecPlayerToWorld(RotationUtil.vecWorldToPlayer(entity.getVelocity(), prevGravityDirection), gravityDirection));
+            //if(!GravityChangerMod.config.worldVelocity)
+            //    if(entity.isLogicalSideForUpdatingMovement())
+            //    entity.setVelocity(RotationUtil.vecPlayerToWorld(RotationUtil.vecWorldToPlayer(entity.getVelocity(), prevGravityDirection), gravityDirection));
+
+            if(!(entity instanceof ProjectileEntity)){
+                entity.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(entity.getVelocity(),prevGravityDirection),gravityDirection));
+            }
 
             // Keep world looking direction when changing gravity
             if(GravityChangerMod.config.keepWorldLook) {
@@ -141,6 +146,17 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         return Direction.DOWN;
     }
 
+    float test =0;
+
+    @Override
+    public Direction getPrevTrackedGravityDirection() {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            return trackedPrevGravityDirection;
+        }
+        return Direction.DOWN;
+    }
+
+
     @Override
     public Direction getDefaultTrackedGravityDirection() {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
@@ -149,15 +165,31 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         return Direction.DOWN;
     }
 
+
+
     @Override
     public void setTrackedGravityDirection(Direction gravityDirection, boolean initalGravity) {
         if(!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
             if (this.prevGravityDirection != gravityDirection) {
+                //Direction SavedGravity= this.gravityDirection;
+                if(entity.world.isClient) {
+                    RotationUtil.applyNewRotation(gravityDirection,this.gravityDirection);
+                }
+                setPrevTrackedGravityDirection(this.gravityDirection);
                 this.gravityDirection = gravityDirection;
                 this.onGravityChanged(this.prevGravityDirection, initalGravity);
+                //setPrevTrackedGravityDirection(SavedGravity);
                 this.prevGravityDirection = gravityDirection;
             }
             this.gravityDirection = gravityDirection;
+            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+        }
+    }
+
+    @Override
+    public void setPrevTrackedGravityDirection(Direction gravityDirection) {
+        if(!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            this.trackedPrevGravityDirection = gravityDirection;
             GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
     }
@@ -170,11 +202,16 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         }
     }
 
+
     @Override
     public void readFromNbt(NbtCompound nbt) {
         if (nbt.contains("GravityDirection", NbtElement.INT_TYPE)) {
             Direction gravityDirection = Direction.byId(nbt.getInt("GravityDirection"));
             this.setTrackedGravityDirection(gravityDirection,true);
+        }
+        if (nbt.contains("PrevGravityDirection", NbtElement.INT_TYPE)) {
+            Direction gravityDirection = Direction.byId(nbt.getInt("PrevGravityDirection"));
+            this.setPrevTrackedGravityDirection(gravityDirection);
         }
         if (nbt.contains("DefaultGravityDirection", NbtElement.INT_TYPE)) {
             Direction gravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
@@ -185,6 +222,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     @Override
     public void writeToNbt(NbtCompound nbt) {
         nbt.putInt("GravityDirection", this.getTrackedGravityDirection().getId());
+        nbt.putInt("PrevGravityDirection", this.getPrevTrackedGravityDirection().getId());
         nbt.putInt("DefaultGravityDirection", this.getDefaultTrackedGravityDirection().getId());
     }
 }

@@ -13,6 +13,8 @@
   "item.gravitychanger.gravity_changer_west_aoe": "West Gravity Changer AOE",
   "item.gravitychanger.gravity_changer_east_aoe": "East Gravity Changer AOE",
 
+  "itemGroup.gravitychanger.general": "Gravity Changer",
+
   "direction.down": "Down",
   "direction.up": "Up",
   "direction.north": "North",
@@ -31,6 +33,10 @@
   "text.autoconfig.gravitychanger.option.keepWorldLook": "Keep World Look",
   "text.autoconfig.gravitychanger.option.keepWorldLook.@Tooltip[0]": "Makes it so that you keep your world relative",
   "text.autoconfig.gravitychanger.option.keepWorldLook.@Tooltip[1]": "look direction when changing gravity",
+
+  "text.autoconfig.gravitychanger.option.rotationTime": "Camera Rotation Time",
+  "text.autoconfig.gravitychanger.option.rotationTime.@Tooltip[0]": "The time it takes for the camera to rotate",
+  "text.autoconfig.gravitychanger.option.rotationTime.@Tooltip[1]": "from one direction to the next",
 
   "text.autoconfig.gravitychanger.option.server.@PrefixText": "Server",
   "text.autoconfig.gravitychanger.option.worldVelocity": "World Relative Velocity Transfer",

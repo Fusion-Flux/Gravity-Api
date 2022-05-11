@@ -17,6 +17,11 @@ public class GravityChangerConfig implements ConfigData {
     )
     public boolean keepWorldLook = false;
 
+    @ConfigEntry.Gui.Tooltip(
+            count = 2
+    )
+    public int rotationTime = 500;
+
     @ConfigEntry.Gui.PrefixText
     @ConfigEntry.Gui.Excluded
     private boolean server;

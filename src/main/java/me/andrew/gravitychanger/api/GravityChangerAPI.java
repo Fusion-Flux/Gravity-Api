@@ -54,6 +54,13 @@ public abstract class GravityChangerAPI {
         return Direction.DOWN;
     }
 
+    public static Direction getPrevGravtityDirection(Entity entity) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getPrevTrackedGravityDirection).orElse(Direction.DOWN);
+        }
+        return Direction.DOWN;
+    }
+
     public static Direction getDefaultGravityDirection(Entity entity) {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getDefaultTrackedGravityDirection).orElse(Direction.DOWN);
@@ -79,6 +86,7 @@ public abstract class GravityChangerAPI {
             maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.setDefaultTrackedGravityDirection(gravityDirection));
         }
     }
+
 
     /**
      * Returns the world relative velocity for the given player

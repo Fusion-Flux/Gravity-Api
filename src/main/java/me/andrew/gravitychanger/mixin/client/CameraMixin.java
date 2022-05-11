@@ -61,11 +61,13 @@ public abstract class CameraMixin {
             )
     )
     private void inject_setRotation(CallbackInfo ci) {
-        Direction gravityDirection = ((EntityAccessor) this.focusedEntity).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) return;
+        if(this.focusedEntity !=null) {
+            Direction gravityDirection = ((EntityAccessor) this.focusedEntity).gravitychanger$getAppliedGravityDirection();
+            if (gravityDirection == Direction.DOWN) return;
 
-        Quaternion rotation = RotationUtil.getCameraRotationQuaternion(gravityDirection).copy();
-        rotation.hamiltonProduct(this.rotation);
-        this.rotation.set(rotation.getX(), rotation.getY(), rotation.getZ(), rotation.getW());
+            Quaternion rotation = RotationUtil.getCameraRotationQuaternion(gravityDirection).copy();
+            rotation.hamiltonProduct(this.rotation);
+            this.rotation.set(rotation.getX(), rotation.getY(), rotation.getZ(), rotation.getW());
+        }
     }
 }

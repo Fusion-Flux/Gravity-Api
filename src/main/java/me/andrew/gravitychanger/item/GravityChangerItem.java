@@ -27,17 +27,20 @@ public class GravityChangerItem extends Item {
         this.gravityDirection = gravityDirection;
     }
 
+
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
+        if(!(entity instanceof PlayerEntity))
         if (!user.isSneaking()) {
-            if (GravityChangerAPI.getGravityDirection(user) == this.gravityDirection) {
-                GravityChangerAPI.setDefaultGravityDirection(user, this.gravityDirection);
+            if (GravityChangerAPI.getGravityDirection(entity) == this.gravityDirection) {
+                GravityChangerAPI.setDefaultGravityDirection(entity, this.gravityDirection);
             } else {
-                GravityChangerAPI.setGravityDirection(user, this.gravityDirection);
+                GravityChangerAPI.setGravityDirection(entity, this.gravityDirection);
             }
         } else {
-            GravityChangerAPI.setGravityDirection(user, GravityChangerAPI.getDefaultGravityDirection(user));
+            GravityChangerAPI.setGravityDirection(entity, GravityChangerAPI.getDefaultGravityDirection(entity));
         }
-        return TypedActionResult.success(user.getStackInHand(hand));
+        return ActionResult.PASS;
     }
+
 }
