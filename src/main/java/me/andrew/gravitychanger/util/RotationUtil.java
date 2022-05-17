@@ -289,7 +289,7 @@ public abstract class RotationUtil {
 //
         if (prevDirection == Direction.SOUTH) {
             if (currentDirection == Direction.DOWN) {
-                rotStart = rotationByRadians(Direction.EAST.getUnitVector(),Math.toRadians(180));
+                rotStart = rotationByRadians(Direction.EAST.getUnitVector(),Math.toRadians(90));
             }
         }
 //

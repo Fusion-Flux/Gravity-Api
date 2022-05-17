@@ -24,6 +24,7 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -83,7 +84,7 @@ public abstract class FishingBobberEntityMixin extends Entity implements EntityA
         fishingBobberEntity.refreshPositionAndAngles(pos.x, pos.y, pos.z, rot.x, rot.y);
     }
 
-  /*  @ModifyVariable(
+    @ModifyVariable(
             method = "<init>(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/world/World;II)V",
             at = @At(
                     value = "INVOKE_ASSIGN",
@@ -99,5 +100,5 @@ public abstract class FishingBobberEntityMixin extends Entity implements EntityA
         }
 
         return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
-    }*/
+    }
 }

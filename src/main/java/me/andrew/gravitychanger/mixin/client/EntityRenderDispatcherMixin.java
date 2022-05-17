@@ -81,7 +81,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_2(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof ProjectileEntity)) {
+        if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity) && !entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
             Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
             if (gravityDirection == Direction.DOWN) return;
             if (!this.renderShadows) return;

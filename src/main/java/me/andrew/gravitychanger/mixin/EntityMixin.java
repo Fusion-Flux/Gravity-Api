@@ -22,6 +22,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -136,6 +137,10 @@ public abstract class EntityMixin implements EntityAccessor {
     public abstract float getPitch();
 
     @Shadow private Vec3d trackedPosition;
+
+    @Shadow public abstract boolean hasPassenger(Entity passenger);
+
+    @Shadow public abstract double getMountedHeightOffset();
 
     @Override
     public Direction gravitychanger$getAppliedGravityDirection() {
@@ -768,5 +773,6 @@ public abstract class EntityMixin implements EntityAccessor {
         blockpos = new BlockPos(this.getEyePos());
         return blockpos;
     }
+
 
 }

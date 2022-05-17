@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
@@ -36,16 +37,28 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
         super(entityType, world);
     }
 
+
+
     @Override
     public Direction gravitychanger$getAppliedGravityDirection() {
         Entity vehicle = this.getVehicle();
         if(vehicle != null) {
-            return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
+            if(GravityChangerAPI.getGravityDirection(vehicle) !=GravityChangerAPI.getGravityDirection((PlayerEntity)(Object)this) ) {
+                GravityChangerAPI.setGravityDirection((PlayerEntity) (Object) this, GravityChangerAPI.getGravityDirection(vehicle));
+                //return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
+            }
         }
 
         return GravityChangerAPI.getGravityDirection((PlayerEntity)(Object)this);
     }
-//
+    @Inject(
+            method = "dismountVehicle",
+            at = @At("HEAD")
+    )
+    public void dismountVehicle(CallbackInfo ci) {
+        GravityChangerAPI.setGravityDirection((PlayerEntity) (Object) this, GravityChangerAPI.getDefaultGravityDirection((PlayerEntity) (Object) this));
+    }
+    //
     //@Override
     //public void gravitychanger$onGravityChanged(Direction prevGravityDirection, boolean initialGravity) {
     //    Direction gravityDirection = this.gravitychanger$getGravityDirection();
@@ -269,7 +282,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
         return new ItemEntity(world, vec3d.x, vec3d.y, vec3d.z, stack);
     }
 
-    /*@Redirect(
+    @Redirect(
             method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;",
             at = @At(
                     value = "INVOKE",
@@ -285,7 +298,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
 
         itemEntity.setVelocity(RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection));
     }
-*/
+
     @Inject(
             method = "adjustMovementForSneaking",
             at = @At("HEAD"),

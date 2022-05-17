@@ -54,6 +54,8 @@ public abstract class GravityChangerAPI {
         return Direction.DOWN;
     }
 
+
+
     public static Direction getPrevGravtityDirection(Entity entity) {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getPrevTrackedGravityDirection).orElse(Direction.DOWN);
@@ -80,6 +82,7 @@ public abstract class GravityChangerAPI {
             maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.setTrackedGravityDirection(gravityDirection,false));
         }
     }
+
 
     public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection) {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {

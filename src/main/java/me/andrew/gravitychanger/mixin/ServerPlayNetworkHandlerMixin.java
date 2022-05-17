@@ -123,39 +123,39 @@ public abstract class ServerPlayNetworkHandlerMixin {
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }
 
-    @Redirect(
-            method = "onVehicleMove",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getY()D",
-                    ordinal = 0
-            )
-    )
-    private double redirect_onVehicleMove_getY_0(Entity instance) {
-        Direction gravityDirection = ((EntityAccessor) instance).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
-            return instance.getY();
-        }
-
-        return RotationUtil.vecWorldToPlayer(instance.getPos(), gravityDirection).y;
-    }
-
-    @Redirect(
-            method = "onVehicleMove",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getY()D",
-                    ordinal = 2
-            )
-    )
-    private double redirect_onVehicleMove_getY_2(Entity instance) {
-        Direction gravityDirection = ((EntityAccessor) instance).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
-            return instance.getY();
-        }
-
-        return RotationUtil.vecWorldToPlayer(instance.getPos(), gravityDirection).y;
-    }
+    //@Redirect(
+    //        method = "onVehicleMove",
+    //        at = @At(
+    //                value = "INVOKE",
+    //                target = "Lnet/minecraft/entity/Entity;getY()D",
+    //                ordinal = 0
+    //        )
+    //)
+    //private double redirect_onVehicleMove_getY_0(Entity instance) {
+    //    Direction gravityDirection = ((EntityAccessor) instance).gravitychanger$getAppliedGravityDirection();
+    //    if(gravityDirection == Direction.DOWN) {
+    //        return instance.getY();
+    //    }
+//
+    //    return RotationUtil.vecWorldToPlayer(instance.getPos(), gravityDirection).y;
+    //}
+//
+    //@Redirect(
+    //        method = "onVehicleMove",
+    //        at = @At(
+    //                value = "INVOKE",
+    //                target = "Lnet/minecraft/entity/Entity;getY()D",
+    //                ordinal = 2
+    //        )
+    //)
+    //private double redirect_onVehicleMove_getY_2(Entity instance) {
+    //    Direction gravityDirection = ((EntityAccessor) instance).gravitychanger$getAppliedGravityDirection();
+    //    if(gravityDirection == Direction.DOWN) {
+    //        return instance.getY();
+    //    }
+//
+    //    return RotationUtil.vecWorldToPlayer(instance.getPos(), gravityDirection).y;
+    //}
 
     @ModifyArg(
             method = "onVehicleMove",
@@ -174,22 +174,22 @@ public abstract class ServerPlayNetworkHandlerMixin {
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }
 
-    @ModifyVariable(
-            method = "onVehicleMove",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getX()D",
-                    ordinal = 1
-            ),ordinal = 0
-    )
-    private double modify_onVehicleMove_double_12(double value) {
-        Direction gravityDirection = ((EntityAccessor) this.player).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
-            return value;
-        }
-
-        return gravitychanger$onPlayerMove_playerMovementY;
-    }
+    //@ModifyVariable(
+    //        method = "onVehicleMove",
+    //        at = @At(
+    //                value = "INVOKE",
+    //                target = "Lnet/minecraft/entity/Entity;getX()D",
+    //                ordinal = 1
+    //        ),ordinal = 0
+    //)
+    //private double modify_onVehicleMove_double_12(double value) {
+    //    Direction gravityDirection = ((EntityAccessor) this.player).gravitychanger$getAppliedGravityDirection();
+    //    if(gravityDirection == Direction.DOWN) {
+    //        return value;
+    //    }
+//
+    //    return gravitychanger$onPlayerMove_playerMovementY;
+    //}
 
 
     @ModifyArgs(

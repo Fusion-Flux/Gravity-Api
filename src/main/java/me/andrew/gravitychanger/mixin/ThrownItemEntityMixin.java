@@ -11,6 +11,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.ThrownEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -33,15 +34,16 @@ public abstract class ThrownItemEntityMixin extends ThrownEntity implements Enti
         super(entityType, world);
     }
 
-    @Override
-    public Direction gravitychanger$getAppliedGravityDirection() {
-        Entity vehicle = this.getVehicle();
-        if(vehicle != null) {
-            return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
-        }
-
-        return GravityChangerAPI.getGravityDirection((ThrownItemEntity)(Object)this);
-    }
+   // @Override
+   // public Direction gravitychanger$getAppliedGravityDirection() {
+   //     Entity vehicle = this.getVehicle();
+   //     if(vehicle != null) {
+   //         GravityChangerAPI.setGravityDirection((ThrownItemEntity)(Object)this,GravityChangerAPI.getGravityDirection(vehicle));
+   //         return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
+   //     }
+//
+   //     return GravityChangerAPI.getGravityDirection((ThrownItemEntity)(Object)this);
+   // }
 
 
 
