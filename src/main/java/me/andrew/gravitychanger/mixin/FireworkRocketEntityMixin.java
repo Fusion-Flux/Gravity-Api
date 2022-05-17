@@ -43,7 +43,9 @@ public abstract class FireworkRocketEntityMixin extends Entity implements Entity
             ,ordinal = 0
     )
     public Vec3d tick(Vec3d value) {
+        if(shooter != null) {
             value = RotationUtil.vecWorldToPlayer(value, GravityChangerAPI.getGravityDirection(shooter));
+        }
         return value;
     }
 
