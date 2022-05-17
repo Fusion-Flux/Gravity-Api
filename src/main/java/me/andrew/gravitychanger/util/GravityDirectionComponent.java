@@ -165,7 +165,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
             if (this.prevGravityDirection != gravityDirection) {
                 //Direction SavedGravity= this.gravityDirection;
                 if (entity.world.isClient && entity instanceof PlayerEntity player && player.isMainPlayer()) {
-                    RotationUtil.applyNewRotation(gravityDirection,this.gravityDirection);
+                    RotationUtil.applyNewRotation(gravityDirection,this.gravityDirection,GravityChangerMod.config.rotationTime);
                 }
                 setPrevTrackedGravityDirection(this.gravityDirection);
                 this.gravityDirection = gravityDirection;

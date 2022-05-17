@@ -226,13 +226,13 @@ public abstract class RotationUtil {
     private static final List<Rotation> ROTATION_QUEUE = new ArrayList<>();
     private static EndRotation END_ROTATION = new EndRotation(null,null);
 
-    private record Rotation(Quaternion startQuaternion,Quaternion endQuaternion, long expiration) {
+    private record Rotation(Quaternion startQuaternion,Quaternion endQuaternion, long expiration, int time) {
     }
 
     private record EndRotation(Quaternion endpoint,Quaternion startpoint) {
     }
 
-    public static void applyNewRotation(Direction currentDirection,Direction prevDirection) {
+    public static void applyNewRotation(Direction currentDirection,Direction prevDirection,int time) {
         long now = System.currentTimeMillis();
         Quaternion rotStart = WORLD_ROTATION_QUATERNIONS[prevDirection.getId()];
         if (prevDirection == Direction.DOWN) {
@@ -313,7 +313,13 @@ public abstract class RotationUtil {
                 rotStart.hamiltonProduct(Vec3f.NEGATIVE_X.getDegreesQuaternion(-90));
             }
         }
-        ROTATION_QUEUE.add(new Rotation(WORLD_ROTATION_QUATERNIONS[currentDirection.getId()],rotStart, now + EXPIRATION_TIME));
+        int expireTime = time;
+
+        if(currentDirection == prevDirection.getOpposite()){
+            expireTime = expireTime*2;
+        }
+
+        ROTATION_QUEUE.add(new Rotation(WORLD_ROTATION_QUATERNIONS[currentDirection.getId()],rotStart, now + expireTime,expireTime));
         END_ROTATION = new EndRotation(WORLD_ROTATION_QUATERNIONS[currentDirection.getId()],rotStart);
     }
 
@@ -346,7 +352,7 @@ public abstract class RotationUtil {
             Rotation rotation = iterator.next();
 
             if (rotation.expiration > now) {
-                float delta = (rotation.expiration - now) / (float) EXPIRATION_TIME;
+                float delta = (rotation.expiration - now) / (float) rotation.time;
                 accumulator = interpolate(rotation.startQuaternion, rotation.endQuaternion, MathHelper.clamp((delta*delta*(3-2*delta)), 0, 1));
             } else {
                 iterator.remove();

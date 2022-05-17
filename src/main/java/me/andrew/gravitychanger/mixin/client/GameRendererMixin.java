@@ -10,6 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Quaternion;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,7 +35,16 @@ public abstract class GameRendererMixin {
         if(this.camera.getFocusedEntity() != null) {
             Entity focusedEntity = this.camera.getFocusedEntity();
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity);
+            double offset =1.62;
+            if(GravityChangerAPI.getGravityDirection(focusedEntity) == GravityChangerAPI.getPrevGravtityDirection(focusedEntity).getOpposite()){
+                offset = offset/2;
+            }
+
+            Vec3d translation = RotationUtil.vecPlayerToWorld(new Vec3d(0,offset,0),GravityChangerAPI.getGravityDirection(focusedEntity));
+            matrix.translate(0,-offset,0);
             matrix.multiply(RotationUtil.getRotation(gravityDirection));
+            matrix.translate(translation.x,translation.y,translation.z);
+
         }
        // float accuTicks = GravityChangerAPI.getAccumulatedTicks(focusedEntity);
        // if(accuTicks <=1) {
