@@ -24,4 +24,6 @@ public interface GravityComponent extends Component {
 
     void setGravityPriority(int priority);
 
+    void resetGravity();
+
 }

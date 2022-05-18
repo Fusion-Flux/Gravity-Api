@@ -70,6 +70,13 @@ public abstract class GravityChangerAPI {
         return Direction.DOWN;
         }
 
+    public static int getGravityPriority(Entity entity) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravityPriority).orElse(0);
+        }
+        return 0;
+    }
+
 
     /**
      * Sets the main gravity direction for the given player
@@ -90,6 +97,17 @@ public abstract class GravityChangerAPI {
         }
     }
 
+    public static void setGravityPriority(Entity entity, int priority) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.setGravityPriority(priority));
+        }
+    }
+
+    public static void resetGravity(Entity entity) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(GravityComponent::resetGravity);
+        }
+    }
 
     /**
      * Returns the world relative velocity for the given player

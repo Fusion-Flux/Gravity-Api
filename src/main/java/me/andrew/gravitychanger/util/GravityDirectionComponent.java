@@ -199,6 +199,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     public void setGravityPriority(int priority) {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
             currentGravityPriority = priority;
+            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
     }
 
@@ -210,6 +211,13 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         return 0;
     }
 
+    @Override
+    public void resetGravity() {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            setTrackedGravityDirection(defaultGravityDirection,false);
+            setGravityPriority(0);
+        }
+    }
 
     @Override
     public void readFromNbt(NbtCompound nbt) {
@@ -225,6 +233,10 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
             Direction gravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
             this.setDefaultTrackedGravityDirection(gravityDirection);
         }
+        if (nbt.contains("GravityPriority", NbtElement.INT_TYPE)) {
+            int priority = nbt.getInt("GravityPriority");
+            this.setGravityPriority(priority);
+        }
     }
 
     @Override
@@ -232,5 +244,6 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         nbt.putInt("GravityDirection", this.getTrackedGravityDirection().getId());
         nbt.putInt("PrevGravityDirection", this.getPrevTrackedGravityDirection().getId());
         nbt.putInt("DefaultGravityDirection", this.getDefaultTrackedGravityDirection().getId());
+        nbt.putInt("GravityPriority", this.getGravityPriority());
     }
 }
