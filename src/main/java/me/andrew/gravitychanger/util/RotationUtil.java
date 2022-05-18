@@ -353,7 +353,7 @@ public abstract class RotationUtil {
 
             if (rotation.expiration > now) {
                 float delta = (rotation.expiration - now) / (float) rotation.time;
-                accumulator = interpolate(rotation.startQuaternion, rotation.endQuaternion, MathHelper.clamp((delta*delta*(3-2*delta)), 0, 1));
+                accumulator = interpolate(rotation.startQuaternion, rotation.endQuaternion, MathHelper.clamp((delta*delta*(3-1*delta)), 0, 1));
             } else {
                 iterator.remove();
             }

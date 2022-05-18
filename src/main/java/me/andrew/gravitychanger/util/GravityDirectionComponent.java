@@ -23,6 +23,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     Direction defaultGravityDirection = Direction.DOWN;
     Direction prevGravityDirection = Direction.DOWN;
     Direction trackedPrevGravityDirection = Direction.DOWN;
+    int currentGravityPriority = 0;
     private final Entity entity;
 
     public GravityDirectionComponent(Entity entity) {
@@ -192,6 +193,21 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
             this.defaultGravityDirection = gravityDirection;
             GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
+    }
+
+    @Override
+    public void setGravityPriority(int priority) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            currentGravityPriority = priority;
+        }
+    }
+
+    @Override
+    public int getGravityPriority() {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            return currentGravityPriority;
+        }
+        return 0;
     }
 
 
