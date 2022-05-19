@@ -30,23 +30,12 @@ public class GravityChangerItemAOE extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         Box box = user.getBoundingBox().expand(3);
-       // if (!world.isClient) {
-            List<Entity> list = world.getEntitiesByClass(Entity.class, box, e -> !(e instanceof PlayerEntity && ((PlayerEntity) e).getAbilities().flying));
+            List<Entity> list = world.getEntitiesByClass(Entity.class, box, e -> !(e instanceof PlayerEntity));
             for (Entity entity : list) {
                 if (!(entity instanceof PlayerEntity))
-                    if (entity != user) {
-                        if (!user.isSneaking()) {
-                            if (GravityChangerAPI.getGravityDirection(entity) == this.gravityDirection) {
-                                GravityChangerAPI.setDefaultGravityDirection(entity, this.gravityDirection);
-                            } else {
-                                GravityChangerAPI.setGravityDirection(entity, this.gravityDirection);
-                            }
-                        } else {
-                            GravityChangerAPI.setGravityDirection(entity, GravityChangerAPI.getDefaultGravityDirection(entity));
-                        }
-                    }
+                            GravityChangerAPI.setDefaultGravityDirection(entity, gravityDirection);
+                GravityChangerAPI.updateGravity(entity);
             }
-       // }
         return TypedActionResult.success(user.getStackInHand(hand));
     }
 

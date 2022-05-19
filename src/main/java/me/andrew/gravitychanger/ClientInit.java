@@ -13,7 +13,7 @@ public class ClientInit implements ClientModInitializer {
             boolean initialGravity = buf.readBoolean();
             client.execute(() -> {
                 if(client.player == null) return;
-                GravityChangerAPI.setGravityDirection(client.player,gravityDirection);
+                //GravityChangerAPI.setGravityDirection(client.player,gravityDirection);
                // ((RotatableEntityAccessor) client.player).gravitychanger$setGravityDirection(gravityDirection, initialGravity);
             });
         });

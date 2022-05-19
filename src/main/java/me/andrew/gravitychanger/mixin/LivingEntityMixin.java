@@ -2,6 +2,7 @@ package me.andrew.gravitychanger.mixin;
 
 import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.api.GravityChangerAPI;
+import me.andrew.gravitychanger.util.Gravity;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.*;
 import net.minecraft.nbt.NbtCompound;
@@ -33,15 +34,17 @@ public abstract class LivingEntityMixin extends Entity implements EntityAccessor
     }
 
 
-     @Override
-     public Direction gravitychanger$getAppliedGravityDirection() {
-         Entity vehicle = this.getVehicle();
-         if(vehicle != null) {
-             return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
-         }
+    @Override
+    public Direction gravitychanger$getAppliedGravityDirection() {
+        //Entity vehicle = this.getVehicle();
+        //if(vehicle != null) {
+        //    GravityChangerAPI.addGravity((LivingEntity)(Object)this,new Gravity(GravityChangerAPI.getGravityDirection(vehicle),99999,2,"vehicle"));
+        //    //GravityChangerAPI.setGravityDirection((Entity)(Object)this,GravityChangerAPI.getGravityDirection(vehicle));
+        //    return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
+        //}
 
-         return GravityChangerAPI.getGravityDirection((LivingEntity)(Object)this);
-     }
+        return GravityChangerAPI.getGravityDirection((LivingEntity)(Object)this);
+    }
 //
    // @Override
    // public void gravitychanger$onGravityChanged(Direction prevGravityDirection, boolean initialGravity) {

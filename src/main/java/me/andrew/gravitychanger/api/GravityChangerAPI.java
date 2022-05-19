@@ -1,8 +1,10 @@
 package me.andrew.gravitychanger.api;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import me.andrew.gravitychanger.util.EntityTags;
+import me.andrew.gravitychanger.util.Gravity;
 import org.jetbrains.annotations.Nullable;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
@@ -54,7 +56,12 @@ public abstract class GravityChangerAPI {
         return Direction.DOWN;
     }
 
-
+    public static ArrayList<Gravity> getGravityList(Entity entity) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravity).orElse(new ArrayList<Gravity>());
+        }
+        return new ArrayList<Gravity>();
+    }
 
     public static Direction getPrevGravtityDirection(Entity entity) {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
@@ -70,13 +77,12 @@ public abstract class GravityChangerAPI {
         return Direction.DOWN;
         }
 
-    public static int getGravityPriority(Entity entity) {
+    public static boolean getIsInverted(Entity entity) {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
-            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravityPriority).orElse(0);
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getInvertGravity).orElse(false);
         }
-        return 0;
+        return false;
     }
-
 
     /**
      * Sets the main gravity direction for the given player
@@ -84,12 +90,34 @@ public abstract class GravityChangerAPI {
      * If the player is either a ServerPlayerEntity or a ClientPlayerEntity also slightly adjusts player position
      * This may not immediately change the applied gravity direction for the player, see GravityChangerAPI#getAppliedGravityDirection
      */
-    public static void setGravityDirection(Entity entity, Direction gravityDirection) {
+    public static void addGravity(Entity entity, Gravity gravity) {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
-            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.setTrackedGravityDirection(gravityDirection,false));
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.addGravity(gravity,false));
+        }
+    }
+    public static void updateGravity(Entity entity) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.updateGravity(false));
         }
     }
 
+    public static void setGravity(Entity entity, ArrayList<Gravity> gravity,boolean needsUpdate) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.setGravity(gravity,false,needsUpdate));
+        }
+    }
+
+    public static void setIsInverted(Entity entity, boolean isInverted) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.invertGravity(isInverted));
+        }
+    }
+
+    public static void clearGravity(Entity entity) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(GravityComponent::clearGravity);
+        }
+    }
 
     public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection) {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
@@ -97,17 +125,11 @@ public abstract class GravityChangerAPI {
         }
     }
 
-    public static void setGravityPriority(Entity entity, int priority) {
-        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
-            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.setGravityPriority(priority));
-        }
-    }
-
-    public static void resetGravity(Entity entity) {
-        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
-            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(GravityComponent::resetGravity);
-        }
-    }
+    //public static void resetGravity(Entity entity) {
+    //    if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+    //        maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(GravityComponent::resetGravity);
+    //    }
+    //}
 
     /**
      * Returns the world relative velocity for the given player

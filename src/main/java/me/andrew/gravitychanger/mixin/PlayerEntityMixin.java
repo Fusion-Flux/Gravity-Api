@@ -2,6 +2,7 @@ package me.andrew.gravitychanger.mixin;
 
 import me.andrew.gravitychanger.accessor.EntityAccessor;
 import me.andrew.gravitychanger.api.GravityChangerAPI;
+import me.andrew.gravitychanger.util.Gravity;
 import me.andrew.gravitychanger.util.RotationUtil;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.PlayerAbilities;
@@ -41,13 +42,13 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
 
     @Override
     public Direction gravitychanger$getAppliedGravityDirection() {
-        Entity vehicle = this.getVehicle();
-        if(vehicle != null) {
-            if(GravityChangerAPI.getGravityDirection(vehicle) !=GravityChangerAPI.getGravityDirection((PlayerEntity)(Object)this) ) {
-                GravityChangerAPI.setGravityDirection((PlayerEntity) (Object) this, GravityChangerAPI.getGravityDirection(vehicle));
-                //return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
-            }
-        }
+       // Entity vehicle = this.getVehicle();
+       // if(!world.isClient)
+       // if(vehicle != null) {
+       //     GravityChangerAPI.addGravity((PlayerEntity)(Object)this,new Gravity(GravityChangerAPI.getGravityDirection(vehicle),999,2,"vehicle"));
+       //     //GravityChangerAPI.setGravityDirection((Entity)(Object)this,GravityChangerAPI.getGravityDirection(vehicle));
+       //     return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
+       // }
 
         return GravityChangerAPI.getGravityDirection((PlayerEntity)(Object)this);
     }
@@ -56,7 +57,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements EntityAc
             at = @At("HEAD")
     )
     public void dismountVehicle(CallbackInfo ci) {
-        GravityChangerAPI.setGravityDirection((PlayerEntity) (Object) this, GravityChangerAPI.getDefaultGravityDirection((PlayerEntity) (Object) this));
+        //GravityChangerAPI.setGravityDirection((PlayerEntity) (Object) this, GravityChangerAPI.getDefaultGravityDirection((PlayerEntity) (Object) this));
     }
     //
     //@Override

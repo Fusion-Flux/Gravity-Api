@@ -16,6 +16,11 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @SuppressWarnings({"deprecation", "CommentedOutCode"})
 public class GravityDirectionComponent implements GravityComponent, AutoSyncedComponent {
@@ -23,7 +28,10 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     Direction defaultGravityDirection = Direction.DOWN;
     Direction prevGravityDirection = Direction.DOWN;
     Direction trackedPrevGravityDirection = Direction.DOWN;
-    int currentGravityPriority = 0;
+    boolean isInverted = false;
+
+    ArrayList<Gravity> gravityList = new ArrayList<Gravity>();
+
     private final Entity entity;
 
     public GravityDirectionComponent(Entity entity) {
@@ -161,17 +169,34 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     }
 
     @Override
-    public void setTrackedGravityDirection(Direction gravityDirection, boolean initialGravity) {
+    public void updateGravity(boolean initialGravity) {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            Gravity primaryGravity=null;
+            for(Gravity temp : gravityList){
+                if(primaryGravity != null) {
+                    if (temp.priority > primaryGravity.priority) {
+                        primaryGravity = temp;
+                    }
+                }else{
+                    primaryGravity = temp;
+                }
+            }
+            Direction gravityDirection = this.getDefaultTrackedGravityDirection();
+            if(primaryGravity!= null){
+                gravityDirection = primaryGravity.gravityDirection;
+            }
+            if(isInverted){
+                gravityDirection = gravityDirection.getOpposite();
+            }
+
             if (this.prevGravityDirection != gravityDirection) {
-                //Direction SavedGravity= this.gravityDirection;
+
                 if (entity.world.isClient && entity instanceof PlayerEntity player && player.isMainPlayer()) {
                     RotationUtil.applyNewRotation(gravityDirection,this.gravityDirection,GravityChangerMod.config.rotationTime);
                 }
                 setPrevTrackedGravityDirection(this.gravityDirection);
                 this.gravityDirection = gravityDirection;
                 this.onGravityChanged(this.prevGravityDirection, initialGravity);
-                //setPrevTrackedGravityDirection(SavedGravity);
                 this.prevGravityDirection = gravityDirection;
             }
             this.gravityDirection = gravityDirection;
@@ -182,8 +207,10 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     @Override
     public void setPrevTrackedGravityDirection(Direction gravityDirection) {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
-            this.trackedPrevGravityDirection = gravityDirection;
-            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+            if(gravityDirection != null) {
+                this.trackedPrevGravityDirection = gravityDirection;
+                GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+            }
         }
     }
 
@@ -196,54 +223,110 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     }
 
     @Override
-    public void setGravityPriority(int priority) {
+    public void addGravity(Gravity gravity, boolean initialGravity) {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
-            currentGravityPriority = priority;
+            int index =0;
+            boolean addValue = true;
+            for(Gravity temp : gravityList){
+                if(Objects.equals(temp.source, gravity.source)){
+                    gravityList.set(index,gravity);
+                    addValue = false;
+                    break;
+                }
+                index++;
+            }
+            if(addValue)
+            this.gravityList.add(gravity);
             GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+            this.updateGravity(initialGravity);
         }
     }
 
     @Override
-    public int getGravityPriority() {
-        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
-            return currentGravityPriority;
-        }
-        return 0;
+    public ArrayList<Gravity> getGravity() {
+        return gravityList;
     }
 
     @Override
-    public void resetGravity() {
-        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
-            setTrackedGravityDirection(defaultGravityDirection,false);
-            setGravityPriority(0);
-        }
+    public void setGravity(ArrayList<Gravity> gravityList,boolean initalGravity,boolean needsUpdate) {
+        this.gravityList = gravityList;
+        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+        if(needsUpdate)
+        this.updateGravity(initalGravity);
+    }
+
+    @Override
+    public void invertGravity(boolean isInverted) {
+        this.isInverted = isInverted;
+        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+        this.updateGravity(false);
+    }
+
+    @Override
+    public boolean getInvertGravity(){
+        return this.isInverted;
+    }
+
+    @Override
+    public void clearGravity() {
+        this.gravityList = new ArrayList<Gravity>();
+        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+        this.updateGravity(false);
     }
 
     @Override
     public void readFromNbt(NbtCompound nbt) {
-        if (nbt.contains("GravityDirection", NbtElement.INT_TYPE)) {
-            Direction gravityDirection = Direction.byId(nbt.getInt("GravityDirection"));
-            this.setTrackedGravityDirection(gravityDirection,true);
+        if (nbt.contains("ListSize", NbtElement.INT_TYPE)) {
+            int listSize = nbt.getInt("ListSize");
+            if(listSize != 0){
+                ArrayList<Gravity> newGravityList = new ArrayList<Gravity>();
+                for(int index=0; index<listSize; index++){
+                    Gravity newGravity = new Gravity(
+                            Direction.byId(nbt.getInt("GravityDirection "+index)),
+                            nbt.getInt("GravityPriority "+index),
+                            nbt.getInt("GravityDuration "+index),
+                            nbt.getString("GravitySource "+index)
+                    );
+                    newGravityList.add(newGravity);
+                }
+                this.setGravity(newGravityList,true,false);
+            }
+
         }
         if (nbt.contains("PrevGravityDirection", NbtElement.INT_TYPE)) {
             Direction gravityDirection = Direction.byId(nbt.getInt("PrevGravityDirection"));
             this.setPrevTrackedGravityDirection(gravityDirection);
+            //this.updateGravity(true);
         }
         if (nbt.contains("DefaultGravityDirection", NbtElement.INT_TYPE)) {
             Direction gravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
             this.setDefaultTrackedGravityDirection(gravityDirection);
+            //this.updateGravity(true);
         }
-        if (nbt.contains("GravityPriority", NbtElement.INT_TYPE)) {
-            int priority = nbt.getInt("GravityPriority");
-            this.setGravityPriority(priority);
-        }
+            this.invertGravity(nbt.getBoolean("IsGravityInverted"));
+
+            this.updateGravity(true);
+
     }
 
     @Override
-    public void writeToNbt(NbtCompound nbt) {
-        nbt.putInt("GravityDirection", this.getTrackedGravityDirection().getId());
+    public void writeToNbt(@NotNull NbtCompound nbt) {
+        //nbt.putInt("GravityDirection", this.getTrackedGravityDirection().getId());
+
+        int index = 0;
+        if(!gravityList.isEmpty())
+            for(Gravity temp : gravityList){
+                if(temp.gravityDirection!=null)
+                nbt.putInt("GravityDirection "+index, temp.getGravityDirection().getId());
+                nbt.putInt("GravityPriority "+index, temp.getPriority());
+                nbt.putInt("GravityDuration "+index, temp.getGravityDuration());
+                if(temp.source!=null)
+                nbt.putString("GravitySource "+index, temp.getSource());
+                index++;
+            }
+        nbt.putInt("ListSize", index);
         nbt.putInt("PrevGravityDirection", this.getPrevTrackedGravityDirection().getId());
         nbt.putInt("DefaultGravityDirection", this.getDefaultTrackedGravityDirection().getId());
-        nbt.putInt("GravityPriority", this.getGravityPriority());
+        nbt.putBoolean("IsGravityInverted", this.getInvertGravity());
     }
 }

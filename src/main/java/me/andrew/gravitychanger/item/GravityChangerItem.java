@@ -1,6 +1,7 @@
 package me.andrew.gravitychanger.item;
 
 import me.andrew.gravitychanger.api.GravityChangerAPI;
+import me.andrew.gravitychanger.util.Gravity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -29,15 +30,8 @@ public class GravityChangerItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (!user.isSneaking()) {
-            if (GravityChangerAPI.getGravityDirection(user) == this.gravityDirection) {
                 GravityChangerAPI.setDefaultGravityDirection(user, this.gravityDirection);
-            } else {
-                GravityChangerAPI.setGravityDirection(user, this.gravityDirection);
-            }
-        } else {
-            GravityChangerAPI.setGravityDirection(user, GravityChangerAPI.getDefaultGravityDirection(user));
-        }
+        GravityChangerAPI.updateGravity(user);
         return TypedActionResult.success(user.getStackInHand(hand));
     }
 
