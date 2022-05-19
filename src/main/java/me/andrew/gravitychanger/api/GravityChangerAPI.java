@@ -101,9 +101,9 @@ public abstract class GravityChangerAPI {
         }
     }
 
-    public static void setGravity(Entity entity, ArrayList<Gravity> gravity,boolean needsUpdate) {
+    public static void setGravity(Entity entity, ArrayList<Gravity> gravity) {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
-            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.setGravity(gravity,false,needsUpdate));
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.setGravity(gravity,false));
         }
     }
 
