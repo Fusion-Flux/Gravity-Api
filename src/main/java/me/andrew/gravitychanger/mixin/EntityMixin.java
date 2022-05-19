@@ -180,7 +180,7 @@ public abstract class EntityMixin implements EntityAccessor {
                 }
             }
 
-            GravityChangerAPI.setGravity((Entity)(Object)this,goodList,true);
+            GravityChangerAPI.setGravity((Entity)(Object)this,goodList);
         }
     }
 

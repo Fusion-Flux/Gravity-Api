@@ -248,11 +248,15 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     }
 
     @Override
-    public void setGravity(ArrayList<Gravity> gravityList,boolean initalGravity,boolean needsUpdate) {
+    public void setGravity(ArrayList<Gravity> gravityList,boolean initalGravity) {
         this.gravityList = gravityList;
         GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
-        if(needsUpdate)
         this.updateGravity(initalGravity);
+    }
+
+    public void internalSetGravity(ArrayList<Gravity> gravityList,boolean initalGravity) {
+        this.gravityList = gravityList;
+        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
     }
 
     @Override
@@ -260,6 +264,11 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         this.isInverted = isInverted;
         GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         this.updateGravity(false);
+    }
+
+    public void internalInvertGravity(boolean isInverted) {
+        this.isInverted = isInverted;
+        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
     }
 
     @Override
@@ -289,7 +298,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                     );
                     newGravityList.add(newGravity);
                 }
-                this.setGravity(newGravityList,true,false);
+                this.internalSetGravity(newGravityList,true);
             }
 
         }
@@ -303,7 +312,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
             this.setDefaultTrackedGravityDirection(gravityDirection);
             //this.updateGravity(true);
         }
-            this.invertGravity(nbt.getBoolean("IsGravityInverted"));
+            this.internalInvertGravity(nbt.getBoolean("IsGravityInverted"));
 
             this.updateGravity(true);
 

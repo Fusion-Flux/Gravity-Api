@@ -26,7 +26,7 @@ public interface GravityComponent extends Component {
 
     ArrayList<Gravity> getGravity();
 
-    void setGravity(ArrayList<Gravity> gravityList,boolean initalGravity,boolean needsUpdate);
+    void setGravity(ArrayList<Gravity> gravityList,boolean initalGravity);
 
     void invertGravity(boolean isInverted);
 
