@@ -158,30 +158,31 @@ public abstract class EntityMixin implements EntityAccessor {
 
     @Inject(
             method = "tick",
-            at = @At("HEAD")
+            at = @At("TAIL")
     )
     private void inject_tick(CallbackInfo ci) {
-
-        Entity vehicle = this.getVehicle();
-        if(vehicle != null) {
-            Direction vehicleGravity = GravityChangerAPI.getGravityDirection(vehicle);
-            if(GravityChangerAPI.getIsInverted((Entity) (Object) this)){
-                vehicleGravity = vehicleGravity.getOpposite();
-            }
-            GravityChangerAPI.addGravity((Entity) (Object) this, new Gravity(vehicleGravity, 99999999, 2, "vehicle"));
+if(!world.isClient) {
+    Entity vehicle = this.getVehicle();
+    if (vehicle != null) {
+        Direction vehicleGravity = GravityChangerAPI.getGravityDirection(vehicle);
+        if (GravityChangerAPI.getIsInverted((Entity) (Object) this)) {
+            vehicleGravity = vehicleGravity.getOpposite();
         }
-        ArrayList<Gravity> gravityList = GravityChangerAPI.getGravityList((Entity)(Object)this);
-        ArrayList<Gravity> goodList =new ArrayList<Gravity>();
-        if(!gravityList.isEmpty()){
-            for(Gravity temp : gravityList){
-                if(temp.getGravityDuration() != 0){
-                    temp.decreaseDuration();
-                    goodList.add(temp);
-                }
+        GravityChangerAPI.addGravity((Entity) (Object) this, new Gravity(vehicleGravity, 99999999, 2, "vehicle"));
+    }
+    ArrayList<Gravity> gravityList = GravityChangerAPI.getGravityList((Entity) (Object) this);
+    ArrayList<Gravity> goodList = new ArrayList<Gravity>();
+    if (!gravityList.isEmpty()) {
+        for (Gravity temp : gravityList) {
+            if (temp.getGravityDuration() != 0) {
+                temp.decreaseDuration();
+                goodList.add(temp);
             }
-
-            GravityChangerAPI.setGravity((Entity)(Object)this,goodList);
         }
+
+        GravityChangerAPI.setGravity((Entity) (Object) this, goodList);
+    }
+}
     }
 
     @Inject(

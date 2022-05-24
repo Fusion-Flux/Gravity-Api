@@ -30,8 +30,8 @@ public class GravityChangerItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-                GravityChangerAPI.setDefaultGravityDirection(user, this.gravityDirection);
-        GravityChangerAPI.updateGravity(user);
+            GravityChangerAPI.setDefaultGravityDirection(user, this.gravityDirection);
+            //GravityChangerAPI.updateGravity(user);
         return TypedActionResult.success(user.getStackInHand(hand));
     }
 

@@ -47,7 +47,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
             // Adjust position to avoid suffocation in blocks when changing gravity
             EntityDimensions dimensions = entity.getDimensions(entity.getPose());
             Direction relativeDirection = RotationUtil.dirWorldToPlayer(gravityDirection, prevGravityDirection);
-            if (!(entity instanceof AreaEffectCloudEntity)) {
+            if (!(entity instanceof AreaEffectCloudEntity) && !(entity instanceof PersistentProjectileEntity)) {
                 if (!(entity instanceof EndCrystalEntity)) {
                     Vec3d relativePosOffset = switch (relativeDirection) {
                         case DOWN -> Vec3d.ZERO;
@@ -139,7 +139,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                     }
                 }
             }
-            //GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
     }
 
@@ -216,6 +216,14 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
 
     @Override
     public void setDefaultTrackedGravityDirection(Direction gravityDirection) {
+        if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
+            this.defaultGravityDirection = gravityDirection;
+            this.updateGravity(false);
+            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+        }
+    }
+
+    public void setInternalDefaultTrackedGravityDirection(Direction gravityDirection) {
         if (!entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITIES)) {
             this.defaultGravityDirection = gravityDirection;
             GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
@@ -301,21 +309,21 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                     );
                     newGravityList.add(newGravity);
                 }
-                this.internalSetGravity(newGravityList,true);
+                this.gravityList =(newGravityList);
             }
 
         }
         if (nbt.contains("PrevGravityDirection", NbtElement.INT_TYPE)) {
             Direction gravityDirection = Direction.byId(nbt.getInt("PrevGravityDirection"));
-            this.setPrevTrackedGravityDirection(gravityDirection);
+            this.trackedPrevGravityDirection =(gravityDirection);
             //this.updateGravity(true);
         }
         if (nbt.contains("DefaultGravityDirection", NbtElement.INT_TYPE)) {
             Direction gravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
-            this.setDefaultTrackedGravityDirection(gravityDirection);
+            this.defaultGravityDirection=(gravityDirection);
             //this.updateGravity(true);
         }
-            this.internalInvertGravity(nbt.getBoolean("IsGravityInverted"));
+            this.isInverted = (nbt.getBoolean("IsGravityInverted"));
 
             this.updateGravity(true);
 
