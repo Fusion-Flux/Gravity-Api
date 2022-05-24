@@ -75,15 +75,23 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                 entity.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(entity.getVelocity(),prevGravityDirection),gravityDirection));
             }
 
+            boolean changeLook = false;
+if(entity instanceof PlayerEntity){
+    if(entity.world.isClient){
+        changeLook = true;
+    }
+}else{
+    changeLook=true;
+}
             // Keep world looking direction when changing gravity
-            if (!(entity instanceof ProjectileEntity))
-            if (GravityChangerMod.config.keepWorldLook) {
-                Vec2f worldAngles = RotationUtil.rotPlayerToWorld(entity.getYaw(), entity.getPitch(), prevGravityDirection);
-                Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, gravityDirection);
-                entity.setYaw(newViewAngles.x);
-                entity.setPitch(newViewAngles.y);
-            }else {
-                if (prevGravityDirection == gravityDirection.getOpposite()){
+            if (!(entity instanceof ProjectileEntity) && changeLook) {
+                // if (GravityChangerMod.config.keepWorldLook) {
+                //     Vec2f worldAngles = RotationUtil.rotPlayerToWorld(entity.getYaw(), entity.getPitch(), prevGravityDirection);
+                //     Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, gravityDirection);
+                //     entity.setYaw(newViewAngles.x);
+                //     entity.setPitch(newViewAngles.y);
+                // }else {
+                if (prevGravityDirection == gravityDirection.getOpposite()) {
                     Vec2f worldAngles = RotationUtil.rotPlayerToWorld(entity.getYaw(), entity.getPitch(), prevGravityDirection);
                     Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, gravityDirection);
                     entity.setYaw(newViewAngles.x);
@@ -139,7 +147,8 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                     }
                 }
             }
-            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+           // }
+            //GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
     }
 
