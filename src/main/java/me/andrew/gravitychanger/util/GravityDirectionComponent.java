@@ -47,7 +47,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
             // Adjust position to avoid suffocation in blocks when changing gravity
             EntityDimensions dimensions = entity.getDimensions(entity.getPose());
             Direction relativeDirection = RotationUtil.dirWorldToPlayer(gravityDirection, prevGravityDirection);
-            if (!(entity instanceof AreaEffectCloudEntity) && !(entity instanceof PersistentProjectileEntity)&& !(entity instanceof ItemEntity)) {
+            if (!(entity instanceof AreaEffectCloudEntity)) {
                 if (!(entity instanceof EndCrystalEntity)) {
                     Vec3d relativePosOffset = switch (relativeDirection) {
                         case DOWN -> Vec3d.ZERO;

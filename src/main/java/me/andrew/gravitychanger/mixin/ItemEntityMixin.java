@@ -30,11 +30,6 @@ public abstract class ItemEntityMixin  extends Entity implements EntityAccessor 
 
     @Override
     public Direction gravitychanger$getAppliedGravityDirection() {
-        Entity vehicle = this.getVehicle();
-        if(vehicle != null) {
-            return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
-        }
-
         return GravityChangerAPI.getGravityDirection((ItemEntity)(Object)this);
     }
 
