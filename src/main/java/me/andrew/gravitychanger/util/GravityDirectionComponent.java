@@ -66,14 +66,11 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                     entity.setPosition(entity.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, prevGravityDirection)).add(RotationUtil.vecPlayerToWorld(new Vec3d(0, (dimensions.height / 2) + .5, 0), gravityDirection)));
                 }
             }
+        }
             // Keep world velocity when changing gravity
             //if (!GravityChangerMod.config.worldVelocity)
             //    if (entity.isLogicalSideForUpdatingMovement())
             //    entity.setVelocity(RotationUtil.vecPlayerToWorld(RotationUtil.vecWorldToPlayer(entity.getVelocity(), prevGravityDirection), gravityDirection));
-
-            if (!(entity instanceof ProjectileEntity)){
-                entity.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(entity.getVelocity(),prevGravityDirection),gravityDirection));
-            }
 
             boolean changeLook = false;
 if(entity instanceof PlayerEntity){
@@ -84,72 +81,99 @@ if(entity instanceof PlayerEntity){
     changeLook=true;
 }
             // Keep world looking direction when changing gravity
-            if (!(entity instanceof ProjectileEntity) && changeLook) {
-                // if (GravityChangerMod.config.keepWorldLook) {
-                //     Vec2f worldAngles = RotationUtil.rotPlayerToWorld(entity.getYaw(), entity.getPitch(), prevGravityDirection);
-                //     Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, gravityDirection);
-                //     entity.setYaw(newViewAngles.x);
-                //     entity.setPitch(newViewAngles.y);
-                // }else {
-                if (prevGravityDirection == gravityDirection.getOpposite()) {
+            if (!(entity instanceof ProjectileEntity)) {
+                if (GravityChangerMod.config.keepWorldLook) {
                     Vec2f worldAngles = RotationUtil.rotPlayerToWorld(entity.getYaw(), entity.getPitch(), prevGravityDirection);
                     Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, gravityDirection);
                     entity.setYaw(newViewAngles.x);
                     entity.setPitch(newViewAngles.y);
-                }
+                } else {
+                    // System.out.println("called");
 
+                    //System.out.println("prev grav " + prevGravityDirection);
+                    // System.out.println("grav " + gravityDirection);
 
-                if (prevGravityDirection == Direction.UP || prevGravityDirection == Direction.DOWN) {
-                    if (gravityDirection == Direction.EAST) {
-                        entity.setYaw(entity.getYaw() - 90);
+                    //Vec3d rotatedVelocity = RotationUtil.vecPlayerToWorld(entity.getVelocity(), gravityDirection);
+//
+                    //if(entity.isOnGround() && (rotatedVelocity.x != 0 || rotatedVelocity.z != 0)){
+                    //    entity.setYaw(entity.getYaw() + 90);
+                    //}
+
+                    if (prevGravityDirection == gravityDirection.getOpposite()) {
+                        Vec2f worldAngles = RotationUtil.rotPlayerToWorld(entity.getYaw(), entity.getPitch(), prevGravityDirection);
+                        Vec2f newViewAngles = RotationUtil.rotWorldToPlayer(worldAngles.x, worldAngles.y, gravityDirection);
+                        entity.setYaw(newViewAngles.x);
+                        entity.setPitch(newViewAngles.y);
+                        //System.out.println("opposite");
                     }
-                }
 
-                if (prevGravityDirection == Direction.EAST) {
-                    if (gravityDirection == Direction.UP || gravityDirection == Direction.DOWN) {
-                        entity.setYaw(entity.getYaw() + 90);
-                    }
-                }
 
-                if (prevGravityDirection == Direction.UP || prevGravityDirection == Direction.DOWN) {
-                    if (gravityDirection == Direction.WEST) {
-                        entity.setYaw(entity.getYaw() + 90);
+                    if (prevGravityDirection == Direction.UP || prevGravityDirection == Direction.DOWN) {
+                        if (gravityDirection == Direction.EAST) {
+                            entity.setYaw(entity.getYaw() - 90);
+                            //System.out.println("vert east");
+                        }
                     }
-                }
 
-                if (prevGravityDirection == Direction.WEST) {
-                    if (gravityDirection == Direction.UP || gravityDirection == Direction.DOWN) {
-                        entity.setYaw(entity.getYaw() - 90);
+                    if (prevGravityDirection == Direction.EAST) {
+                        if (gravityDirection == Direction.UP || gravityDirection == Direction.DOWN) {
+                            entity.setYaw(entity.getYaw() + 90);
+                            //System.out.println("east vert");
+                        }
                     }
-                }
 
-                if (prevGravityDirection == Direction.DOWN) {
-                    if (gravityDirection == Direction.SOUTH) {
-                        entity.setYaw(entity.getYaw() - 180);
+                    if (prevGravityDirection == Direction.UP || prevGravityDirection == Direction.DOWN) {
+                        if (gravityDirection == Direction.WEST) {
+                            entity.setYaw(entity.getYaw() + 90);
+                            //System.out.println("vert west");
+                        }
                     }
-                }
 
-                if (prevGravityDirection == Direction.UP) {
-                    if (gravityDirection == Direction.NORTH) {
-                        entity.setYaw(entity.getYaw() - 180);
+                    if (prevGravityDirection == Direction.WEST) {
+                        if (gravityDirection == Direction.UP || gravityDirection == Direction.DOWN) {
+                            entity.setYaw(entity.getYaw() - 90);
+                            //System.out.println("west vert");
+                        }
                     }
-                }
 
-                if (prevGravityDirection == Direction.SOUTH) {
-                    if (gravityDirection == Direction.DOWN) {
-                        entity.setYaw(entity.getYaw() + 180);
+                    if (prevGravityDirection == Direction.DOWN) {
+                        if (gravityDirection == Direction.SOUTH) {
+                            entity.setYaw(entity.getYaw() - 180);
+                            //System.out.println("down south");
+                        }
                     }
-                }
 
-                if (prevGravityDirection == Direction.NORTH) {
-                    if (gravityDirection == Direction.UP) {
-                        entity.setYaw(entity.getYaw() + 180);
+                    if (prevGravityDirection == Direction.UP) {
+                        if (gravityDirection == Direction.NORTH) {
+                            entity.setYaw(entity.getYaw() - 180);
+                            //System.out.println("up north");
+                        }
                     }
+
+                    if (prevGravityDirection == Direction.SOUTH) {
+                        if (gravityDirection == Direction.DOWN) {
+                            entity.setYaw(entity.getYaw() + 180);
+                            //System.out.println("south down");
+                        }
+                    }
+
+                    if (prevGravityDirection == Direction.NORTH) {
+                        if (gravityDirection == Direction.UP) {
+                            entity.setYaw(entity.getYaw() + 180);
+                            //System.out.println("north up");
+                        }
+                    }
+
+
+
                 }
             }
+        if (!(entity instanceof ProjectileEntity)){
+            entity.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(entity.getVelocity(),prevGravityDirection),gravityDirection));
+        }
            // }
             //GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
-        }
+
     }
 
     @Override

@@ -93,7 +93,7 @@ public class GravityCommand {
         for (Entity entity : entities) {
             if (GravityChangerAPI.getDefaultGravityDirection(entity) != gravityDirection) {
                 GravityChangerAPI.setDefaultGravityDirection(entity, gravityDirection);
-                GravityChangerAPI.updateGravity(entity);
+                //GravityChangerAPI.updateGravity(entity);
                 getSendFeedback(source, entity, gravityDirection);
                 i++;
             }
@@ -112,7 +112,7 @@ public class GravityCommand {
             };
             Direction newGravityDirection = RotationUtil.dirPlayerToWorld(combinedRelativeDirection, gravityDirection);
             GravityChangerAPI.setDefaultGravityDirection(entity, newGravityDirection);
-            GravityChangerAPI.updateGravity(entity);
+            //GravityChangerAPI.updateGravity(entity);
             getSendFeedback(source, entity, newGravityDirection);
             i++;
         }
@@ -125,7 +125,7 @@ public class GravityCommand {
             Direction gravityDirection = Direction.random(source.getWorld().random);
             if (GravityChangerAPI.getGravityDirection(entity) != gravityDirection) {
                 GravityChangerAPI.setDefaultGravityDirection(entity, gravityDirection);
-                GravityChangerAPI.updateGravity(entity);
+                //GravityChangerAPI.updateGravity(entity);
                 getSendFeedback(source, entity, gravityDirection);
                 i++;
             }

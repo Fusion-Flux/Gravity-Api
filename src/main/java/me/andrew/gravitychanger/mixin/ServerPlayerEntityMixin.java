@@ -44,7 +44,7 @@ public abstract class ServerPlayerEntityMixin implements  ServerPlayerEntityAcce
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this);
         if(gravityDirection != GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
             GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this));
-            GravityChangerAPI.updateGravity((ServerPlayerEntity)(Object)this);
+            //GravityChangerAPI.updateGravity((ServerPlayerEntity)(Object)this);
            // GravityChangerAPI.setGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this));
         } else {
             this.gravitychanger$sendGravityPacket(gravityDirection, false);
@@ -64,7 +64,7 @@ public abstract class ServerPlayerEntityMixin implements  ServerPlayerEntityAcce
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this);
         if(gravityDirection != GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
             GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this));
-            GravityChangerAPI.updateGravity((ServerPlayerEntity)(Object)this);
+            //GravityChangerAPI.updateGravity((ServerPlayerEntity)(Object)this);
             //GravityChangerAPI.setGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this));
         } else {
             this.gravitychanger$sendGravityPacket(gravityDirection, false);
@@ -78,7 +78,7 @@ public abstract class ServerPlayerEntityMixin implements  ServerPlayerEntityAcce
     private void inject_copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
         if(GravityChangerMod.config.resetGravityOnRespawn) {
             GravityChangerAPI.setDefaultGravityDirection(oldPlayer, GravityChangerAPI.getDefaultGravityDirection(oldPlayer));
-            GravityChangerAPI.updateGravity(oldPlayer);
+            //GravityChangerAPI.updateGravity(oldPlayer);
             //GravityChangerAPI.setGravityDirection(oldPlayer, GravityChangerAPI.getDefaultGravityDirection(oldPlayer));
         } else {
             //GravityChangerAPI.setGravityDirection(oldPlayer, GravityChangerAPI.getGravityDirection(oldPlayer));
