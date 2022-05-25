@@ -331,8 +331,8 @@ if(entity instanceof PlayerEntity){
     public void readFromNbt(NbtCompound nbt) {
         if (nbt.contains("ListSize", NbtElement.INT_TYPE)) {
             int listSize = nbt.getInt("ListSize");
+            ArrayList<Gravity> newGravityList = new ArrayList<Gravity>();
             if(listSize != 0){
-                ArrayList<Gravity> newGravityList = new ArrayList<Gravity>();
                 for(int index=0; index<listSize; index++){
                     Gravity newGravity = new Gravity(
                             Direction.byId(nbt.getInt("GravityDirection "+index)),
@@ -342,19 +342,14 @@ if(entity instanceof PlayerEntity){
                     );
                     newGravityList.add(newGravity);
                 }
-                this.gravityList =(newGravityList);
             }
-
+            this.gravityList =(newGravityList);
         }
         if (nbt.contains("PrevGravityDirection", NbtElement.INT_TYPE)) {
-            Direction gravityDirection = Direction.byId(nbt.getInt("PrevGravityDirection"));
-            this.trackedPrevGravityDirection =(gravityDirection);
-            //this.updateGravity(true);
+            this.trackedPrevGravityDirection =(Direction.byId(nbt.getInt("PrevGravityDirection")));
         }
         if (nbt.contains("DefaultGravityDirection", NbtElement.INT_TYPE)) {
-            Direction gravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
-            this.defaultGravityDirection=(gravityDirection);
-            //this.updateGravity(true);
+            this.defaultGravityDirection=(Direction.byId(nbt.getInt("DefaultGravityDirection")));
         }
             this.isInverted = (nbt.getBoolean("IsGravityInverted"));
 
@@ -367,8 +362,8 @@ if(entity instanceof PlayerEntity){
         //nbt.putInt("GravityDirection", this.getTrackedGravityDirection().getId());
 
         int index = 0;
-        if(!gravityList.isEmpty())
-            for(Gravity temp : gravityList){
+        if(!this.getGravity().isEmpty())
+            for(Gravity temp : this.getGravity()){
                 if(temp.gravityDirection!=null)
                 nbt.putInt("GravityDirection "+index, temp.getGravityDirection().getId());
                 nbt.putInt("GravityPriority "+index, temp.getPriority());
