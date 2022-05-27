@@ -6,11 +6,12 @@
   "name": "GravityChanger",
   "description": "Lets you change player gravity",
   "contact": {
-    "issues": "https://github.com/Gaider10/GravityChanger/issues",
-    "sources": "https://github.com/Gaider10/GravityChanger"
+    "issues": "https://github.com/Fusion-Flux/GravityChanger/issues",
+    "sources": "https://github.com/Fusion-Flux/GravityChanger"
   },
   "authors": [
-    "Gaider10"
+    "Gaider10",
+    "Fusion Flux"
   ],
   "license": "MIT",
   "icon": "assets/gravitychanger/icon.png",

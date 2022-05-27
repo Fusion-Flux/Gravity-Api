@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
+    "minecraft:item_frame",
+    "minecraft:glow_item_frame",
+    "minecraft:painting",
     "create:contraption",
     "create:stationary_contraption",
     "create:gantry_contraption",
