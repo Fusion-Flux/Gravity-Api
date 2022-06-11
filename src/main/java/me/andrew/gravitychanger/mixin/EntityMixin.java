@@ -17,6 +17,7 @@ import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.math.*;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
@@ -33,7 +34,6 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 @Mixin(Entity.class)
@@ -78,9 +78,6 @@ public abstract class EntityMixin implements EntityAccessor {
     public abstract int getBlockZ();
 
     @Shadow
-    protected boolean submergedInWater;
-
-    @Shadow
     public boolean noClip;
 
     @Shadow
@@ -96,15 +93,9 @@ public abstract class EntityMixin implements EntityAccessor {
     public static Vec3d adjustMovementForCollisions(Vec3d movement, Box entityBoundingBox, List<VoxelShape> collisions) {
         return null;
     }
-
-    ;
-
     @Shadow
     public abstract Vec3d getPos();
 
-    @Shadow
-    @Final
-    protected Random random;
 
     @Shadow
     public abstract boolean isConnectedThroughVehicle(Entity entity);
@@ -114,13 +105,6 @@ public abstract class EntityMixin implements EntityAccessor {
 
     @Shadow
     protected abstract void tickInVoid();
-
-    @Shadow
-    public abstract boolean isSubmergedIn(TagKey<Fluid> fluidTag);
-
-    @Shadow
-    @Final
-    private Set<TagKey<Fluid>> submergedFluidTag;
 
     @Shadow
     public abstract double getEyeY();
@@ -138,11 +122,7 @@ public abstract class EntityMixin implements EntityAccessor {
     @Shadow
     public abstract float getPitch();
 
-    @Shadow private Vec3d trackedPosition;
-
-    @Shadow public abstract boolean hasPassenger(Entity passenger);
-
-    @Shadow public abstract double getMountedHeightOffset();
+    @Shadow @Final protected Random random;
 
     @Override
     public Direction gravitychanger$getAppliedGravityDirection() {

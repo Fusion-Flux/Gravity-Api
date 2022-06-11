@@ -4,11 +4,11 @@
     "minecraft:item_frame",
     "minecraft:glow_item_frame",
     "minecraft:painting",
-    "create:contraption",
-    "create:stationary_contraption",
-    "create:gantry_contraption",
-    "create:super_glue",
-    "create:crafting_blueprint",
-    "create:seat"
+    {"create:contraption","required": false},
+    {"create:stationary_contraption","required": false},
+    {"create:gantry_contraption","required": false},
+    {"create:super_glue","required": false},
+    {"create:crafting_blueprint","required": false},
+    {"create:seat","required": false}
   ]
 }
