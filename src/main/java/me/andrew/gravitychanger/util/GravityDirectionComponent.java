@@ -233,7 +233,7 @@ if(entity instanceof PlayerEntity){
                 this.prevGravityDirection = gravityDirection;
             }
             this.gravityDirection = gravityDirection;
-            //GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
     }
 
@@ -278,7 +278,7 @@ if(entity instanceof PlayerEntity){
             }
             if(addValue)
             this.gravityList.add(gravity);
-            this.updateGravity(initialGravity);
+            //this.updateGravity(initialGravity);
             GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
     }
@@ -291,7 +291,7 @@ if(entity instanceof PlayerEntity){
     @Override
     public void setGravity(ArrayList<Gravity> gravityList,boolean initalGravity) {
         this.gravityList = gravityList;
-        this.updateGravity(initalGravity);
+        //this.updateGravity(initalGravity);
         GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         //this.updateGravity(initalGravity);
     }
@@ -304,7 +304,6 @@ if(entity instanceof PlayerEntity){
     @Override
     public void invertGravity(boolean isInverted) {
         this.isInverted = isInverted;
-        this.updateGravity(false);
         GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         //this.updateGravity(false);
     }
@@ -322,7 +321,6 @@ if(entity instanceof PlayerEntity){
     @Override
     public void clearGravity() {
         this.gravityList = new ArrayList<Gravity>();
-        this.updateGravity(false);
         GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         //this.updateGravity(false);
     }
