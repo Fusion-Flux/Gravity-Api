@@ -168,7 +168,7 @@ if(!world.isClient) {
         if (GravityChangerAPI.getIsInverted((Entity) (Object) this)) {
             vehicleGravity = vehicleGravity.getOpposite();
         }
-        if(vehicleGravity == GravityChangerAPI.getDefaultGravityDirection((Entity) (Object) this))
+        if(vehicleGravity != GravityChangerAPI.getDefaultGravityDirection((Entity) (Object) this))
         GravityChangerAPI.addGravity((Entity) (Object) this, new Gravity(vehicleGravity, 99999999, 2, "vehicle"));
     }
     ArrayList<Gravity> gravityList = GravityChangerAPI.getGravityList((Entity) (Object) this);
