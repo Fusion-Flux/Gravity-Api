@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "gravitychanger",
+  "id": "fusions_gravity_api",
   "version": "${version}",
 
-  "name": "GravityChanger",
+  "name": "Fusions Gravity API",
   "description": "Lets you change player gravity",
   "contact": {
     "issues": "https://github.com/Fusion-Flux/GravityChanger/issues",
@@ -14,25 +14,25 @@
     "Fusion Flux"
   ],
   "license": "MIT",
-  "icon": "assets/gravitychanger/icon.png",
+  "icon": "assets/fusions_gravity_api/icon.png",
   
   "environment": "*",
   "entrypoints": {
     "main": [
-      "me.andrew.gravitychanger.GravityChangerMod"
+      "com.fusionflux.fusions_gravity_api.GravityChangerMod"
     ],
     "client": [
-      "me.andrew.gravitychanger.ClientInit"
+      "com.fusionflux.fusions_gravity_api.ClientInit"
     ],
     "modmenu": [
-      "me.andrew.gravitychanger.ModMenuIntegration"
+      "com.fusionflux.fusions_gravity_api.ModMenuIntegration"
     ],
     "cardinal-components": [
-      "me.andrew.gravitychanger.util.GravityChangerComponents"
+      "com.fusionflux.fusions_gravity_api.util.GravityChangerComponents"
     ]
   },
   "mixins": [
-    "gravitychanger.mixins.json"
+    "fusions_gravity_api.mixins.json"
   ],
 
   "depends": {

@@ -1,0 +1,56 @@
+{
+  "item.fusions_gravity_api.gravity_changer_down": "Down Gravity Changer",
+  "item.fusions_gravity_api.gravity_changer_up": "Up Gravity Changer",
+  "item.fusions_gravity_api.gravity_changer_north": "North Gravity Changer",
+  "item.fusions_gravity_api.gravity_changer_south": "South Gravity Changer",
+  "item.fusions_gravity_api.gravity_changer_west": "West Gravity Changer",
+  "item.fusions_gravity_api.gravity_changer_east": "East Gravity Changer",
+
+  "item.fusions_gravity_api.gravity_changer_down_aoe": "Down Gravity Changer AOE",
+  "item.fusions_gravity_api.gravity_changer_up_aoe": "Up Gravity Changer AOE",
+  "item.fusions_gravity_api.gravity_changer_north_aoe": "North Gravity Changer AOE",
+  "item.fusions_gravity_api.gravity_changer_south_aoe": "South Gravity Changer AOE",
+  "item.fusions_gravity_api.gravity_changer_west_aoe": "West Gravity Changer AOE",
+  "item.fusions_gravity_api.gravity_changer_east_aoe": "East Gravity Changer AOE",
+
+  "itemGroup.fusions_gravity_api.general": "Gravity Changer",
+
+  "direction.down": "Down",
+  "direction.up": "Up",
+  "direction.north": "North",
+  "direction.south": "South",
+  "direction.west": "West",
+  "direction.east": "East",
+
+  "commands.gravity.get.self": "Your gravity is %s",
+  "commands.gravity.get.other": "%s's gravity is %s",
+  "commands.gravity.set.self": "Set own gravity to %s",
+  "commands.gravity.set.other": "Set %s's gravity to %s",
+
+  "text.autoconfig.fusions_gravity_api.title": "GravityChanger Config",
+
+  "text.autoconfig.fusions_gravity_api.option.client.@PrefixText": "Client",
+  "text.autoconfig.fusions_gravity_api.option.keepWorldLook": "Keep World Look",
+  "text.autoconfig.fusions_gravity_api.option.keepWorldLook.@Tooltip[0]": "Makes it so that you keep your world relative",
+  "text.autoconfig.fusions_gravity_api.option.keepWorldLook.@Tooltip[1]": "look direction when changing gravity",
+
+  "text.autoconfig.fusions_gravity_api.option.rotationTime": "Camera Rotation Time",
+  "text.autoconfig.fusions_gravity_api.option.rotationTime.@Tooltip[0]": "The time it takes for the camera to rotate",
+  "text.autoconfig.fusions_gravity_api.option.rotationTime.@Tooltip[1]": "from one direction to the next",
+
+  "text.autoconfig.fusions_gravity_api.option.server.@PrefixText": "Server",
+  "text.autoconfig.fusions_gravity_api.option.worldVelocity": "World Relative Velocity Transfer",
+  "text.autoconfig.fusions_gravity_api.option.worldVelocity.@Tooltip[0]": "Makes it so when gravity changes velocity is world relative",
+  "text.autoconfig.fusions_gravity_api.option.worldVelocity.@Tooltip[1]": "lets you keep moving the same direction when gravity changes",
+
+  "text.autoconfig.fusions_gravity_api.option.resetGravityOnDimensionChange": "Reset Gravity On Dimension Change",
+  "text.autoconfig.fusions_gravity_api.option.resetGravityOnDimensionChange.@Tooltip[0]": "Makes it so that your gravity is reset",
+  "text.autoconfig.fusions_gravity_api.option.resetGravityOnDimensionChange.@Tooltip[1]": "to Your Gravity Default every time you change dimension",
+
+  "text.autoconfig.fusions_gravity_api.option.resetGravityOnRespawn": "Reset Gravity On Respawn",
+  "text.autoconfig.fusions_gravity_api.option.resetGravityOnRespawn.@Tooltip[0]": "Makes it so that your gravity is reset",
+  "text.autoconfig.fusions_gravity_api.option.resetGravityOnRespawn.@Tooltip[1]": "to Your Gravity Default every time you respawn",
+  "text.autoconfig.fusions_gravity_api.option.voidDamageAboveWorld": "Void Damage Above World",
+  "text.autoconfig.fusions_gravity_api.option.voidDamageAboveWorld.@Tooltip[0]": "Makes it so that you start taking void damage",
+  "text.autoconfig.fusions_gravity_api.option.voidDamageAboveWorld.@Tooltip[1]": "if you are above y = max_world_height + 256"
+}
