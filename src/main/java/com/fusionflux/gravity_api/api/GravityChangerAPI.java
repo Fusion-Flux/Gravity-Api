@@ -21,7 +21,7 @@ import net.minecraft.util.math.Vec3d;
 
 public abstract class GravityChangerAPI {
     public static final ComponentKey<GravityComponent> GRAVITY_COMPONENT =
-            ComponentRegistry.getOrCreate(new Identifier("gravitychanger", "gravity_direction"), GravityComponent.class);
+            ComponentRegistry.getOrCreate(new Identifier("gravityapi", "gravity_direction"), GravityComponent.class);
     /**
      * Returns the applied gravity direction for the given player
      * This is the direction that directly affects everything this mod changes

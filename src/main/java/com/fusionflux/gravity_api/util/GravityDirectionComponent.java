@@ -26,6 +26,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     Direction defaultGravityDirection = Direction.DOWN;
     Direction prevGravityDirection = Direction.DOWN;
     Direction trackedPrevGravityDirection = Direction.DOWN;
+    boolean initalSpawn = true;
     boolean isInverted = false;
 
     ArrayList<Gravity> gravityList = new ArrayList<Gravity>();
@@ -351,7 +352,11 @@ if(entity instanceof PlayerEntity){
         }
             this.isInverted = (nbt.getBoolean("IsGravityInverted"));
 
-            this.updateGravity(true);
+            this.updateGravity(initalSpawn);
+
+            if(initalSpawn){
+                initalSpawn = false;
+            }
 
     }
 

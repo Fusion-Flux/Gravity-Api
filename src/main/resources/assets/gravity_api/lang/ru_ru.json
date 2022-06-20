@@ -1,10 +1,10 @@
 {
-  "item.fusions_gravity_api.gravity_changer_down": "Изменитель гравитации Низ",
-  "item.fusions_gravity_api.gravity_changer_up": "Изменитель гравитации Верх",
-  "item.fusions_gravity_api.gravity_changer_north": "Изменитель гравитации Север",
-  "item.fusions_gravity_api.gravity_changer_south": "Изменитель гравитации Юг",
-  "item.fusions_gravity_api.gravity_changer_west": "Изменитель гравитации Запад",
-  "item.fusions_gravity_api.gravity_changer_east": "Изменитель гравитации Восток",
+  "item.gravity_api.gravity_changer_down": "Изменитель гравитации Низ",
+  "item.gravity_api.gravity_changer_up": "Изменитель гравитации Верх",
+  "item.gravity_api.gravity_changer_north": "Изменитель гравитации Север",
+  "item.gravity_api.gravity_changer_south": "Изменитель гравитации Юг",
+  "item.gravity_api.gravity_changer_west": "Изменитель гравитации Запад",
+  "item.gravity_api.gravity_changer_east": "Изменитель гравитации Восток",
 
   "direction.down": "Низ",
   "direction.up": "Верх",
@@ -18,21 +18,21 @@
   "commands.gravity.set.self": "Ваша гравитация изменена на %s",
   "commands.gravity.set.other": "Гравитация %s изменена на %s",
 
-  "text.autoconfig.fusions_gravity_api.title": "GravityChanger Config",
+  "text.autoconfig.gravity_api.title": "GravityChanger Config",
 
-  "text.autoconfig.fusions_gravity_api.option.client.@PrefixText": "Клиент",
-  "text.autoconfig.fusions_gravity_api.option.keepWorldLook": "Сохранять взгляд на мир",
-  "text.autoconfig.fusions_gravity_api.option.keepWorldLook.@Tooltip[0]": "Делает так, чтобы ваш угол обзора поворачивался",
-  "text.autoconfig.fusions_gravity_api.option.keepWorldLook.@Tooltip[1]": "относительно камеры при изменении гравитации",
+  "text.autoconfig.gravity_api.option.client.@PrefixText": "Клиент",
+  "text.autoconfig.gravity_api.option.keepWorldLook": "Сохранять взгляд на мир",
+  "text.autoconfig.gravity_api.option.keepWorldLook.@Tooltip[0]": "Делает так, чтобы ваш угол обзора поворачивался",
+  "text.autoconfig.gravity_api.option.keepWorldLook.@Tooltip[1]": "относительно камеры при изменении гравитации",
 
-  "text.autoconfig.fusions_gravity_api.option.server.@PrefixText": "Сервер",
-  "text.autoconfig.fusions_gravity_api.option.resetGravityOnDimensionChange": "Сбрасывать гравитацию при смене измерения",
-  "text.autoconfig.fusions_gravity_api.option.resetGravityOnDimensionChange.@Tooltip[0]": "Изменяет вашу гравитацию на Низ при",
-  "text.autoconfig.fusions_gravity_api.option.resetGravityOnDimensionChange.@Tooltip[1]": "каждом попадании в другое измерение",
-  "text.autoconfig.fusions_gravity_api.option.resetGravityOnRespawn": "Сбрасывать гравитацию при возрождении",
-  "text.autoconfig.fusions_gravity_api.option.resetGravityOnRespawn.@Tooltip[0]": "Изменяет вашу гравитацию на",
-  "text.autoconfig.fusions_gravity_api.option.resetGravityOnRespawn.@Tooltip[1]": "Низ при каждом возрождении",
-  "text.autoconfig.fusions_gravity_api.option.voidDamageAboveWorld": "Урон от пустоты над миром",
-  "text.autoconfig.fusions_gravity_api.option.voidDamageAboveWorld.@Tooltip[0]": "Делает так, что вы начинаете получать урон от пустоты",
-  "text.autoconfig.fusions_gravity_api.option.voidDamageAboveWorld.@Tooltip[1]": "если вы выше чем (максимальная высота мира + 256 блоков)"
+  "text.autoconfig.gravity_api.option.server.@PrefixText": "Сервер",
+  "text.autoconfig.gravity_api.option.resetGravityOnDimensionChange": "Сбрасывать гравитацию при смене измерения",
+  "text.autoconfig.gravity_api.option.resetGravityOnDimensionChange.@Tooltip[0]": "Изменяет вашу гравитацию на Низ при",
+  "text.autoconfig.gravity_api.option.resetGravityOnDimensionChange.@Tooltip[1]": "каждом попадании в другое измерение",
+  "text.autoconfig.gravity_api.option.resetGravityOnRespawn": "Сбрасывать гравитацию при возрождении",
+  "text.autoconfig.gravity_api.option.resetGravityOnRespawn.@Tooltip[0]": "Изменяет вашу гравитацию на",
+  "text.autoconfig.gravity_api.option.resetGravityOnRespawn.@Tooltip[1]": "Низ при каждом возрождении",
+  "text.autoconfig.gravity_api.option.voidDamageAboveWorld": "Урон от пустоты над миром",
+  "text.autoconfig.gravity_api.option.voidDamageAboveWorld.@Tooltip[0]": "Делает так, что вы начинаете получать урон от пустоты",
+  "text.autoconfig.gravity_api.option.voidDamageAboveWorld.@Tooltip[1]": "если вы выше чем (максимальная высота мира + 256 блоков)"
 }

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "fusions_gravity_api:item/gravity_changer_north_aoe"
+    "layer0": "gravity_api:item/gravity_changer_north_aoe"
   }
 }

@@ -14,7 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 public class GravityChangerMod implements ModInitializer {
-    public static final String MOD_ID = "fusions_gravity_api";
+    public static final String MOD_ID = "gravity_api";
     public static final Identifier CHANNEL_GRAVITY = new Identifier(MOD_ID, "gravity");
     public static GravityChangerConfig config;
 
