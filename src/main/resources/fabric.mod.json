@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "fusions_gravity_api",
+  "id": "gravity_api",
   "version": "${version}",
 
-  "name": "Fusions Gravity API",
+  "name": "Gravity API",
   "description": "Lets you change player gravity",
   "contact": {
     "issues": "https://github.com/Fusion-Flux/GravityChanger/issues",
@@ -14,25 +14,25 @@
     "Fusion Flux"
   ],
   "license": "MIT",
-  "icon": "assets/fusions_gravity_api/icon.png",
+  "icon": "assets/gravity_api/icon.png",
   
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.fusionflux.fusions_gravity_api.GravityChangerMod"
+      "com.fusionflux.gravity_api.GravityChangerMod"
     ],
     "client": [
-      "com.fusionflux.fusions_gravity_api.ClientInit"
+      "com.fusionflux.gravity_api.ClientInit"
     ],
     "modmenu": [
-      "com.fusionflux.fusions_gravity_api.ModMenuIntegration"
+      "com.fusionflux.gravity_api.ModMenuIntegration"
     ],
     "cardinal-components": [
-      "com.fusionflux.fusions_gravity_api.util.GravityChangerComponents"
+      "com.fusionflux.gravity_api.util.GravityChangerComponents"
     ]
   },
   "mixins": [
-    "fusions_gravity_api.mixins.json"
+    "gravity_api.mixins.json"
   ],
 
   "depends": {
@@ -44,7 +44,7 @@
   },
   "custom": {
     "cardinal-components": [
-      "gravitychanger:gravity_direction"
+      "gravityapi:gravity_direction"
     ],
     "lithium:options": {
       "mixin.entity.collisions": false,
