@@ -1,6 +1,6 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.RotationAnimation;
+import com.fusionflux.gravity_api.util.RotationUtil;
 import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.accessor.ServerPlayerEntityAccessor;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
@@ -44,8 +44,11 @@ public abstract class ServerPlayerEntityMixin implements  ServerPlayerEntityAcce
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this);
         if(gravityDirection != GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
             GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, Direction.DOWN);
+            RotationUtil.applyNewRotation(gravityDirection,GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this),GravityChangerMod.config.rotationTime);
         } else {
             GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this));
+            RotationUtil.applyNewRotation(gravityDirection,GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this),GravityChangerMod.config.rotationTime);
+            this.gravitychanger$sendGravityPacket(gravityDirection, false);
         }
     }
 
@@ -62,8 +65,11 @@ public abstract class ServerPlayerEntityMixin implements  ServerPlayerEntityAcce
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this);
         if(gravityDirection != GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
             GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, Direction.DOWN);
+            RotationUtil.applyNewRotation(gravityDirection,GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this),GravityChangerMod.config.rotationTime);
         } else {
             GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this));
+            RotationUtil.applyNewRotation(gravityDirection,GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this),GravityChangerMod.config.rotationTime);
+            this.gravitychanger$sendGravityPacket(gravityDirection, false);
         }
     }
 
@@ -73,8 +79,12 @@ public abstract class ServerPlayerEntityMixin implements  ServerPlayerEntityAcce
     )
     private void inject_copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
         if(GravityChangerMod.config.resetGravityOnRespawn) {
+            RotationUtil.applyNewRotation(GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this),GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this),GravityChangerMod.config.rotationTime);
+            //GravityChangerAPI.updateGravity(oldPlayer);
+            //GravityChangerAPI.setGravityDirection(oldPlayer, GravityChangerAPI.getDefaultGravityDirection(oldPlayer));
         } else {
             GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection(oldPlayer));
+            RotationUtil.applyNewRotation(GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this),GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this),GravityChangerMod.config.rotationTime);
         }
     }
 }
