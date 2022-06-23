@@ -1,4 +1,4 @@
-# GravityChanger
+# Gravity API
 A fabric mod and api that lets you change player gravity direction.
 
 ## Features
@@ -30,7 +30,7 @@ To import the mod you can use modrinth maven.
 Add the following to your project:
 #### grable.properties
 ```properties
-gravitychanger_version = 0.3.0
+gravity_api_version = 0.7.11+fabric
 ```
 Replace 0.2.0 with the version you want to use from [here](https://modrinth.com/mod/gravitychanger/versions).
 #### build.gradle
@@ -46,13 +46,13 @@ repositories {
 }
 
 dependencies {
-    modImplementation "maven.modrinth:gravitychanger:${project.gravitychanger_version}"
+    modImplementation "maven.modrinth:fusions-gravity-api:${project.fusions_gravity_api_version}"
 }
 ```
 #### fabric.mod.json
 ```json
 "depends": {
-    "gravitychanger": "^0.3.0"
+    "gravitychanger": "^0.7.11+fabric"
 }
 ```
 Replace 0.3.0 with the lowest version of the mod your mod works with
