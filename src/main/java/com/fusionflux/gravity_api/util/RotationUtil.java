@@ -221,7 +221,108 @@ public abstract class RotationUtil {
     public static Quaternion getCameraRotationQuaternion(Direction gravityDirection) {
         return ENTITY_ROTATION_QUATERNIONS[gravityDirection.getId()];
     }
-    
+
+    private static final int EXPIRATION_TIME = GravityChangerMod.config.rotationTime;
+    private static final List<Rotation> ROTATION_QUEUE = new ArrayList<>();
+    private static EndRotation END_ROTATION = new EndRotation(null,null);
+
+    private record Rotation(Quaternion startQuaternion,Quaternion endQuaternion, long expiration, int time) {
+    }
+
+    private record EndRotation(Quaternion endpoint,Quaternion startpoint) {
+    }
+
+    public static void applyNewRotation(Direction currentDirection,Direction prevDirection,int time) {
+        long now = System.currentTimeMillis();
+        Quaternion rotStart = WORLD_ROTATION_QUATERNIONS[prevDirection.getId()];
+        if (prevDirection == Direction.DOWN) {
+            if (currentDirection == Direction.EAST) {
+                rotStart = rotationByRadians(Direction.DOWN.getUnitVector(),Math.toRadians(-90));
+            }
+        }
+
+        if(prevDirection == Direction.UP){
+            if (currentDirection == Direction.EAST) {
+                rotStart = Vec3f.NEGATIVE_Y.getDegreesQuaternion(-90);
+                rotStart.hamiltonProduct(Vec3f.NEGATIVE_Z.getDegreesQuaternion(180));
+                //rotStart = rotationByRadians(Direction.DOWN.getUnitVector(),Math.toRadians(-90));
+                //rotStart = add(rotStart,rotationByRadians(Direction.NORTH.getUnitVector(),Math.toRadians(90)));
+                //rotStart = Vec3f.NEGATIVE_Y.getDegreesQuaternion(GravityChangerMod.config.qX);
+                //rotStart.hamiltonProduct(Vec3f.NEGATIVE_X.getDegreesQuaternion(GravityChangerMod.config.qY));
+                //rotStart.hamiltonProduct(Vec3f.NEGATIVE_Z.getDegreesQuaternion(GravityChangerMod.config.qZ));
+            }
+        }
+
+        if (prevDirection == Direction.EAST) {
+            if (currentDirection == Direction.UP || currentDirection == Direction.DOWN) {
+                rotStart = rotationByRadians(Direction.NORTH.getUnitVector(),Math.toRadians(90));
+            }
+        }
+
+        if (prevDirection == Direction.UP || prevDirection == Direction.DOWN) {
+            if (currentDirection == Direction.WEST) {
+                rotStart = rotationByRadians(Direction.DOWN.getUnitVector(),Math.toRadians(90));
+                if(prevDirection == Direction.UP)
+                rotStart.hamiltonProduct(Vec3f.NEGATIVE_Z.getDegreesQuaternion(180));
+            }
+        }
+//
+        if (prevDirection == Direction.WEST) {
+            if (currentDirection == Direction.UP || currentDirection == Direction.DOWN) {
+                rotStart = rotationByRadians(Direction.NORTH.getUnitVector(),Math.toRadians(-90));
+            }
+        }
+//
+        if (prevDirection == Direction.DOWN) {
+            if (currentDirection == Direction.SOUTH) {
+                rotStart = rotationByRadians(Direction.DOWN.getUnitVector(),Math.toRadians(-180));
+            }
+        }
+//
+        if (prevDirection == Direction.UP) {
+            if (currentDirection == Direction.NORTH) {
+                rotStart = Vec3f.NEGATIVE_Y.getDegreesQuaternion(0);
+                rotStart.hamiltonProduct(Vec3f.NEGATIVE_X.getDegreesQuaternion(180));
+                //rotStart = rotationByRadians(Direction.UP.getUnitVector(),Math.toRadians(-180));
+            }
+        }
+//
+        if (prevDirection == Direction.SOUTH) {
+            if (currentDirection == Direction.DOWN) {
+                rotStart = rotationByRadians(Direction.EAST.getUnitVector(),Math.toRadians(90));
+            }
+        }
+//
+        if (prevDirection == Direction.NORTH) {
+            if (currentDirection == Direction.UP) {
+                rotStart = Vec3f.NEGATIVE_Y.getDegreesQuaternion(180);
+                rotStart.hamiltonProduct(Vec3f.NEGATIVE_X.getDegreesQuaternion(90));
+            }
+        }
+
+        if (prevDirection == Direction.NORTH) {
+            if (currentDirection == Direction.SOUTH) {
+                rotStart = Vec3f.NEGATIVE_Y.getDegreesQuaternion(180);
+                rotStart.hamiltonProduct(Vec3f.NEGATIVE_X.getDegreesQuaternion(90));
+                rotStart.hamiltonProduct(Vec3f.NEGATIVE_Z.getDegreesQuaternion(180));
+            }
+        }
+        if (prevDirection == Direction.SOUTH) {
+            if (currentDirection == Direction.NORTH) {
+                rotStart = Vec3f.NEGATIVE_Y.getDegreesQuaternion(180);
+                rotStart.hamiltonProduct(Vec3f.NEGATIVE_X.getDegreesQuaternion(-90));
+            }
+        }
+        int expireTime = time;
+
+        if(currentDirection == prevDirection.getOpposite()){
+            expireTime = expireTime*2;
+        }
+
+        ROTATION_QUEUE.add(new Rotation(WORLD_ROTATION_QUATERNIONS[currentDirection.getId()],rotStart, now + expireTime,expireTime));
+        END_ROTATION = new EndRotation(WORLD_ROTATION_QUATERNIONS[currentDirection.getId()],rotStart);
+    }
+
     public static Quaternion rotationByRadians(
             Vec3f axis,
             double rotationAngle
@@ -234,7 +335,33 @@ public abstract class RotationUtil {
                 (float)Math.cos(rotationAngle / 2.0F)
         );
     }
-    
+
+    public static Quaternion getRotation(Direction currentDirec) {
+        if(END_ROTATION.endpoint == null){
+            END_ROTATION = new EndRotation(WORLD_ROTATION_QUATERNIONS[currentDirec.getId()],WORLD_ROTATION_QUATERNIONS[currentDirec.getId()]);
+        }
+        if(ROTATION_QUEUE.isEmpty()) return END_ROTATION.endpoint;
+        long now = System.currentTimeMillis();
+
+        // Start lerping rotations
+        Quaternion accumulator = END_ROTATION.endpoint;
+
+        Iterator<Rotation> iterator = ROTATION_QUEUE.iterator();
+
+        while (iterator.hasNext()) {
+            Rotation rotation = iterator.next();
+
+            if (rotation.expiration > now) {
+                float delta = (rotation.expiration - now) / (float) rotation.time;
+                accumulator = interpolate(rotation.startQuaternion, rotation.endQuaternion, MathHelper.clamp((delta*delta*(3-2*delta)), 0, 1));
+            } else {
+                iterator.remove();
+            }
+        }
+
+        return accumulator;
+    }
+
     public static Quaternion multiply(Quaternion quat ,float val) {
         return new Quaternion(
                 quat.getX() * val, quat.getY() * val, quat.getZ() * val, quat.getW() * val
