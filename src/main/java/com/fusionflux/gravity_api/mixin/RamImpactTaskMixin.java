@@ -16,7 +16,7 @@ public abstract class RamImpactTaskMixin {
     @Shadow private Vec3d direction;
 
     @Redirect(
-            method = "keepRunning(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/mob/PathAwareEntity;J)V",
+            method = "keepRunning(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/passive/GoatEntity;J)V",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/LivingEntity;takeKnockback(DDD)V",
