@@ -46,7 +46,7 @@ repositories {
 }
 
 dependencies {
-    modImplementation "maven.modrinth:fusions-gravity-api:${project.fusions_gravity_api_version}"
+    modImplementation "maven.modrinth:fusions-gravity-api:${project.gravity_api_version}"
 }
 ```
 #### fabric.mod.json
