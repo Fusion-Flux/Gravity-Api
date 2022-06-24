@@ -1,7 +1,6 @@
 package com.fusionflux.gravity_api.mixin.client;
 
 import com.fusionflux.gravity_api.accessor.EntityAccessor;
-import com.fusionflux.gravity_api.util.QuaternionUtil;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -32,7 +31,7 @@ public abstract class EntityRenderMixin {
         }
 
         Quaternion quaternion = RotationUtil.getCameraRotationQuaternion(gravityDirection).copy();
-        QuaternionUtil.inverse(quaternion);
+        quaternion.conjugate();
         quaternion.hamiltonProduct(entityRenderDispatcher.getRotation().copy());
         return quaternion;
     }
