@@ -1,11 +1,13 @@
 package com.fusionflux.gravity_api.mixin.client;
 
 import com.fusionflux.gravity_api.RotationAnimation;
+import com.fusionflux.gravity_api.util.QuaternionUtil;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import com.fusionflux.gravity_api.accessor.EntityAccessor;
 import com.fusionflux.gravity_api.util.EntityTags;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -48,9 +50,11 @@ public abstract class EntityRenderDispatcherMixin {
             if (!this.renderShadows) return;
 
             matrices.push();
-            Quaternion rotation = RotationAnimation.getCurrentGravityRotation(gravityDirection).copy();
-            rotation.conjugate();
-            matrices.multiply(rotation);
+            if(entity instanceof ClientPlayerEntity) {
+                matrices.multiply(QuaternionUtil.inversed(RotationAnimation.getCurrentGravityRotation(gravityDirection)));
+            }else{
+                matrices.multiply(RotationUtil.getCameraRotationQuaternion(gravityDirection));
+            }
         }
     }
 
