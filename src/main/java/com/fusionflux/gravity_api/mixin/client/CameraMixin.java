@@ -1,5 +1,6 @@
 package com.fusionflux.gravity_api.mixin.client;
 
+import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.accessor.EntityAccessor;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.client.render.Camera;
@@ -8,6 +9,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,7 +26,11 @@ public abstract class CameraMixin {
     @Shadow private Entity focusedEntity;
 
     @Shadow @Final private Quaternion rotation;
-
+    
+    @Shadow private float lastCameraY;
+    
+    @Shadow private float cameraY;
+    
     @Redirect(
             method = "update",
             at = @At(
@@ -35,19 +41,27 @@ public abstract class CameraMixin {
     )
     private void redirect_update_setPos_0(Camera camera, double x, double y, double z, BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta) {
         Direction gravityDirection = ((EntityAccessor) focusedEntity).gravitychanger$getAppliedGravityDirection();
-        if(gravityDirection == Direction.DOWN) {
+        if(gravityDirection == Direction.DOWN && !RotationAnimation.isInAnimation()) {
             this.setPos(x, y, z);
             return;
         }
-
-        double entityLerpedY = MathHelper.lerp(tickDelta, focusedEntity.prevY, focusedEntity.getY());
-
-        Vec3d eyeOffset = RotationUtil.vecPlayerToWorld(0, y - entityLerpedY, 0, gravityDirection);
-
+    
+        Quaternion gravityRotation = RotationAnimation.getCurrentGravityRotation(gravityDirection).copy();
+        gravityRotation.conjugate();
+    
+        double entityX = MathHelper.lerp((double) tickDelta, focusedEntity.prevX, focusedEntity.getX());
+        double entityY = MathHelper.lerp((double) tickDelta, focusedEntity.prevY, focusedEntity.getY());
+        double entityZ = MathHelper.lerp((double) tickDelta, focusedEntity.prevZ, focusedEntity.getZ());
+        
+        double currentCameraY = MathHelper.lerp(tickDelta, this.lastCameraY, this.cameraY);
+    
+        Vec3f eyeOffset = new Vec3f(0,(float) currentCameraY,0);
+        eyeOffset.rotate(gravityRotation);
+        
         this.setPos(
-                x + eyeOffset.x,
-                entityLerpedY + eyeOffset.y,
-                z + eyeOffset.z
+                entityX + eyeOffset.getX(),
+                entityY + eyeOffset.getY(),
+                entityZ + eyeOffset.getZ()
         );
     }
 
