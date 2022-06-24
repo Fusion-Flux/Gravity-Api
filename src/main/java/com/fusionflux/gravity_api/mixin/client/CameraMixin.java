@@ -2,6 +2,7 @@ package com.fusionflux.gravity_api.mixin.client;
 
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.accessor.EntityAccessor;
+import com.fusionflux.gravity_api.util.QuaternionUtil;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
@@ -77,9 +78,10 @@ public abstract class CameraMixin {
     private void inject_setRotation(CallbackInfo ci) {
         if(this.focusedEntity !=null) {
             Direction gravityDirection = ((EntityAccessor) this.focusedEntity).gravitychanger$getAppliedGravityDirection();
-            if (gravityDirection == Direction.DOWN) return;
+            if (gravityDirection == Direction.DOWN && !RotationAnimation.isInAnimation()) return;
 
-            Quaternion rotation = RotationUtil.getCameraRotationQuaternion(gravityDirection).copy();
+            Quaternion rotation = RotationAnimation.getCurrentGravityRotation(gravityDirection).copy();
+            rotation.conjugate();
             rotation.hamiltonProduct(this.rotation);
             this.rotation.set(rotation.getX(), rotation.getY(), rotation.getZ(), rotation.getW());
         }
