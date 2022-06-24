@@ -47,10 +47,16 @@ public class RotationAnimation {
         );
         float newPitch = newYawAndPitch.y;
         float newYaw = newYawAndPitch.x;
-        player.setPitch(newPitch);
-        player.prevPitch = newPitch;
-        player.setYaw(newYaw);
-        player.prevYaw = newYaw;
+        float deltaYaw = newYaw-player.getYaw();
+        float deltaPitch = newPitch-player.getPitch();
+        player.setYaw(player.getYaw()+deltaYaw);
+        player.setPitch(player.getPitch()+deltaPitch);
+        player.prevYaw += deltaYaw;
+        player.prevPitch += deltaPitch;
+        player.bodyYaw += deltaYaw;
+        player.prevBodyYaw += deltaYaw;
+        player.headYaw += deltaYaw;
+        player.prevHeadYaw += deltaYaw;
         
         Quaternion newViewRotation = QuaternionUtil.getViewRotation(player.getPitch(), player.getYaw());
         
