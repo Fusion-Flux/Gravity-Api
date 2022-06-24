@@ -38,22 +38,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         Direction gravityDirection = this.getTrackedGravityDirection();
         
         if (!initialGravity) {
-            // keep the entity's eye position fixed, so it won't suffocate
-            // this is also important to immersive portals rendering
-            
-            double eyeHeight = entity.getStandingEyeHeight();
-            Vec3d prevEyeOffset = RotationUtil.vecPlayerToWorld(0, eyeHeight, 0, prevGravityDirection);
-            Vec3d newEyeOffset = RotationUtil.vecPlayerToWorld(0, eyeHeight, 0, gravityDirection);
-            
-            entity.setPosition(entity.getPos().add(prevEyeOffset).subtract(newEyeOffset));
-            
-            // the entity position is interpolated between current position and last tick position
-            // change the last tick position accordingly
-            Vec3d prevFeetPosition = new Vec3d(entity.prevX, entity.prevY, entity.prevZ)
-                .add(prevEyeOffset).subtract(newEyeOffset);
-            entity.prevX = prevFeetPosition.x;
-            entity.prevY = prevFeetPosition.y;
-            entity.prevZ = prevFeetPosition.z;
+        
         }
         
         entity.fallDistance = 0;

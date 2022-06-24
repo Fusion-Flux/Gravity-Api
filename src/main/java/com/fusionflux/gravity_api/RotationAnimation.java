@@ -120,4 +120,8 @@ public class RotationAnimation {
     private static float mapProgress(float delta) {
         return MathHelper.clamp((delta * delta * (3 - 2 * delta)), 0, 1);
     }
+    
+    public static boolean isInAnimation() {
+        return inAnimation;
+    }
 }
