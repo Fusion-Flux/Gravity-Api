@@ -201,13 +201,6 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         }
     }
     
-    public void setInternalDefaultTrackedGravityDirection(Direction gravityDirection) {
-        if (canChangeGravity()) {
-            this.defaultGravityDirection = gravityDirection;
-            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
-        }
-    }
-    
     @Override
     public void addGravity(Gravity gravity, boolean initialGravity) {
         if (canChangeGravity()) {
@@ -241,21 +234,10 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         //this.updateGravity(initalGravity);
     }
     
-    public void internalSetGravity(ArrayList<Gravity> gravityList, boolean initalGravity) {
-        this.gravityList = gravityList;
-        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
-    }
-    
     @Override
     public void invertGravity(boolean isInverted) {
         this.isInverted = isInverted;
         this.updateGravity(false);
-        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
-        //this.updateGravity(false);
-    }
-    
-    public void internalInvertGravity(boolean isInverted) {
-        this.isInverted = isInverted;
         GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
     }
     
