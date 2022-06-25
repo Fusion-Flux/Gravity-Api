@@ -12,8 +12,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -40,35 +42,13 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     @Override
     public void onGravityChanged(Direction prevGravityDirection, boolean initialGravity) {
         Direction gravityDirection = this.getTrackedGravityDirection();
-        entity.fallDistance = 0;
-        entity.setBoundingBox(((AccessorEntity)entity).gravity$calculateBoundingBox());
-        if (!initialGravity) {
-            // Adjust position to avoid suffocation in blocks when changing gravity
-            EntityDimensions dimensions = entity.getDimensions(entity.getPose());
-            Direction relativeDirection = RotationUtil.dirWorldToPlayer(gravityDirection, prevGravityDirection);
-            if (!(entity instanceof AreaEffectCloudEntity) && !(entity instanceof PersistentProjectileEntity)) {
-                if (!(entity instanceof EndCrystalEntity)) {
-                    Vec3d relativePosOffset = switch (relativeDirection) {
-                        case DOWN -> Vec3d.ZERO;
-                        case UP -> new Vec3d(0.0D, dimensions.height - 1.0E-6D, 0.0D);
-                        default -> Vec3d.of(relativeDirection.getVector()).multiply(dimensions.width / 2 - (gravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D)).add(0.0D, dimensions.width / 2 - (prevGravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D), 0.0D);
-                    };
-                    entity.setPosition(entity.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, prevGravityDirection)));
-                } else {
-                    //entity.setPosition(0,0,0);
-                    entity.setPosition(entity.getPos().subtract(RotationUtil.vecWorldToPlayer(new Vec3d(0, (dimensions.height / 2) + .5, 0), prevGravityDirection)));
-                    Vec3d relativePosOffset = switch (relativeDirection) {
-                        case DOWN -> Vec3d.ZERO;
-                        case UP -> new Vec3d(0.0D, dimensions.height - 1.0E-6D, 0.0D);
-                        default -> Vec3d.of(relativeDirection.getVector()).multiply(dimensions.width / 2 - (gravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D)).add(0.0D, dimensions.width / 2 - (prevGravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D), 0.0D);
-                    };
-                    entity.setPosition(entity.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, prevGravityDirection)).add(RotationUtil.vecPlayerToWorld(new Vec3d(0, (dimensions.height / 2) + .5, 0), gravityDirection)));
-                }
-            }
-        }
         
         entity.fallDistance = 0;
         entity.setBoundingBox(((AccessorEntity) entity).gravity$calculateBoundingBox());
+        
+        if (!initialGravity) {
+            adjustEntityPosition(prevGravityDirection, gravityDirection);
+        }
         
         // Keep world velocity when changing gravity
         if (!GravityChangerMod.config.worldVelocity) {
@@ -78,6 +58,62 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                 );
             }
         }
+    }
+    
+    // Adjust position to avoid suffocation in blocks when changing gravity
+    private void adjustEntityPosition(Direction prevGravityDirection, Direction gravityDirection) {
+        if (entity instanceof AreaEffectCloudEntity || entity instanceof PersistentProjectileEntity || entity instanceof EndCrystalEntity) {
+            return;
+        }
+        
+        Box entityBoundingBox = entity.getBoundingBox();
+        
+        // for example, if gravity changed from down to north, move up
+        // if gravity changed from down to up, also move up
+        Direction movingDirection = prevGravityDirection.getOpposite();
+        
+        Iterable<VoxelShape> collisions = entity.world.getCollisions(entity, entityBoundingBox);
+        Box totalCollisionBox = null;
+        for (VoxelShape collision : collisions) {
+            if (!collision.isEmpty()) {
+                Box boundingBox = collision.getBoundingBox();
+                if (totalCollisionBox == null) {
+                    totalCollisionBox = boundingBox;
+                }
+                else {
+                    totalCollisionBox = totalCollisionBox.union(boundingBox);
+                }
+            }
+        }
+        
+        if (totalCollisionBox != null) {
+            entity.setPosition(entity.getPos().add(getPositionAdjustmentOffset(
+                entityBoundingBox, totalCollisionBox, movingDirection
+            )));
+        }
+    }
+    
+    private static Vec3d getPositionAdjustmentOffset(
+        Box entityBoundingBox, Box nearbyCollisionUnion, Direction movingDirection
+    ) {
+        Direction.Axis axis = movingDirection.getAxis();
+        double offset = 0;
+        if (movingDirection.getDirection() == Direction.AxisDirection.POSITIVE) {
+            double pushing = nearbyCollisionUnion.getMax(axis);
+            double pushed = entityBoundingBox.getMin(axis);
+            if (pushing > pushed) {
+                offset = pushing - pushed;
+            }
+        }
+        else {
+            double pushing = nearbyCollisionUnion.getMin(axis);
+            double pushed = entityBoundingBox.getMax(axis);
+            if (pushing < pushed) {
+                offset = pushed - pushing;
+            }
+        }
+        
+        return new Vec3d(movingDirection.getUnitVector()).multiply(offset);
     }
     
     @Override
