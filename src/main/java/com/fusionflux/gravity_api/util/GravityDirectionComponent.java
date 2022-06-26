@@ -6,9 +6,7 @@ import com.fusionflux.gravity_api.mixin.AccessorEntity;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -28,39 +26,37 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     Direction prevGravityDirection = Direction.DOWN;
     boolean initalSpawn = true;
     boolean isInverted = false;
-    int animationTimeMs = 500;
+    int animationDuration = 500;
+    RotationAnimation animation = new RotationAnimation();
     
-    ArrayList<Gravity> gravityList = new ArrayList<Gravity>();
+    ArrayList<Gravity> gravityList = new ArrayList<>();
     
     private final Entity entity;
     
     public GravityDirectionComponent(Entity entity) {
         this.entity = entity;
     }
-    
-    @Override
-    public void onGravityChanged(Direction prevGravityDirection, boolean initialGravity) {
-        Direction gravityDirection = this.getGravityDirection();
-        
+
+    public void onGravityChanged(Direction oldGravity, Direction newGravity, boolean initialGravity) {
         entity.fallDistance = 0;
         entity.setBoundingBox(((AccessorEntity) entity).gravity$calculateBoundingBox());
         
         if (!initialGravity) {
-            adjustEntityPosition(prevGravityDirection, gravityDirection);
+            adjustEntityPosition(oldGravity, newGravity);
         }
         
         // Keep world velocity when changing gravity
         if (!GravityChangerMod.config.worldVelocity) {
             if (entity.isLogicalSideForUpdatingMovement()) {
                 entity.setVelocity(RotationUtil.vecPlayerToWorld(
-                    RotationUtil.vecWorldToPlayer(entity.getVelocity(), prevGravityDirection), gravityDirection)
+                    RotationUtil.vecWorldToPlayer(entity.getVelocity(), oldGravity), newGravity)
                 );
             }
         }
     }
     
     // Adjust position to avoid suffocation in blocks when changing gravity
-    private void adjustEntityPosition(Direction prevGravityDirection, Direction gravityDirection) {
+    private void adjustEntityPosition(Direction oldGravity, Direction newGravity) {
         if (entity instanceof AreaEffectCloudEntity || entity instanceof PersistentProjectileEntity || entity instanceof EndCrystalEntity) {
             return;
         }
@@ -69,7 +65,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         
         // for example, if gravity changed from down to north, move up
         // if gravity changed from down to up, also move up
-        Direction movingDirection = prevGravityDirection.getOpposite();
+        Direction movingDirection = oldGravity.getOpposite();
         
         Iterable<VoxelShape> collisions = entity.world.getCollisions(entity, entityBoundingBox);
         Box totalCollisionBox = null;
@@ -157,23 +153,21 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                     primaryGravity = temp;
                 }
             }
-            Direction gravityDirection = this.getDefaultGravityDirection();
+            Direction newGravity = getDefaultGravityDirection();
             if (primaryGravity != null) {
-                gravityDirection = primaryGravity.gravityDirection;
+                newGravity = primaryGravity.gravityDirection;
             }
             if (isInverted) {
-                gravityDirection = gravityDirection.getOpposite();
+                newGravity = newGravity.getOpposite();
             }
-            
-            if (this.prevGravityDirection != gravityDirection) {
-                
-                if (entity.world.isClient && entity instanceof PlayerEntity player && player.isMainPlayer()) {
-                    RotationAnimation.applyRotationAnimation(gravityDirection, this.gravityDirection, animationTimeMs);
-                }
-                this.onGravityChanged(this.gravityDirection, initialGravity);
-                this.prevGravityDirection = this.gravityDirection;
+            Direction oldGravity = gravityDirection;
+            if (oldGravity != newGravity) {
+                long timeMs = entity.world.getTime()*50;
+                animation.applyRotationAnimation(newGravity, oldGravity, animationDuration, entity, timeMs);
+                prevGravityDirection = oldGravity;
+                gravityDirection = newGravity;
+                onGravityChanged(oldGravity, newGravity, initialGravity);
             }
-            this.gravityDirection = gravityDirection;
             GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
     }
@@ -182,7 +176,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     public void setDefaultGravityDirection(Direction gravityDirection, int animationDurationMs) {
         if (canChangeGravity()) {
             this.defaultGravityDirection = gravityDirection;
-            this.animationTimeMs = animationDurationMs;
+            this.animationDuration = animationDurationMs;
             this.updateGravity(false);
             GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
@@ -240,7 +234,12 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         //this.updateGravity(false);
     }
-    
+
+    @Override
+    public RotationAnimation getGravityAnimation() {
+        return animation;
+    }
+
     @Override
     public void readFromNbt(NbtCompound nbt) {
         if (nbt.contains("ListSize", NbtElement.INT_TYPE)) {
@@ -266,7 +265,8 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
             this.defaultGravityDirection = (Direction.byId(nbt.getInt("DefaultGravityDirection")));
         }
         this.isInverted = (nbt.getBoolean("IsGravityInverted"));
-        this.animationTimeMs = nbt.getInt("animationTimeMs");
+        this.animationDuration = nbt.getInt("animationTimeMs");
+        this.animation.fromNbt(nbt);
         
         this.updateGravity(initalSpawn);
         
@@ -293,6 +293,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         nbt.putInt("PrevGravityDirection", this.getPrevGravityDirection().getId());
         nbt.putInt("DefaultGravityDirection", this.getDefaultGravityDirection().getId());
         nbt.putBoolean("IsGravityInverted", this.getInvertGravity());
-        nbt.putInt("animationTimeMs", animationTimeMs);
+        nbt.putInt("animationTimeMs", animationDuration);
+        this.animation.toNbt(nbt);
     }
 }
