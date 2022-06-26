@@ -26,7 +26,6 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     Direction gravityDirection = Direction.DOWN;
     Direction defaultGravityDirection = Direction.DOWN;
     Direction prevGravityDirection = Direction.DOWN;
-    Direction trackedPrevGravityDirection = Direction.DOWN;
     boolean initalSpawn = true;
     boolean isInverted = false;
     int animationTimeMs = 500;
@@ -41,7 +40,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     
     @Override
     public void onGravityChanged(Direction prevGravityDirection, boolean initialGravity) {
-        Direction gravityDirection = this.getTrackedGravityDirection();
+        Direction gravityDirection = this.getGravityDirection();
         
         entity.fallDistance = 0;
         entity.setBoundingBox(((AccessorEntity) entity).gravity$calculateBoundingBox());
@@ -117,7 +116,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     }
     
     @Override
-    public Direction getTrackedGravityDirection() {
+    public Direction getGravityDirection() {
         if (canChangeGravity()) {
             return gravityDirection;
         }
@@ -129,15 +128,15 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     }
     
     @Override
-    public Direction getPrevTrackedGravityDirection() {
+    public Direction getPrevGravityDirection() {
         if (canChangeGravity()) {
-            return trackedPrevGravityDirection;
+            return prevGravityDirection;
         }
         return Direction.DOWN;
     }
     
     @Override
-    public Direction getDefaultTrackedGravityDirection() {
+    public Direction getDefaultGravityDirection() {
         if (canChangeGravity()) {
             return defaultGravityDirection;
         }
@@ -158,7 +157,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                     primaryGravity = temp;
                 }
             }
-            Direction gravityDirection = this.getDefaultTrackedGravityDirection();
+            Direction gravityDirection = this.getDefaultGravityDirection();
             if (primaryGravity != null) {
                 gravityDirection = primaryGravity.gravityDirection;
             }
@@ -171,10 +170,8 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                 if (entity.world.isClient && entity instanceof PlayerEntity player && player.isMainPlayer()) {
                     RotationAnimation.applyRotationAnimation(gravityDirection, this.gravityDirection, animationTimeMs);
                 }
-                setPrevTrackedGravityDirection(this.gravityDirection);
-                this.gravityDirection = gravityDirection;
-                this.onGravityChanged(this.prevGravityDirection, initialGravity);
-                this.prevGravityDirection = gravityDirection;
+                this.onGravityChanged(this.gravityDirection, initialGravity);
+                this.prevGravityDirection = this.gravityDirection;
             }
             this.gravityDirection = gravityDirection;
             GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
@@ -182,17 +179,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     }
     
     @Override
-    public void setPrevTrackedGravityDirection(Direction gravityDirection) {
-        if (canChangeGravity()) {
-            if (gravityDirection != null) {
-                this.trackedPrevGravityDirection = gravityDirection;
-                GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
-            }
-        }
-    }
-    
-    @Override
-    public void setDefaultTrackedGravityDirection(Direction gravityDirection, int animationDurationMs) {
+    public void setDefaultGravityDirection(Direction gravityDirection, int animationDurationMs) {
         if (canChangeGravity()) {
             this.defaultGravityDirection = gravityDirection;
             this.animationTimeMs = animationDurationMs;
@@ -273,7 +260,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
             this.gravityList = (newGravityList);
         }
         if (nbt.contains("PrevGravityDirection", NbtElement.INT_TYPE)) {
-            this.trackedPrevGravityDirection = (Direction.byId(nbt.getInt("PrevGravityDirection")));
+            this.prevGravityDirection = (Direction.byId(nbt.getInt("PrevGravityDirection")));
         }
         if (nbt.contains("DefaultGravityDirection", NbtElement.INT_TYPE)) {
             this.defaultGravityDirection = (Direction.byId(nbt.getInt("DefaultGravityDirection")));
@@ -291,8 +278,6 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     
     @Override
     public void writeToNbt(@NotNull NbtCompound nbt) {
-        //nbt.putInt("GravityDirection", this.getTrackedGravityDirection().getId());
-        
         int index = 0;
         if (!this.getGravity().isEmpty())
             for (Gravity temp : this.getGravity()) {
@@ -305,8 +290,8 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                 index++;
             }
         nbt.putInt("ListSize", index);
-        nbt.putInt("PrevGravityDirection", this.getPrevTrackedGravityDirection().getId());
-        nbt.putInt("DefaultGravityDirection", this.getDefaultTrackedGravityDirection().getId());
+        nbt.putInt("PrevGravityDirection", this.getPrevGravityDirection().getId());
+        nbt.putInt("DefaultGravityDirection", this.getDefaultGravityDirection().getId());
         nbt.putBoolean("IsGravityInverted", this.getInvertGravity());
         nbt.putInt("animationTimeMs", animationTimeMs);
     }

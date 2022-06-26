@@ -51,7 +51,7 @@ public abstract class GravityChangerAPI {
      */
     public static Direction getGravityDirection(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
-            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getTrackedGravityDirection).orElse(Direction.DOWN);
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravityDirection).orElse(Direction.DOWN);
         }
         return Direction.DOWN;
     }
@@ -65,14 +65,14 @@ public abstract class GravityChangerAPI {
 
     public static Direction getPrevGravtityDirection(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
-            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getPrevTrackedGravityDirection).orElse(Direction.DOWN);
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getPrevGravityDirection).orElse(Direction.DOWN);
         }
         return Direction.DOWN;
     }
 
     public static Direction getDefaultGravityDirection(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
-            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getDefaultTrackedGravityDirection).orElse(Direction.DOWN);
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getDefaultGravityDirection).orElse(Direction.DOWN);
         }
         return Direction.DOWN;
         }
@@ -123,7 +123,7 @@ public abstract class GravityChangerAPI {
     public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection, int animationDurationMs) {
         if (EntityTags.canChangeGravity(entity)) {
             maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(
-                gc -> gc.setDefaultTrackedGravityDirection(gravityDirection, animationDurationMs)
+                gc -> gc.setDefaultGravityDirection(gravityDirection, animationDurationMs)
             );
         }
     }

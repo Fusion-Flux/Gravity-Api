@@ -9,17 +9,15 @@ public interface GravityComponent extends Component {
 
     void onGravityChanged(Direction prevGravityDirection, boolean initialGravity);
 
-    Direction getTrackedGravityDirection();
+    Direction getGravityDirection();
 
     void updateGravity(boolean initalGravity);
 
-    Direction getPrevTrackedGravityDirection();
+    Direction getPrevGravityDirection();
 
-    void setPrevTrackedGravityDirection(Direction gravityDirection);
+    Direction getDefaultGravityDirection();
 
-    Direction getDefaultTrackedGravityDirection();
-
-    void setDefaultTrackedGravityDirection(Direction gravityDirection, int animationDurationMs);
+    void setDefaultGravityDirection(Direction gravityDirection, int animationDurationMs);
 
     void addGravity(Gravity gravity, boolean initialGravity);
 
