@@ -56,7 +56,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     }
     
     // Adjust position to avoid suffocation in blocks when changing gravity
-    private void adjustEntityPosition(Direction prevGravityDirection, Direction gravityDirection) {
+    private void adjustEntityPosition(Direction oldGravity, Direction newGravity) {
         if (entity instanceof AreaEffectCloudEntity || entity instanceof PersistentProjectileEntity || entity instanceof EndCrystalEntity) {
             return;
         }
@@ -65,7 +65,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         
         // for example, if gravity changed from down to north, move up
         // if gravity changed from down to up, also move up
-        Direction movingDirection = prevGravityDirection.getOpposite();
+        Direction movingDirection = oldGravity.getOpposite();
         
         Iterable<VoxelShape> collisions = entity.world.getCollisions(entity, entityBoundingBox);
         Box totalCollisionBox = null;
@@ -164,9 +164,9 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
             if (oldGravity != newGravity) {
                 long timeMs = entity.world.getTime()*50;
                 animation.applyRotationAnimation(newGravity, oldGravity, animationDuration, entity, timeMs);
-                onGravityChanged(oldGravity, newGravity, initialGravity);
                 prevGravityDirection = oldGravity;
                 gravityDirection = newGravity;
+                onGravityChanged(oldGravity, newGravity, initialGravity);
             }
             GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
