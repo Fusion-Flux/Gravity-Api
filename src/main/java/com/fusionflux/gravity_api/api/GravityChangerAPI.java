@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import com.fusionflux.gravity_api.GravityChangerMod;
+import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import com.fusionflux.gravity_api.util.EntityTags;
 import com.fusionflux.gravity_api.util.Gravity;
@@ -82,6 +83,13 @@ public abstract class GravityChangerAPI {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getInvertGravity).orElse(false);
         }
         return false;
+    }
+
+    public static Optional<RotationAnimation> getGravityAnimation(Entity entity) {
+        if (EntityTags.canChangeGravity(entity)) {
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravityAnimation);
+        }
+        return Optional.empty();
     }
 
     /**
