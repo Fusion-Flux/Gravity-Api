@@ -136,30 +136,27 @@ public abstract class EntityMixin implements EntityAccessor {
             at = @At("TAIL")
     )
     private void inject_tick(CallbackInfo ci) {
-if(!world.isClient) {
-    Entity vehicle = this.getVehicle();
-    if (vehicle != null) {
-        Direction vehicleGravity = GravityChangerAPI.getGravityDirection(vehicle);
-        if (GravityChangerAPI.getIsInverted((Entity) (Object) this)) {
-            vehicleGravity = vehicleGravity.getOpposite();
-        }
-        if(vehicleGravity != GravityChangerAPI.getDefaultGravityDirection((Entity) (Object) this))
-        GravityChangerAPI.addGravity((Entity) (Object) this, new Gravity(vehicleGravity, 99999999, 2, "vehicle"));
-    }
-    ArrayList<Gravity> gravityList = GravityChangerAPI.getGravityList((Entity) (Object) this);
-    ArrayList<Gravity> goodList = new ArrayList<Gravity>();
-    if (!gravityList.isEmpty()) {
-        for (Gravity temp : gravityList) {
-            if (temp.getGravityDuration() != 0) {
-                temp.decreaseDuration();
-                goodList.add(temp);
+        if(!world.isClient) {
+            Entity vehicle = this.getVehicle();
+            if (vehicle != null) {
+                Direction vehicleGravity = GravityChangerAPI.getGravityDirection(vehicle);
+                if (GravityChangerAPI.getIsInverted((Entity) (Object) this)) {
+                    vehicleGravity = vehicleGravity.getOpposite();
+                }
+                if(vehicleGravity != GravityChangerAPI.getDefaultGravityDirection((Entity) (Object) this))
+                GravityChangerAPI.addGravity((Entity) (Object) this, new Gravity(vehicleGravity, 99999999, 1, "vehicle"));
             }
+            ArrayList<Gravity> gravityList = GravityChangerAPI.getGravityList((Entity) (Object) this);
+            if (!gravityList.isEmpty()) {
+                gravityList.removeIf(g -> g.getGravityDuration() == 0);
+                for (Gravity temp : gravityList) {
+                    if (temp.getGravityDuration() > 0) {
+                        temp.decreaseDuration();
+                    }
+                }
+            }
+            GravityChangerAPI.updateGravity((Entity) (Object) this);
         }
-
-        GravityChangerAPI.setGravity((Entity) (Object) this, goodList);
-        GravityChangerAPI.updateGravity((Entity) (Object) this);
-    }
-}
     }
 
     @Inject(
