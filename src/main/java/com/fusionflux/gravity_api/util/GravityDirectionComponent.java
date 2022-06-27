@@ -36,7 +36,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     public GravityDirectionComponent(Entity entity) {
         this.entity = entity;
     }
-
+    
     public void onGravityChanged(Direction oldGravity, Direction newGravity, boolean initialGravity) {
         entity.fallDistance = 0;
         entity.setBoundingBox(((AccessorEntity) entity).gravity$calculateBoundingBox());
@@ -162,8 +162,12 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
             }
             Direction oldGravity = gravityDirection;
             if (oldGravity != newGravity) {
-                long timeMs = entity.world.getTime()*50;
-                animation.applyRotationAnimation(newGravity, oldGravity, animationDuration, entity, timeMs);
+                long timeMs = entity.world.getTime() * 50;
+                animation.applyRotationAnimation(
+                    newGravity, oldGravity,
+                    initialGravity ? 0 : animationDuration,
+                    entity, timeMs
+                );
                 prevGravityDirection = oldGravity;
                 gravityDirection = newGravity;
                 onGravityChanged(oldGravity, newGravity, initialGravity);
@@ -234,12 +238,12 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         //this.updateGravity(false);
     }
-
+    
     @Override
     public RotationAnimation getGravityAnimation() {
         return animation;
     }
-
+    
     @Override
     public void readFromNbt(NbtCompound nbt) {
         if (nbt.contains("ListSize", NbtElement.INT_TYPE)) {
