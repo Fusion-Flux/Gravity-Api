@@ -1,5 +1,6 @@
 package com.fusionflux.gravity_api.util;
 
+import com.fusionflux.gravity_api.RotationAnimation;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.util.math.Direction;
 
@@ -7,7 +8,7 @@ import java.util.ArrayList;
 
 public interface GravityComponent extends Component {
 
-    void onGravityChanged(Direction prevGravityDirection, boolean initialGravity);
+    void onGravityChanged(Direction from, Direction to, boolean initialGravity);
 
     Direction getGravityDirection();
 
@@ -16,7 +17,9 @@ public interface GravityComponent extends Component {
     Direction getPrevGravityDirection();
 
     Direction getDefaultGravityDirection();
-
+    
+    Direction getActualGravityDirection();
+    
     void setDefaultGravityDirection(Direction gravityDirection, int animationDurationMs);
 
     void addGravity(Gravity gravity, boolean initialGravity);
@@ -30,4 +33,6 @@ public interface GravityComponent extends Component {
     boolean getInvertGravity();
 
     void clearGravity();
+
+    RotationAnimation getGravityAnimation();
 }

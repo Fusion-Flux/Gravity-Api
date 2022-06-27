@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import com.fusionflux.gravity_api.GravityChangerMod;
+import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import com.fusionflux.gravity_api.util.EntityTags;
 import com.fusionflux.gravity_api.util.Gravity;
@@ -72,13 +73,27 @@ public abstract class GravityChangerAPI {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getDefaultGravityDirection).orElse(Direction.DOWN);
         }
         return Direction.DOWN;
+    }
+
+    public static Direction getActualGravityDirection(Entity entity) {
+        if (EntityTags.canChangeGravity(entity)) {
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getActualGravityDirection).orElse(Direction.DOWN);
         }
+        return Direction.DOWN;
+    }
 
     public static boolean getIsInverted(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getInvertGravity).orElse(false);
         }
         return false;
+    }
+
+    public static Optional<RotationAnimation> getGravityAnimation(Entity entity) {
+        if (EntityTags.canChangeGravity(entity)) {
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravityAnimation);
+        }
+        return Optional.empty();
     }
 
     /**
@@ -89,7 +104,7 @@ public abstract class GravityChangerAPI {
      */
     public static void addGravity(Entity entity, Gravity gravity) {
         if (EntityTags.canChangeGravity(entity)) {
-            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.addGravity(gravity,false));
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.addGravity(gravity, false));
         }
     }
     
@@ -101,7 +116,7 @@ public abstract class GravityChangerAPI {
 
     public static void setGravity(Entity entity, ArrayList<Gravity> gravity) {
         if (EntityTags.canChangeGravity(entity)) {
-            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.setGravity(gravity,false));
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.setGravity(gravity, false));
         }
     }
 

@@ -4,11 +4,9 @@ import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.QuaternionUtil;
 import com.fusionflux.gravity_api.util.RotationUtil;
-
 import com.fusionflux.gravity_api.util.EntityTags;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -27,6 +25,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Optional;
 
 @Mixin(EntityRenderDispatcher.class)
 public abstract class EntityRenderDispatcherMixin {
@@ -51,11 +51,11 @@ public abstract class EntityRenderDispatcherMixin {
             if (!this.renderShadows) return;
 
             matrices.push();
-            if(entity instanceof ClientPlayerEntity) {
-                matrices.multiply(QuaternionUtil.inversed(RotationAnimation.getCurrentGravityRotation(gravityDirection)));
-            }else{
-                matrices.multiply(RotationUtil.getCameraRotationQuaternion(gravityDirection));
-            }
+            Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(entity);
+            if(animationOptional.isEmpty()) return;
+            RotationAnimation animation = animationOptional.get();
+            long timeMs = entity.world.getTime()*50+(long)(tickDelta*50);
+            matrices.multiply(QuaternionUtil.inversed(animation.getCurrentGravityRotation(gravityDirection, timeMs)));
         }
     }
 
