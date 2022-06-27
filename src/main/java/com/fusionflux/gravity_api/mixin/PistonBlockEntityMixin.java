@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.block.entity.PistonBlockEntity;
 import net.minecraft.entity.Entity;
@@ -21,7 +22,7 @@ public abstract class PistonBlockEntityMixin {
             )
     )
     private static Vec3d redirect_moveEntity_Vec3d_0(double x, double y, double z, Direction direction, Entity entity, double d, Direction direction2) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return new Vec3d(x, y, z);
         }

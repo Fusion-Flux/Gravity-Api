@@ -1,7 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
 import com.fusionflux.gravity_api.GravityChangerMod;
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.Gravity;
 import com.fusionflux.gravity_api.util.RotationUtil;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements EntityAccessor {
+public abstract class EntityMixin{
     @Shadow
     private Vec3d pos;
 
@@ -119,17 +119,17 @@ public abstract class EntityMixin implements EntityAccessor {
 
     @Shadow @Final protected Random random;
 
-    @Override
+    /*@Override
     public Direction gravitychanger$getAppliedGravityDirection() {
         //Entity vehicle = this.getVehicle();
         //if(vehicle != null) {
         //    GravityChangerAPI.addGravity((Entity)(Object)this,new Gravity(GravityChangerAPI.getGravityDirection(vehicle),999,2,"vehicle"));
         //    //GravityChangerAPI.setGravityDirection((Entity)(Object)this,GravityChangerAPI.getGravityDirection(vehicle));
-        //    return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
+        //    return GravityChangerAPI.getGravityDirection(vehicle);
         //}
 
         return GravityChangerAPI.getGravityDirection((Entity)(Object)this);
-    }
+    }*/
 
     @Inject(
             method = "tick",
@@ -171,7 +171,7 @@ if(!world.isClient) {
         Entity entity = ((Entity) (Object) this);
         if (entity instanceof ProjectileEntity) return;
 
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
 
         Box box = cir.getReturnValue().offset(this.pos.negate());
@@ -187,7 +187,7 @@ if(!world.isClient) {
             cancellable = true
     )
     private void inject_calculateBoundsForPose(EntityPose pos, CallbackInfoReturnable<Box> cir) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
 
         Box box = cir.getReturnValue().offset(this.pos.negate());
@@ -203,7 +203,7 @@ if(!world.isClient) {
             cancellable = true
     )
     private void inject_getRotationVector(CallbackInfoReturnable<Vec3d> cir) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
 
         cir.setReturnValue(RotationUtil.vecPlayerToWorld(cir.getReturnValue(), gravityDirection));
@@ -215,7 +215,7 @@ if(!world.isClient) {
             cancellable = true
     )
     private void inject_getVelocityAffectingPos(CallbackInfoReturnable<BlockPos> cir) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
 
         cir.setReturnValue(new BlockPos(this.pos.add(Vec3d.of(gravityDirection.getVector()).multiply(0.5000001D))));
@@ -227,7 +227,7 @@ if(!world.isClient) {
             cancellable = true
     )
     private void inject_getEyePos(CallbackInfoReturnable<Vec3d> cir) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
 
         cir.setReturnValue(RotationUtil.vecPlayerToWorld(0.0D, this.standingEyeHeight, 0.0D, gravityDirection).add(this.pos));
@@ -239,7 +239,7 @@ if(!world.isClient) {
             cancellable = true
     )
     private void inject_getCameraPosVec(float tickDelta, CallbackInfoReturnable<Vec3d> cir) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
 
         Vec3d vec3d = RotationUtil.vecPlayerToWorld(0.0D, this.standingEyeHeight, 0.0D, gravityDirection);
@@ -256,7 +256,7 @@ if(!world.isClient) {
             cancellable = true
     )
     private void inject_getBrightnessAtEyes(CallbackInfoReturnable<Float> cir) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
 
         cir.setReturnValue(this.world.isPosLoaded(this.getBlockX(), this.getBlockZ()) ? this.world.getBrightness(new BlockPos(this.getEyePos())) : 0.0F);
@@ -268,7 +268,7 @@ if(!world.isClient) {
             ordinal = 0
     )
     private Vec3d modify_move_Vec3d_0_0(Vec3d vec3d) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) {
             return vec3d;
         }
@@ -287,7 +287,7 @@ if(!world.isClient) {
             index = 0
     )
     private Vec3d modify_move_multiply_0(Vec3d vec3d) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) {
             return vec3d;
         }
@@ -305,7 +305,7 @@ if(!world.isClient) {
             ordinal = 0
     )
     private Vec3d modify_move_Vec3d_0_1(Vec3d vec3d) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) {
             return vec3d;
         }
@@ -323,7 +323,7 @@ if(!world.isClient) {
             ordinal = 1
     )
     private Vec3d modify_move_Vec3d_1(Vec3d vec3d) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) {
             return vec3d;
         }
@@ -337,20 +337,9 @@ if(!world.isClient) {
             cancellable = true
     )
     private void inject_getLandingPos(CallbackInfoReturnable<BlockPos> cir) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
-
         BlockPos blockPos = new BlockPos(RotationUtil.vecPlayerToWorld(0.0D, -0.20000000298023224D, 0.0D, gravityDirection).add(this.pos));
-        // Probably not needed since these blocks only extend up
-//        if (this.world.getBlockState(blockPos).isAir()) {
-//            BlockPos blockPos2 = blockPos.offset(gravityDirection);
-//            BlockState blockState = this.world.getBlockState(blockPos2);
-//            if (blockState.isIn(BlockTags.FENCES) || blockState.isIn(BlockTags.WALLS) || blockState.getBlock() instanceof FenceGateBlock) {
-//                cir.setReturnValue(blockPos2);
-//                return;
-//            }
-//        }
-
         cir.setReturnValue(blockPos);
     }
 
@@ -364,7 +353,7 @@ if(!world.isClient) {
             ordinal = 0
     )
     private Vec3d modify_adjustMovementForCollisions_Vec3d_0(Vec3d vec3d) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) {
             return vec3d;
         }
@@ -378,7 +367,7 @@ if(!world.isClient) {
             cancellable = true
     )
     private void inject_adjustMovementForCollisions(CallbackInfoReturnable<Vec3d> cir) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
 
         cir.setReturnValue(RotationUtil.vecPlayerToWorld(cir.getReturnValue(), gravityDirection));
@@ -393,7 +382,7 @@ if(!world.isClient) {
     )
     private void redirect_adjustMovementForCollisions_stretch_0(Args args) {
         Vec3d rotate = new Vec3d(args.get(0), args.get(1), args.get(2));
-        rotate = RotationUtil.vecPlayerToWorld(rotate, ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection());
+        rotate = RotationUtil.vecPlayerToWorld(rotate, GravityChangerAPI.getGravityDirection((Entity)(Object)this));
         args.set(0, rotate.x);
         args.set(1, rotate.y);
         args.set(2, rotate.z);
@@ -409,7 +398,7 @@ if(!world.isClient) {
     )
     private void redirect_adjustMovementForCollisions_offset_0(Args args) {
         Vec3d rotate = args.get(0);
-        rotate = RotationUtil.vecPlayerToWorld(rotate, ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection());
+        rotate = RotationUtil.vecPlayerToWorld(rotate, GravityChangerAPI.getGravityDirection((Entity)(Object)this));
         args.set(0, rotate);
     }
 
@@ -423,7 +412,7 @@ if(!world.isClient) {
     )
     private void redirect_adjustMovementForCollisions_offset_1(Args args) {
         Vec3d rotate = args.get(0);
-        rotate = RotationUtil.vecPlayerToWorld(rotate, ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection());
+        rotate = RotationUtil.vecPlayerToWorld(rotate, GravityChangerAPI.getGravityDirection((Entity)(Object)this));
         args.set(0, rotate);
     }
 
@@ -437,7 +426,7 @@ if(!world.isClient) {
             return vec3d;
         }
 
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
             return vec3d;
         }
@@ -453,7 +442,7 @@ if(!world.isClient) {
     private static void inject_adjustMovementForCollisions(Entity entity, Vec3d movement, Box entityBoundingBox, World world, List<VoxelShape> collisions, CallbackInfoReturnable<Vec3d> cir) {
         if (entity == null) return;
 
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) return;
 
         cir.setReturnValue(RotationUtil.vecWorldToPlayer(cir.getReturnValue(), gravityDirection));
@@ -469,7 +458,7 @@ if(!world.isClient) {
     )
     private static Vec3d redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(Vec3d movement, Box entityBoundingBox, List<VoxelShape> collisions, Entity entity) {
         Direction gravityDirection;
-        if(entity == null || (gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection()) == Direction.DOWN) {
+        if(entity == null || (gravityDirection = GravityChangerAPI.getGravityDirection(entity)) == Direction.DOWN) {
             return adjustMovementForCollisions(movement, entityBoundingBox, collisions);
         }
 
@@ -523,7 +512,7 @@ if(!world.isClient) {
     //private static void redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(Entity entity, Vec3d movement, Box entityBoundingBox, World world, List<VoxelShape> collisions, CallbackInfoReturnable<Vec3d> cir, ImmutableList.Builder<VoxelShape> builder) {
     //    Direction gravityDirection;
     //    List<VoxelShape> collisionsProper = builder.build();
-    //    if(entity == null || (gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection()) == Direction.DOWN) {
+    //    if(entity == null || (gravityDirection = GravityChangerAPI.getGravityDirection(entity)) == Direction.DOWN) {
     //        return;
     //    }
 //
@@ -572,7 +561,7 @@ if(!world.isClient) {
     )
     private void modify_isInsideWall_of_0(Args args) {
         Vec3d rotate = new Vec3d(args.get(1), args.get(2), args.get(3));
-        rotate = RotationUtil.vecPlayerToWorld(rotate, ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection());
+        rotate = RotationUtil.vecPlayerToWorld(rotate, GravityChangerAPI.getGravityDirection((Entity)(Object)this));
         args.set(1, rotate.x);
         args.set(2, rotate.y);
         args.set(3, rotate.z);
@@ -586,7 +575,7 @@ if(!world.isClient) {
             )
     )
     private double redirect_getHorizontalFacing_getYaw_0(double rotation) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) {
             return rotation;
         }
@@ -600,7 +589,7 @@ if(!world.isClient) {
             cancellable = true
     )
     private void inject_spawnSprintingParticles(CallbackInfo ci) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
 
         ci.cancel();
@@ -627,7 +616,7 @@ if(!world.isClient) {
             ordinal = 1
     )
     private Vec3d modify_updateMovementInFluid_Vec3d_0(Vec3d vec3d) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) {
             return vec3d;
         }
@@ -645,7 +634,7 @@ if(!world.isClient) {
             index = 0
     )
     private Vec3d modify_updateMovementInFluid_add_0(Vec3d vec3d) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) {
             return vec3d;
         }
@@ -660,8 +649,8 @@ if(!world.isClient) {
             cancellable = true
     )
     private void inject_pushAwayFrom(Entity entity, CallbackInfo ci) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
-        Direction otherGravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
+        Direction otherGravityDirection = GravityChangerAPI.getGravityDirection(entity);
 
         if (gravityDirection == Direction.DOWN && otherGravityDirection == Direction.DOWN) return;
 
@@ -742,7 +731,7 @@ if(!world.isClient) {
     )
     private void redirect_doesNotCollide_offset_0(Args args) {
         Vec3d rotate = new Vec3d(args.get(0), args.get(1), args.get(2));
-        rotate = RotationUtil.vecPlayerToWorld(rotate, ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection());
+        rotate = RotationUtil.vecPlayerToWorld(rotate, GravityChangerAPI.getGravityDirection((Entity)(Object)this));
         args.set(0, rotate.x);
         args.set(1, rotate.y);
         args.set(2, rotate.z);

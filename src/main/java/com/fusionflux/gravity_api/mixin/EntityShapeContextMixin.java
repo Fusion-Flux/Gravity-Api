@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.block.EntityShapeContext;
 import net.minecraft.entity.Entity;
@@ -31,7 +32,7 @@ public abstract class EntityShapeContextMixin {
             )
     )
     private static double redirect_init_getY_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getY();
         }
@@ -47,7 +48,7 @@ public abstract class EntityShapeContextMixin {
     private void inject_isAbove(VoxelShape shape, BlockPos pos, boolean defaultValue, CallbackInfoReturnable<Boolean> cir) {
         if(this.entity == null) return;
 
-        Direction gravityDirection = ((EntityAccessor) this.entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.entity);
         if(gravityDirection == Direction.DOWN) return;
 
         cir.setReturnValue(this.minY > RotationUtil.boxWorldToPlayer(new Box(pos), gravityDirection).minY + RotationUtil.boxWorldToPlayer(shape.getBoundingBox().expand(-9.999999747378752E-6D), gravityDirection).maxX);

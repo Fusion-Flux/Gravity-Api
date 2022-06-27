@@ -1,6 +1,6 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.entity.Entity;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(FireworkRocketEntity.class)
-public abstract class FireworkRocketEntityMixin extends Entity implements EntityAccessor {
+public abstract class FireworkRocketEntityMixin extends Entity{
 
     @Shadow private @Nullable LivingEntity shooter;
 
@@ -26,15 +26,15 @@ public abstract class FireworkRocketEntityMixin extends Entity implements Entity
         super(type, world);
     }
 
-    @Override
+    /*@Override
     public Direction gravitychanger$getAppliedGravityDirection() {
         Entity vehicle = this.getVehicle();
         if(vehicle != null) {
-            return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
+            return GravityChangerAPI.getGravityDirection(vehicle);
         }
 
         return GravityChangerAPI.getGravityDirection((FireworkRocketEntity)(Object)this);
-    }
+    }*/
     @ModifyVariable(
             method = "tick",
             at = @At(

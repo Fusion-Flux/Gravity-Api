@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemUsageContext;
@@ -20,7 +21,7 @@ public abstract class ItemUsageContextMixin {
             )
     )
     private float redirect_getPlayerYaw_getYaw_0(PlayerEntity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getYaw();
         }

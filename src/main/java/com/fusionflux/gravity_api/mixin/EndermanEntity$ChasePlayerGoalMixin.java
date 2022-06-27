@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +21,7 @@ public abstract class EndermanEntity$ChasePlayerGoalMixin {
             )
     )
     private double redirect_tick_getEyeY_0(LivingEntity livingEntity) {
-        Direction gravityDirection = ((EntityAccessor) livingEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(livingEntity);
         if(gravityDirection == Direction.DOWN) {
             return livingEntity.getEyeY();
         }
@@ -37,7 +38,7 @@ public abstract class EndermanEntity$ChasePlayerGoalMixin {
             )
     )
     private double redirect_tick_getX_0(LivingEntity livingEntity) {
-        Direction gravityDirection = ((EntityAccessor) livingEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(livingEntity);
         if(gravityDirection == Direction.DOWN) {
             return livingEntity.getX();
         }
@@ -54,7 +55,7 @@ public abstract class EndermanEntity$ChasePlayerGoalMixin {
             )
     )
     private double redirect_tick_getZ_0(LivingEntity livingEntity) {
-        Direction gravityDirection = ((EntityAccessor) livingEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(livingEntity);
         if(gravityDirection == Direction.DOWN) {
             return livingEntity.getZ();
         }

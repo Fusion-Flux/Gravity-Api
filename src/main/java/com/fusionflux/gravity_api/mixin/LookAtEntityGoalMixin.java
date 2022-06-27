@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.util.math.Direction;
@@ -19,7 +20,7 @@ public abstract class LookAtEntityGoalMixin {
             )
     )
     private double redirect_tick_getEyeY_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getEyeY();
         }
@@ -36,7 +37,7 @@ public abstract class LookAtEntityGoalMixin {
             )
     )
     private double redirect_tick_getX_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getX();
         }
@@ -53,7 +54,7 @@ public abstract class LookAtEntityGoalMixin {
             )
     )
     private double redirect_tick_getZ_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getZ();
         }

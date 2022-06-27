@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.WitchEntity;
@@ -23,7 +24,7 @@ public abstract class WitchEntityMixin {
             ordinal = 0
     )
     private Vec3d modify_attack_Vec3d_0(Vec3d value, LivingEntity target, float pullProgress) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return value;
         }
@@ -40,7 +41,7 @@ public abstract class WitchEntityMixin {
             )
     )
     private double redirect_attack_getX_0(LivingEntity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return target.getX();
         }
@@ -57,7 +58,7 @@ public abstract class WitchEntityMixin {
             )
     )
     private double redirect_attack_getEyeY_0(LivingEntity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return target.getEyeY();
         }
@@ -74,7 +75,7 @@ public abstract class WitchEntityMixin {
             )
     )
     private double redirect_attack_getZ_0(LivingEntity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return target.getZ();
         }
@@ -90,7 +91,7 @@ public abstract class WitchEntityMixin {
             )
     )
     private double redirect_attack_sqrt_0(double value, LivingEntity target, float pullProgress) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return Math.sqrt(value);
         }

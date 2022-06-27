@@ -1,9 +1,10 @@
 package com.fusionflux.gravity_api.mixin.client;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -13,9 +14,14 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import java.util.Map;
+import java.util.UUID;
+
 @Mixin(ClientPlayNetworkHandler.class)
 public abstract class ClientPlayNetworkHandlerMixin {
     @Shadow @Final private MinecraftClient client;
+
+    @Shadow @Final private Map<UUID, PlayerListEntry> playerListEntries;
 
     @Redirect(
             method = "onGameStateChange",
@@ -26,7 +32,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
             )
     )
     private double redirect_onGameStateChange_getEyeY_0(PlayerEntity playerEntity) {
-        Direction gravityDirection = ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
         if(gravityDirection == Direction.DOWN) {
             return playerEntity.getEyeY();
         }
@@ -43,7 +49,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
             )
     )
     private double redirect_onGameStateChange_getX_0(PlayerEntity playerEntity) {
-        Direction gravityDirection = ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
         if(gravityDirection == Direction.DOWN) {
             return playerEntity.getX();
         }
@@ -60,7 +66,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
             )
     )
     private double redirect_onGameStateChange_getZ_0(PlayerEntity playerEntity) {
-        Direction gravityDirection = ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
         if(gravityDirection == Direction.DOWN) {
             return playerEntity.getZ();
         }
@@ -77,7 +83,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
             )
     )
     private Vec3d redirect_onExplosion_add_0(Vec3d vec3d, double x, double y, double z) {
-        Direction gravityDirection = ((EntityAccessor) this.client.player).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(client.player);
         if(gravityDirection == Direction.DOWN) {
             return vec3d.add(x, y, z);
         }

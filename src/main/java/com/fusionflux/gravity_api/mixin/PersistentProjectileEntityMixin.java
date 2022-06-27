@@ -1,6 +1,6 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.entity.Entity;
@@ -34,9 +34,9 @@ public abstract class PersistentProjectileEntityMixin extends Entity {
     )
     public Vec3d tick(Vec3d modify){
         modify = new Vec3d(modify.x, modify.y+0.05, modify.z);
-        modify = RotationUtil.vecWorldToPlayer(modify,((EntityAccessor) this).gravitychanger$getAppliedGravityDirection());
+        modify = RotationUtil.vecWorldToPlayer(modify,GravityChangerAPI.getGravityDirection(this));
         modify = new Vec3d(modify.x, modify.y-0.05, modify.z);
-        modify = RotationUtil.vecPlayerToWorld(modify,((EntityAccessor) this).gravitychanger$getAppliedGravityDirection());
+        modify = RotationUtil.vecPlayerToWorld(modify,GravityChangerAPI.getGravityDirection(this));
         return  modify;
     }
 
@@ -50,7 +50,7 @@ public abstract class PersistentProjectileEntityMixin extends Entity {
             )
     )
     private static void modifyargs_init_init_0(Args args, EntityType<? extends ThrownEntity> type, LivingEntity owner, World world) {
-        Direction gravityDirection = ((EntityAccessor) owner).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(owner);
         if(gravityDirection == Direction.DOWN) return;
 
         Vec3d pos = owner.getEyePos().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.10000000149011612D, 0.0D, gravityDirection));

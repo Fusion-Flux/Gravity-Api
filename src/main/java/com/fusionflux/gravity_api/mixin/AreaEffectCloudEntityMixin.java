@@ -2,7 +2,7 @@ package com.fusionflux.gravity_api.mixin;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
 import net.minecraft.entity.*;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.particle.ParticleEffect;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Mixin(AreaEffectCloudEntity.class)
-public abstract class AreaEffectCloudEntityMixin extends Entity implements EntityAccessor {
+public abstract class AreaEffectCloudEntityMixin extends Entity{
 
 
     @Shadow public abstract boolean isWaiting();
@@ -63,15 +63,15 @@ public abstract class AreaEffectCloudEntityMixin extends Entity implements Entit
     }
 
 
-    @Override
+    /*@Override
     public Direction gravitychanger$getAppliedGravityDirection() {
         Entity vehicle = this.getVehicle();
         if(vehicle != null) {
-            return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
+            return GravityChangerAPI.getGravityDirection(vehicle);
         }
 
         return GravityChangerAPI.getGravityDirection((AreaEffectCloudEntity)(Object)this);
-    }
+    }*/
 //
 //
 //
@@ -194,11 +194,11 @@ public abstract class AreaEffectCloudEntityMixin extends Entity implements Entit
         double d = this.getX() ;
         double e = this.getY();
         double l = this.getZ() ;
-        Vec3d modify = RotationUtil.vecWorldToPlayer(d,e,l, this.gravitychanger$getAppliedGravityDirection());
+        Vec3d modify = RotationUtil.vecWorldToPlayer(d,e,l, GravityChangerAPI.getGravityDirection(this));
         d = modify.x+ (double)(MathHelper.cos(h) * k);
         e = modify.y;
         l = modify.z+ (double)(MathHelper.sin(h) * k);
-        modify = RotationUtil.vecPlayerToWorld(d,e,l, this.gravitychanger$getAppliedGravityDirection());
+        modify = RotationUtil.vecPlayerToWorld(d,e,l, GravityChangerAPI.getGravityDirection(this));
 
         args.set(1,modify.x);
         args.set(2,modify.y);

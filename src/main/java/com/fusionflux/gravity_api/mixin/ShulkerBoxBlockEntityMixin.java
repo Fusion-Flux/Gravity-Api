@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.entity.Entity;
@@ -22,7 +23,7 @@ public abstract class ShulkerBoxBlockEntityMixin {
             )
     )
     private void redirect_pushEntities_move_0(Entity entity, MovementType movementType, Vec3d vec3d) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             entity.move(movementType, vec3d);
             return;

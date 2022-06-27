@@ -1,6 +1,6 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.entity.Entity;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(FishingBobberEntity.class)
-public abstract class FishingBobberEntityMixin extends Entity implements EntityAccessor {
+public abstract class FishingBobberEntityMixin extends Entity {
 
 
 
@@ -26,15 +26,15 @@ public abstract class FishingBobberEntityMixin extends Entity implements EntityA
     }
 
 
-    @Override
+    /*@Override
     public Direction gravitychanger$getAppliedGravityDirection() {
         Entity vehicle = this.getVehicle();
         if(vehicle != null) {
-            return ((EntityAccessor) vehicle).gravitychanger$getAppliedGravityDirection();
+            return GravityChangerAPI.getGravityDirection(vehicle);
         }
 
         return GravityChangerAPI.getGravityDirection((FishingBobberEntity)(Object)this);
-    }
+    }*/
 
 /*
     @ModifyVariable(
@@ -61,7 +61,7 @@ public abstract class FishingBobberEntityMixin extends Entity implements EntityA
             )
     )
     private void redirect_init_(FishingBobberEntity fishingBobberEntity, double x, double y, double z, float yaw, float pitch, PlayerEntity thrower, World world, int lureLevel, int luckOfTheSeaLevel) {
-        Direction gravityDirection = ((EntityAccessor) thrower).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(thrower);
         if(gravityDirection == Direction.DOWN) {
             fishingBobberEntity.refreshPositionAndAngles(x, y, z, yaw, pitch);
             return;
@@ -82,7 +82,7 @@ public abstract class FishingBobberEntityMixin extends Entity implements EntityA
             ordinal = 0
     )
     private Vec3d modify_init_Vec3d_1(Vec3d vec3d, PlayerEntity thrower, World world, int lureLevel, int luckOfTheSeaLevel) {
-        Direction gravityDirection = ((EntityAccessor) thrower).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(thrower);
         if(gravityDirection == Direction.DOWN) {
             return vec3d;
         }

@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.task.RamImpactTask;
@@ -24,7 +25,7 @@ public abstract class RamImpactTaskMixin {
             )
     )
     private void redirect_keepRunning_takeKnockback_0(LivingEntity target, double strength, double x, double z) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             target.takeKnockback(strength, x, z);
             return;

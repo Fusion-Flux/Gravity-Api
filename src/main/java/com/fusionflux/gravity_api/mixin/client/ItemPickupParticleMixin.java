@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin.client;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.client.particle.ItemPickupParticle;
 import net.minecraft.entity.Entity;
@@ -26,7 +27,7 @@ public abstract class ItemPickupParticleMixin {
             ordinal = 0
     )
     private double modify_buildGeometry_double_0(double value) {
-        Direction gravityDirection = ((EntityAccessor) this.interactingEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.interactingEntity);
         if(gravityDirection == Direction.DOWN) {
             return value;
         }
@@ -45,7 +46,7 @@ public abstract class ItemPickupParticleMixin {
             ordinal = 1
     )
     private double modify_buildGeometry_double_1(double value) {
-        Direction gravityDirection = ((EntityAccessor) this.interactingEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.interactingEntity);
         if(gravityDirection == Direction.DOWN) {
             return value;
         }
@@ -64,7 +65,7 @@ public abstract class ItemPickupParticleMixin {
             ordinal = 2
     )
     private double modify_buildGeometry_double_2(double value) {
-        Direction gravityDirection = ((EntityAccessor) this.interactingEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.interactingEntity);
         if(gravityDirection == Direction.DOWN) {
             return value;
         }

@@ -1,7 +1,8 @@
 package com.fusionflux.gravity_api.mixin;
 
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.util.math.Direction;
@@ -17,7 +18,7 @@ public abstract class ProjectileEntityMixin {
             ordinal = 0
     )
     private float modify_setProperties_pitch(float value, Entity user, float yaw, float roll, float speed, float divergence) {
-        Direction gravityDirection = ((EntityAccessor) user).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(user);
         if(gravityDirection == Direction.DOWN) {
             return value;
         }
@@ -31,7 +32,7 @@ public abstract class ProjectileEntityMixin {
             ordinal = 1
     )
     private float modify_setProperties_yaw(float value, Entity user, float pitch, float roll, float speed, float divergence) {
-        Direction gravityDirection = ((EntityAccessor) user).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(user);
         if(gravityDirection == Direction.DOWN) {
             return value;
         }
