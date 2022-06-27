@@ -1,8 +1,9 @@
 package com.fusionflux.gravity_api.util;
 
 import com.fusionflux.gravity_api.RotationAnimation;
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.mixin.AccessorEntity;
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -19,8 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Objects;
 
-@SuppressWarnings({"deprecation", "CommentedOutCode"})
-public class GravityDirectionComponent implements GravityComponent, AutoSyncedComponent {
+public class GravityDirectionComponent implements GravityComponent, ServerTickingComponent {
     Direction gravityDirection = Direction.DOWN;
     Direction defaultGravityDirection = Direction.DOWN;
     Direction prevGravityDirection = Direction.DOWN;
@@ -159,7 +159,6 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                 gravityDirection = newGravity;
                 onGravityChanged(oldGravity, newGravity, initialGravity);
             }
-            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
     }
     
@@ -191,28 +190,14 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         if (canChangeGravity()) {
             this.defaultGravityDirection = gravityDirection;
             this.animationDuration = animationDurationMs;
-            this.updateGravity(false);
-            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
     }
     
     @Override
-    public void addGravity(Gravity gravity, boolean initialGravity) {
+    public void addGravity(Gravity newGravity, boolean initialGravity) {
         if (canChangeGravity()) {
-            int index = 0;
-            boolean addValue = true;
-            for (Gravity temp : gravityList) {
-                if (Objects.equals(temp.source, gravity.source)) {
-                    gravityList.set(index, gravity);
-                    addValue = false;
-                    break;
-                }
-                index++;
-            }
-            if (addValue)
-                this.gravityList.add(gravity);
-            //this.updateGravity(initialGravity);
-            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+            gravityList.removeIf(g -> Objects.equals(g.source, newGravity.source));
+            gravityList.add(newGravity);
         }
     }
     
@@ -222,18 +207,13 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     }
     
     @Override
-    public void setGravity(ArrayList<Gravity> gravityList, boolean initalGravity) {
-        this.gravityList = gravityList;
-        //this.updateGravity(initalGravity);
-        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
-        //this.updateGravity(initalGravity);
+    public void setGravity(ArrayList<Gravity> _gravityList, boolean initalGravity) {
+        gravityList = _gravityList;
     }
     
     @Override
-    public void invertGravity(boolean isInverted) {
-        this.isInverted = isInverted;
-        this.updateGravity(false);
-        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+    public void invertGravity(boolean _isInverted) {
+        isInverted = _isInverted;
     }
     
     @Override
@@ -243,10 +223,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     
     @Override
     public void clearGravity() {
-        this.gravityList = new ArrayList<Gravity>();
-        this.updateGravity(false);
-        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
-        //this.updateGravity(false);
+        gravityList.clear();
     }
     
     @Override
@@ -282,8 +259,6 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         this.animationDuration = nbt.getInt("animationTimeMs");
         this.animation.fromNbt(nbt);
         
-        this.updateGravity(initalSpawn);
-        
         if (initalSpawn) {
             initalSpawn = false;
         }
@@ -295,13 +270,13 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         int index = 0;
         if (!this.getGravity().isEmpty())
             for (Gravity temp : this.getGravity()) {
-                if (temp.gravityDirection != null)
+                if (temp.gravityDirection != null && temp.source != null) {
                     nbt.putInt("GravityDirection " + index, temp.getGravityDirection().getId());
-                nbt.putInt("GravityPriority " + index, temp.getPriority());
-                nbt.putInt("GravityDuration " + index, temp.getGravityDuration());
-                if (temp.source != null)
+                    nbt.putInt("GravityPriority " + index, temp.getPriority());
+                    nbt.putInt("GravityDuration " + index, temp.getGravityDuration());
                     nbt.putString("GravitySource " + index, temp.getSource());
-                index++;
+                    index++;
+                }
             }
         nbt.putInt("ListSize", index);
         nbt.putInt("PrevGravityDirection", this.getPrevGravityDirection().getId());
@@ -309,5 +284,21 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         nbt.putBoolean("IsGravityInverted", this.getInvertGravity());
         nbt.putInt("animationTimeMs", animationDuration);
         this.animation.toNbt(nbt);
+    }
+
+    @Override
+    public void serverTick() {
+        Entity vehicle = entity.getVehicle();
+        if (vehicle != null) {
+            addGravity(new Gravity(GravityChangerAPI.getGravityDirection(vehicle), 99999999, 2, "vehicle"), true);
+        }
+        ArrayList<Gravity> gravityList = getGravity();
+        gravityList.removeIf(g -> g.getGravityDuration() == 0);
+        for (Gravity temp : gravityList) {
+            if (temp.getGravityDuration() > 0) {
+                temp.decreaseDuration();
+            }
+        }
+        updateGravity(false);
     }
 }
