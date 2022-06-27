@@ -1,15 +1,12 @@
 package com.fusionflux.gravity_api.mixin.client;
 
 import com.fusionflux.gravity_api.RotationAnimation;
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
-import com.fusionflux.gravity_api.util.QuaternionUtil;
-import com.fusionflux.gravity_api.util.RotationUtil;
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Final;
@@ -41,7 +38,7 @@ public abstract class CameraMixin {
             )
     )
     private void redirect_update_setPos_0(Camera camera, double x, double y, double z, BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta) {
-        Direction gravityDirection = ((EntityAccessor) focusedEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity);
         if(gravityDirection == Direction.DOWN && !RotationAnimation.isInAnimation()) {
             this.setPos(x, y, z);
             return;
@@ -77,7 +74,7 @@ public abstract class CameraMixin {
     )
     private void inject_setRotation(CallbackInfo ci) {
         if(this.focusedEntity !=null) {
-            Direction gravityDirection = ((EntityAccessor) this.focusedEntity).gravitychanger$getAppliedGravityDirection();
+            Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.focusedEntity);
             if (gravityDirection == Direction.DOWN && !RotationAnimation.isInAnimation()) return;
 
             Quaternion rotation = RotationAnimation.getCurrentGravityRotation(gravityDirection).copy();

@@ -1,7 +1,8 @@
 package com.fusionflux.gravity_api.mixin.client;
 
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
@@ -23,7 +24,7 @@ public abstract class InGameOverlayRendererMixin {
             cancellable = true
     )
     private static void inject_getInWallBlockState(PlayerEntity player, CallbackInfoReturnable<BlockState> cir) {
-        Direction gravityDirection = ((EntityAccessor) player).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         if(gravityDirection == Direction.DOWN) return;
 
         cir.cancel();

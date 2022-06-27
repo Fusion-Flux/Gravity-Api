@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import net.minecraft.entity.ai.goal.WolfBegGoal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
@@ -19,7 +20,7 @@ public abstract class WolfBegGoalMixin {
             )
     )
     private double redirect_tick_getEyeY_0(PlayerEntity playerEntity) {
-        Direction gravityDirection = ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
         if(gravityDirection == Direction.DOWN) {
             return playerEntity.getEyeY();
         }
@@ -36,7 +37,7 @@ public abstract class WolfBegGoalMixin {
             )
     )
     private double redirect_tick_getX_0(PlayerEntity playerEntity) {
-        Direction gravityDirection = ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
         if(gravityDirection == Direction.DOWN) {
             return playerEntity.getX();
         }
@@ -53,7 +54,7 @@ public abstract class WolfBegGoalMixin {
             )
     )
     private double redirect_tick_getZ_0(PlayerEntity playerEntity) {
-        Direction gravityDirection = ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
         if(gravityDirection == Direction.DOWN) {
             return playerEntity.getZ();
         }

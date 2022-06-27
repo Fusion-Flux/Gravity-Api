@@ -2,7 +2,6 @@ package com.fusionflux.gravity_api.mixin;
 
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.GravityChangerMod;
-import com.fusionflux.gravity_api.accessor.ServerPlayerEntityAccessor;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
@@ -18,18 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin implements  ServerPlayerEntityAccessor {
-    @Shadow public ServerPlayNetworkHandler networkHandler;
-
-    @Override
-    public void gravitychanger$sendGravityPacket(Direction gravityDirection, boolean initialGravity) {
-        if(this.networkHandler == null) return;
-
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeEnumConstant(gravityDirection);
-        buf.writeBoolean(initialGravity);
-        this.networkHandler.sendPacket(new CustomPayloadS2CPacket(GravityChangerMod.CHANNEL_GRAVITY, buf));
-    }
+public abstract class ServerPlayerEntityMixin {
 
     @Inject(
             method = "moveToWorld",

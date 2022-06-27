@@ -1,9 +1,10 @@
 package com.fusionflux.gravity_api.mixin.client;
 
 import com.fusionflux.gravity_api.RotationAnimation;
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.QuaternionUtil;
 import com.fusionflux.gravity_api.util.RotationUtil;
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
 import com.fusionflux.gravity_api.util.EntityTags;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -46,7 +47,7 @@ public abstract class EntityRenderDispatcherMixin {
     )
     private void inject_render_0(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity) && !entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
-            Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+            Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
             if (!this.renderShadows) return;
 
             matrices.push();
@@ -68,7 +69,7 @@ public abstract class EntityRenderDispatcherMixin {
     )
     private void inject_render_1(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity) && !entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
-            Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+            Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
             if (!this.renderShadows) return;
 
             matrices.pop();
@@ -86,7 +87,7 @@ public abstract class EntityRenderDispatcherMixin {
     )
     private void inject_render_2(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity) && !entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
-            Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+            Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
             if (gravityDirection == Direction.DOWN) return;
             if (!this.renderShadows) return;
 
@@ -100,7 +101,7 @@ public abstract class EntityRenderDispatcherMixin {
             cancellable = true
     )
     private static void inject_renderShadow(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Entity entity, float opacity, float tickDelta, WorldView world, float radius, CallbackInfo ci) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) return;
 
         ci.cancel();
@@ -168,7 +169,7 @@ public abstract class EntityRenderDispatcherMixin {
             ordinal = 0
     )
     private static Box modify_renderHitbox_Box_0(Box box, MatrixStack matrices, VertexConsumer vertices, Entity entity, float tickDelta) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return box;
         }
@@ -186,7 +187,7 @@ public abstract class EntityRenderDispatcherMixin {
             ordinal = 0
     )
     private static Vec3d modify_renderHitbox_Vec3d_0(Vec3d vec3d, MatrixStack matrices, VertexConsumer vertices, Entity entity, float tickDelta) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return vec3d;
         }

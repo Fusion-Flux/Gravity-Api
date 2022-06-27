@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.IllusionerEntity;
@@ -20,7 +21,7 @@ public abstract class IllusionerEntityMixin {
             )
     )
     private double redirect_attack_getX_0(LivingEntity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return target.getX();
         }
@@ -37,7 +38,7 @@ public abstract class IllusionerEntityMixin {
             )
     )
     private double redirect_attack_getBodyY_0(LivingEntity target, double heightScale) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return target.getBodyY(heightScale);
         }
@@ -54,7 +55,7 @@ public abstract class IllusionerEntityMixin {
             )
     )
     private double redirect_attack_getZ_0(LivingEntity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return target.getZ();
         }
@@ -70,7 +71,7 @@ public abstract class IllusionerEntityMixin {
             )
     )
     private double redirect_attack_sqrt_0(double value, LivingEntity target, float pullProgress) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return Math.sqrt(value);
         }

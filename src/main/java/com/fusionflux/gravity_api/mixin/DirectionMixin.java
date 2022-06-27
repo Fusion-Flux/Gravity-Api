@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
@@ -19,7 +20,7 @@ public abstract class DirectionMixin {
             )
     )
     private static float redirect_getEntityFacingOrder_getYaw_0(Entity entity, float tickDelta) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getYaw(tickDelta);
         }
@@ -36,7 +37,7 @@ public abstract class DirectionMixin {
             )
     )
     private static float redirect_getEntityFacingOrder_getPitch_0(Entity entity, float tickDelta) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getPitch(tickDelta);
         }
@@ -53,7 +54,7 @@ public abstract class DirectionMixin {
             )
     )
     private static float redirect_getLookDirectionForAxis_getYaw_0(Entity entity, float tickDelta) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getYaw(tickDelta);
         }
@@ -70,7 +71,7 @@ public abstract class DirectionMixin {
             )
     )
     private static float redirect_getLookDirectionForAxis_getYaw_1(Entity entity, float tickDelta) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getYaw(tickDelta);
         }
@@ -87,7 +88,7 @@ public abstract class DirectionMixin {
             )
     )
     private static float redirect_getLookDirectionForAxis_getPitch_0(Entity entity, float tickDelta) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getPitch(tickDelta);
         }

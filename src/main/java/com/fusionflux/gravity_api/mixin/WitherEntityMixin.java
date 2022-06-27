@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -21,7 +22,7 @@ public abstract class WitherEntityMixin {
             )
     )
     private double redirect_shootSkullAt_getX_0(LivingEntity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return target.getX();
         }
@@ -38,7 +39,7 @@ public abstract class WitherEntityMixin {
             )
     )
     private double redirect_shootSkullAt_getY_0(LivingEntity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return target.getX();
         }
@@ -55,7 +56,7 @@ public abstract class WitherEntityMixin {
             )
     )
     private double redirect_shootSkullAt_getZ_0(LivingEntity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return target.getX();
         }
@@ -72,7 +73,7 @@ public abstract class WitherEntityMixin {
             )
     )
     private double redirect_tickMovement_getEyeY_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getEyeY();
         }
@@ -89,7 +90,7 @@ public abstract class WitherEntityMixin {
             )
     )
     private double redirect_tickMovement_getX_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getX();
         }
@@ -106,7 +107,7 @@ public abstract class WitherEntityMixin {
             )
     )
     private double redirect_tickMovement_getZ_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getZ();
         }

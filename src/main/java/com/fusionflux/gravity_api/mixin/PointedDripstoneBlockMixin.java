@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.PointedDripstoneBlock;
 import net.minecraft.entity.Entity;
@@ -23,7 +24,7 @@ public abstract class PointedDripstoneBlockMixin {
             )
     )
     private Comparable<Direction> redirect_onLandedUpon_get_0(BlockState blockState, Property<Direction> property, World world, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return blockState.get(property);
         }

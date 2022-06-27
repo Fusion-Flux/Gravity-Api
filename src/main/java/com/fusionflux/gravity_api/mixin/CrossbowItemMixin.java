@@ -1,7 +1,8 @@
 package com.fusionflux.gravity_api.mixin;
 
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.util.math.Direction;
@@ -20,7 +21,7 @@ public abstract class CrossbowItemMixin {
             )
     )
     private static double redirect_shoot_getX_0(LivingEntity livingEntity) {
-        Direction gravityDirection = ((EntityAccessor) livingEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(livingEntity);
         if(gravityDirection == Direction.DOWN) {
             return livingEntity.getX();
         }
@@ -37,7 +38,7 @@ public abstract class CrossbowItemMixin {
             )
     )
     private static double redirect_shoot_getEyeY_0(LivingEntity livingEntity) {
-        Direction gravityDirection = ((EntityAccessor) livingEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(livingEntity);
         if(gravityDirection == Direction.DOWN) {
             return livingEntity.getEyeY();
         }
@@ -54,7 +55,7 @@ public abstract class CrossbowItemMixin {
             )
     )
     private static double redirect_shoot_getZ_0(LivingEntity livingEntity) {
-        Direction gravityDirection = ((EntityAccessor) livingEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(livingEntity);
         if(gravityDirection == Direction.DOWN) {
             return livingEntity.getZ();
         }

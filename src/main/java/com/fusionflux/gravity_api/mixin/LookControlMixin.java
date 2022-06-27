@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.control.LookControl;
 import net.minecraft.util.math.Direction;
@@ -19,7 +20,7 @@ public abstract class LookControlMixin {
             )
     )
     private static double redirect_getLookingHeightForgetEyeY_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getEyeY();
         }
@@ -36,7 +37,7 @@ public abstract class LookControlMixin {
             )
     )
     private double redirect_lookAt_getX_0_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getX();
         }
@@ -53,7 +54,7 @@ public abstract class LookControlMixin {
             )
     )
     private double redirect_lookAt_getZ_0_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getZ();
         }
@@ -70,7 +71,7 @@ public abstract class LookControlMixin {
             )
     )
     private double redirect_lookAt_getX_0_1(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getX();
         }
@@ -87,7 +88,7 @@ public abstract class LookControlMixin {
             )
     )
     private double redirect_lookAt_getZ_0_1(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getZ();
         }

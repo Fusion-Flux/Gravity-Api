@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -37,7 +38,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             )
     )
     private double redirect_onPlayerMove_getY_3(ServerPlayerEntity serverPlayerEntity) {
-        Direction gravityDirection = ((EntityAccessor) serverPlayerEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(serverPlayerEntity);
         if(gravityDirection == Direction.DOWN) {
             return serverPlayerEntity.getY();
         }
@@ -54,7 +55,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             )
     )
     private double redirect_onPlayerMove_getY_7(ServerPlayerEntity serverPlayerEntity) {
-        Direction gravityDirection = ((EntityAccessor) serverPlayerEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(serverPlayerEntity);
         if(gravityDirection == Direction.DOWN) {
             return serverPlayerEntity.getY();
         }
@@ -72,7 +73,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             ordinal = 0
     )
     private boolean modify_onPlayerMove_boolean_0(boolean value, PlayerMoveC2SPacket packet) {
-        Direction gravityDirection = ((EntityAccessor) this.player).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
         if(gravityDirection == Direction.DOWN) {
             return value;
         }
@@ -96,7 +97,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             ordinal = 10
     )
     private double modify_onPlayerMove_double_12(double value) {
-        Direction gravityDirection = ((EntityAccessor) this.player).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
         if(gravityDirection == Direction.DOWN) {
             return value;
         }
@@ -114,7 +115,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             index = 1
     )
     private Vec3d modify_onPlayerMove_move_0(Vec3d vec3d) {
-        Direction gravityDirection = ((EntityAccessor) this.player).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
         if(gravityDirection == Direction.DOWN) {
             return vec3d;
         }
@@ -165,7 +166,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             index = 1
     )
     private Vec3d modify_onVehicleMove_move_0(Vec3d vec3d) {
-        Direction gravityDirection = ((EntityAccessor) this.player).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
         if(gravityDirection == Direction.DOWN) {
             return vec3d;
         }
@@ -182,7 +183,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
     //        ),ordinal = 0
     //)
     //private double modify_onVehicleMove_double_12(double value) {
-    //    Direction gravityDirection = ((EntityAccessor) this.player).gravitychanger$getAppliedGravityDirection();
+    //    Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
     //    if(gravityDirection == Direction.DOWN) {
     //        return value;
     //    }
@@ -199,7 +200,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             )
     )
     private void modify_onVehicleMove_move_0(Args args) {
-        Direction gravityDirection = ((EntityAccessor) this.player).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
         Vec3d argVec = new Vec3d(args.get(0),args.get(1),args.get(2));
         argVec = RotationUtil.vecWorldToPlayer(argVec, gravityDirection);
 

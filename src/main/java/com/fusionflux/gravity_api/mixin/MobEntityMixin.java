@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -21,7 +22,7 @@ public abstract class MobEntityMixin {
             )
     )
     private float redirect_tryAttack_getYaw_0(MobEntity attacker, Entity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return attacker.getYaw();
         }
@@ -38,7 +39,7 @@ public abstract class MobEntityMixin {
             )
     )
     private float redirect_tryAttack_getYaw_1(MobEntity attacker, Entity target) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return attacker.getYaw();
         }
@@ -55,7 +56,7 @@ public abstract class MobEntityMixin {
             )
     )
     private double redirect_lookAtEntity_getEyeY_0(LivingEntity livingEntity) {
-        Direction gravityDirection = ((EntityAccessor) livingEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(livingEntity);
         if(gravityDirection == Direction.DOWN) {
             return livingEntity.getEyeY();
         }
@@ -72,7 +73,7 @@ public abstract class MobEntityMixin {
             )
     )
     private double redirect_lookAtEntity_getX_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getX();
         }
@@ -89,7 +90,7 @@ public abstract class MobEntityMixin {
             )
     )
     private double redirect_lookAtEntity_getZ_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getZ();
         }

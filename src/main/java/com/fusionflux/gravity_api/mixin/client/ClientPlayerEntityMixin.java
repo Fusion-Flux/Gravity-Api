@@ -1,8 +1,8 @@
 package com.fusionflux.gravity_api.mixin.client;
 
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import com.mojang.authlib.GameProfile;
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -27,33 +27,6 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @Shadow protected abstract boolean wouldCollideAt(BlockPos pos);
 
-
-
-    private Direction gravitychanger$gravityDirection = Direction.DOWN;
-
-    //@Override
-    //public Direction gravitychanger$getGravityDirection() {
-    //    if(this.gravitychanger$gravityDirection == null) {
-    //        return Direction.DOWN;
-    //    }
-//
-    //    return this.gravitychanger$gravityDirection;
-    //}
-//
-    //@Override
-    //public void gravitychanger$setGravityDirection(Direction gravityDirection, boolean initialGravity) {
-    //    if(this.gravitychanger$gravityDirection == gravityDirection) return;
-    //    //RotationUtil.applyNewRotation(gravityDirection);
-    //    Direction prevGravityDirection = this.gravitychanger$gravityDirection;
-    //    this.gravitychanger$gravityDirection = gravityDirection;
-    //    this.gravitychanger$onGravityChanged(prevGravityDirection, initialGravity);
-    //}
-//
-    //@Override
-    //public void gravitychanger$onTrackedData(TrackedData<?> data) {
-//
-    //}
-
     @Redirect(
             method = "wouldCollideAt",
             at = @At(
@@ -63,7 +36,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
             )
     )
     private Box redirect_wouldCollideAt_new_0(double x1, double y1, double z1, double x2, double y2, double z2, BlockPos pos) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this);
         if(gravityDirection == Direction.DOWN) {
             return new Box(x1, y1, z1, x2, y2, z2);
         }
@@ -85,7 +58,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
             cancellable = true
     )
     private void inject_pushOutOfBlocks(double x, double z, CallbackInfo ci) {
-        Direction gravityDirection = ((EntityAccessor) this).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this);
         if(gravityDirection == Direction.DOWN) return;
 
         ci.cancel();

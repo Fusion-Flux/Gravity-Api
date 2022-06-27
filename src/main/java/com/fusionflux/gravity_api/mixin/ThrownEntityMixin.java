@@ -1,6 +1,6 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.entity.EntityType;
@@ -17,14 +17,14 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(ThrownEntity.class)
-public abstract class ThrownEntityMixin implements EntityAccessor {
+public abstract class ThrownEntityMixin{
 
     @Shadow protected abstract float getGravity();
 
-    @Override
+    /*@Override
     public Direction gravitychanger$getAppliedGravityDirection() {
         return GravityChangerAPI.getGravityDirection((ThrownEntity)(Object)this);
-    }
+    }*/
 
     @ModifyVariable(
             method = "tick",
@@ -36,9 +36,9 @@ public abstract class ThrownEntityMixin implements EntityAccessor {
     public Vec3d tick(Vec3d modify){
         //if(this instanceof RotatableEntityAccessor) {
             modify = new Vec3d(modify.x, modify.y + this.getGravity(), modify.z);
-            modify = RotationUtil.vecWorldToPlayer(modify, this.gravitychanger$getAppliedGravityDirection());
+            modify = RotationUtil.vecWorldToPlayer(modify, GravityChangerAPI.getGravityDirection((ThrownEntity)(Object)this));
             modify = new Vec3d(modify.x, modify.y - this.getGravity(), modify.z);
-            modify = RotationUtil.vecPlayerToWorld(modify, this.gravitychanger$getAppliedGravityDirection());
+            modify = RotationUtil.vecPlayerToWorld(modify, GravityChangerAPI.getGravityDirection((ThrownEntity)(Object)this));
        // }
         return  modify;
     }
@@ -52,7 +52,7 @@ public abstract class ThrownEntityMixin implements EntityAccessor {
             )
     )
     private static void modifyargs_init_init_0(Args args, EntityType<? extends ThrownEntity> type, LivingEntity owner, World world) {
-        Direction gravityDirection = ((EntityAccessor) owner).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(owner);
         if(gravityDirection == Direction.DOWN) return;
 
         Vec3d pos = owner.getEyePos().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.10000000149011612D, 0.0D, gravityDirection));

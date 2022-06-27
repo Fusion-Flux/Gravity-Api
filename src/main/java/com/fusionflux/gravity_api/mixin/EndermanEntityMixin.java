@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,7 +21,7 @@ public abstract class EndermanEntityMixin {
             )
     )
     private double redirect_isPlayerStaring_getEyeY_0(PlayerEntity playerEntity) {
-        Direction gravityDirection = ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
         if(gravityDirection == Direction.DOWN) {
             return playerEntity.getEyeY();
         }
@@ -37,7 +38,7 @@ public abstract class EndermanEntityMixin {
             )
     )
     private double redirect_isPlayerStaring_getX_0(PlayerEntity playerEntity) {
-        Direction gravityDirection = ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
         if(gravityDirection == Direction.DOWN) {
             return playerEntity.getX();
         }
@@ -54,7 +55,7 @@ public abstract class EndermanEntityMixin {
             )
     )
     private double redirect_isPlayerStaring_getZ_0(PlayerEntity playerEntity) {
-        Direction gravityDirection = ((EntityAccessor) playerEntity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
         if(gravityDirection == Direction.DOWN) {
             return playerEntity.getZ();
         }
@@ -71,7 +72,7 @@ public abstract class EndermanEntityMixin {
             )
     )
     private double redirect_teleportTo_getEyeY_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getEyeY();
         }
@@ -88,7 +89,7 @@ public abstract class EndermanEntityMixin {
             )
     )
     private double redirect_teleportTo_getX_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getX();
         }
@@ -105,7 +106,7 @@ public abstract class EndermanEntityMixin {
             )
     )
     private double redirect_teleportTo_getZ_0(Entity entity) {
-        Direction gravityDirection = ((EntityAccessor) entity).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return entity.getZ();
         }

@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.accessor.EntityAccessor;
+
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.entity.CrossbowUser;
 import net.minecraft.entity.LivingEntity;
@@ -25,7 +26,7 @@ public abstract class PillagerEntityMixin implements CrossbowUser {
             )
     )
     private void redirect_shoot_shoot_0(PillagerEntity pillagerEntity, LivingEntity entity, LivingEntity target, ProjectileEntity projectile, float multishotSpray, float speed) {
-        Direction gravityDirection = ((EntityAccessor) target).gravitychanger$getAppliedGravityDirection();
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             this.shoot(entity, target, projectile, multishotSpray, speed);
             return;
