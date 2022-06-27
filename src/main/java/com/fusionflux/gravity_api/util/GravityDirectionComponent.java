@@ -1,6 +1,5 @@
 package com.fusionflux.gravity_api.util;
 
-import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.mixin.AccessorEntity;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
@@ -147,24 +146,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     @Override
     public void updateGravity(boolean initialGravity) {
         if (canChangeGravity()) {
-            Gravity primaryGravity = null;
-            for (Gravity temp : gravityList) {
-                if (primaryGravity != null) {
-                    if (temp.priority > primaryGravity.priority) {
-                        primaryGravity = temp;
-                    }
-                }
-                else {
-                    primaryGravity = temp;
-                }
-            }
-            Direction newGravity = getDefaultGravityDirection();
-            if (primaryGravity != null) {
-                newGravity = primaryGravity.gravityDirection;
-            }
-            if (isInverted) {
-                newGravity = newGravity.getOpposite();
-            }
+            Direction newGravity = getActualGravityDirection();
             Direction oldGravity = gravityDirection;
             if (oldGravity != newGravity) {
                 long timeMs = entity.world.getTime() * 50;
@@ -179,6 +161,29 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
             }
             GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
+    }
+    
+    @Override
+    public Direction getActualGravityDirection() {
+        Gravity primaryGravity = null;
+        for (Gravity temp : gravityList) {
+            if (primaryGravity != null) {
+                if (temp.priority > primaryGravity.priority) {
+                    primaryGravity = temp;
+                }
+            }
+            else {
+                primaryGravity = temp;
+            }
+        }
+        Direction newGravity = getDefaultGravityDirection();
+        if (primaryGravity != null) {
+            newGravity = primaryGravity.gravityDirection;
+        }
+        if (isInverted) {
+            newGravity = newGravity.getOpposite();
+        }
+        return newGravity;
     }
     
     @Override
