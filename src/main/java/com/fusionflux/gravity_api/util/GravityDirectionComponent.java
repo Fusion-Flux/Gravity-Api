@@ -1,7 +1,6 @@
 package com.fusionflux.gravity_api.util;
 
 import com.fusionflux.gravity_api.RotationAnimation;
-import com.fusionflux.gravity_api.mixin.AccessorEntity;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
@@ -19,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Objects;
 
-@SuppressWarnings({"deprecation", "CommentedOutCode"})
 public class GravityDirectionComponent implements GravityComponent, AutoSyncedComponent {
     Direction gravityDirection = Direction.DOWN;
     Direction defaultGravityDirection = Direction.DOWN;
@@ -39,7 +37,7 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     
     public void onGravityChanged(Direction oldGravity, Direction newGravity, boolean initialGravity) {
         entity.fallDistance = 0;
-        entity.setBoundingBox(((AccessorEntity) entity).gravity$calculateBoundingBox());
+        entity.setPosition(entity.getPos());//Causes bounding box recalculation
         
         if (!initialGravity) {
             adjustEntityPosition(oldGravity, newGravity);
