@@ -7,6 +7,7 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -46,20 +47,17 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         }
         
         // Keep world velocity when changing gravity
-     //   if (!GravityChangerMod.config.worldVelocity) {
-     //       if (entity.isLogicalSideForUpdatingMovement()) {
-
-        if(oldGravity.getOpposite() != newGravity) {
-            entity.setVelocity(RotationUtil.vecPlayerToWorld(
-                    RotationUtil.vecWorldToPlayer(entity.getVelocity().multiply(-1), oldGravity), newGravity)
-            );
-        }else{
-            entity.setVelocity(RotationUtil.vecPlayerToWorld(
-                    RotationUtil.vecWorldToPlayer(entity.getVelocity(), oldGravity), newGravity)
-            );
+        if(entity instanceof PlayerEntity) {
+            if (oldGravity.getOpposite() != newGravity) {
+                entity.setVelocity(RotationUtil.vecPlayerToWorld(
+                        RotationUtil.vecWorldToPlayer(entity.getVelocity().multiply(-1), oldGravity), newGravity)
+                );
+            } else {
+                entity.setVelocity(RotationUtil.vecPlayerToWorld(
+                        RotationUtil.vecWorldToPlayer(entity.getVelocity(), oldGravity), newGravity)
+                );
+            }
         }
-       //     }
-       // }
     }
     
     // Adjust position to avoid suffocation in blocks when changing gravity
