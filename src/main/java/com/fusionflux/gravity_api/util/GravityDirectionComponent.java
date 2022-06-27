@@ -46,13 +46,20 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         }
         
         // Keep world velocity when changing gravity
-        if (!GravityChangerMod.config.worldVelocity) {
-            if (entity.isLogicalSideForUpdatingMovement()) {
-                entity.setVelocity(RotationUtil.vecPlayerToWorld(
+     //   if (!GravityChangerMod.config.worldVelocity) {
+     //       if (entity.isLogicalSideForUpdatingMovement()) {
+
+        if(oldGravity.getOpposite() != newGravity) {
+            entity.setVelocity(RotationUtil.vecPlayerToWorld(
+                    RotationUtil.vecWorldToPlayer(entity.getVelocity().multiply(-1), oldGravity), newGravity)
+            );
+        }else{
+            entity.setVelocity(RotationUtil.vecPlayerToWorld(
                     RotationUtil.vecWorldToPlayer(entity.getVelocity(), oldGravity), newGravity)
-                );
-            }
+            );
         }
+       //     }
+       // }
     }
     
     // Adjust position to avoid suffocation in blocks when changing gravity
