@@ -5,7 +5,7 @@ import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 
 @Config(
-        name ="gravitychanger"
+        name ="gravity_api"
 )
 public class GravityChangerConfig implements ConfigData {
     @ConfigEntry.Gui.PrefixText
