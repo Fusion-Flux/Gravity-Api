@@ -2,7 +2,6 @@ package com.fusionflux.gravity_api.util;
 
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
-import com.fusionflux.gravity_api.mixin.AccessorEntity;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
@@ -39,7 +38,7 @@ public class GravityDirectionComponent implements GravityComponent, ServerTickin
     
     public void onGravityChanged(Direction oldGravity, Direction newGravity, boolean initialGravity) {
         entity.fallDistance = 0;
-        entity.setBoundingBox(((AccessorEntity) entity).gravity$calculateBoundingBox());
+        entity.setPosition(entity.getPos());//Causes bounding box recalculation
         
         if (!initialGravity) {
             adjustEntityPosition(oldGravity, newGravity);
