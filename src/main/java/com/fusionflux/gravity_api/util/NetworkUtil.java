@@ -3,6 +3,7 @@ package com.fusionflux.gravity_api.util;
 import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.api.Gravity;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
+import com.fusionflux.gravity_api.api.RotationParameters;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -56,11 +57,28 @@ public class NetworkUtil {
         buf.writeByte(direction == null ? -1 : direction.getId());
     }
 
+    public static void write(PacketByteBuf buf, RotationParameters rotationParameters){
+        buf.writeBoolean(rotationParameters.rotateVelocity());
+        buf.writeBoolean(rotationParameters.rotateView());
+        buf.writeBoolean(rotationParameters.alternateCenter());
+        buf.writeInt(rotationParameters.rotationTime());
+    }
+
     public static void write(PacketByteBuf buf, Gravity gravity){
         write(buf, gravity.direction());
         buf.writeInt(gravity.duration());
         buf.writeInt(gravity.priority());
         buf.writeString(gravity.source());
+        write(buf, gravity.rotationParameters());
+    }
+
+    public static RotationParameters readRotationParameters(PacketByteBuf buf){
+        return new RotationParameters(
+                buf.readBoolean(),
+                buf.readBoolean(),
+                buf.readBoolean(),
+                buf.readInt()
+        );
     }
 
     public static Direction readDirection(PacketByteBuf buf){
@@ -73,7 +91,8 @@ public class NetworkUtil {
                 readDirection(buf),
                 buf.readInt(),
                 buf.readInt(),
-                buf.readString()
+                buf.readString(),
+                readRotationParameters(buf)
         );
     }
 
@@ -153,65 +172,77 @@ public class NetworkUtil {
 
     //Default Gravity
 
-    public static void sendDefaultGravityToClient(Entity entity, Direction direction, int animationDurationMs){
+    public static void sendDefaultGravityToClient(Entity entity, Direction direction, RotationParameters rotationParameters, boolean initialGravity){
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeInt(entity.getId());
         write(buf, direction);
-        buf.writeInt(animationDurationMs);
+        write(buf, rotationParameters);
+        buf.writeBoolean(initialGravity);
         sendToTracking(entity, CHANNEL_DEFAULT_GRAVITY, buf);
     }
 
     public static void receiveDefaultGravityFromServer(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender){
         int entityId = buf.readInt();
         Direction direction = readDirection(buf);
-        int animationDurationMs = buf.readInt();
+        RotationParameters rotationParameters = readRotationParameters(buf);
+        boolean initialGravity = buf.readBoolean();
         client.execute(() -> {
-            getGravityComponent(client, entityId).ifPresent(gc -> gc.setDefaultGravityDirection(direction, animationDurationMs));
+            getGravityComponent(client, entityId).ifPresent(gc -> gc.setDefaultGravityDirection(direction, rotationParameters, initialGravity));
         });
     }
 
-    public static void sendDefaultGravityToServer(Direction direction, int animationDurationMs){
+    public static void sendDefaultGravityToServer(Direction direction, RotationParameters rotationParameters, boolean initialGravity){
         PacketByteBuf buf = PacketByteBufs.create();
         write(buf, direction);
-        buf.writeInt(animationDurationMs);
+        write(buf, rotationParameters);
+        buf.writeBoolean(initialGravity);
         ClientPlayNetworking.send(CHANNEL_DEFAULT_GRAVITY, buf);
     }
 
     public static void receiveDefaultGravityFromClient(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender){
         Direction direction = readDirection(buf);
-        int animationDurationMs = buf.readInt();
+        RotationParameters rotationParameters = readRotationParameters(buf);
+        boolean initialGravity = buf.readBoolean();
         server.execute(() -> {
-            getGravityComponent(player).ifPresent(gc -> gc.setDefaultGravityDirection(direction, animationDurationMs));
+            getGravityComponent(player).ifPresent(gc -> gc.setDefaultGravityDirection(direction, rotationParameters, initialGravity));
         });
     }
 
     //Inverted
 
-    public static void sendInvertedToClient(Entity entity, boolean inverted){
+    public static void sendInvertedToClient(Entity entity, boolean inverted, RotationParameters rotationParameters, boolean initialGravity){
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeInt(entity.getId());
         buf.writeBoolean(inverted);
+        write(buf, rotationParameters);
+        buf.writeBoolean(initialGravity);
         sendToTracking(entity, CHANNEL_INVERTED, buf);
     }
 
     public static void receiveInvertedFromServer(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender){
         int entityId = buf.readInt();
         boolean inverted = buf.readBoolean();
+        RotationParameters rotationParameters = readRotationParameters(buf);
+        boolean initialGravity = buf.readBoolean();
         client.execute(() -> {
-            getGravityComponent(client, entityId).ifPresent(gc -> gc.invertGravity(inverted));
+            getGravityComponent(client, entityId).ifPresent(gc -> gc.invertGravity(inverted, rotationParameters, initialGravity));
         });
     }
 
-    public static void sendInvertedToServer(boolean inverted){
+    public static void sendInvertedToServer(boolean inverted, RotationParameters rotationParameters, boolean initialGravity){
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeBoolean(inverted);
+        write(buf, rotationParameters);
+        buf.writeBoolean(initialGravity);
         ClientPlayNetworking.send(CHANNEL_INVERTED, buf);
     }
 
     public static void receiveInvertedFromClient(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender){
         boolean inverted = buf.readBoolean();
+        RotationParameters rotationParameters = readRotationParameters(buf);
+        boolean initialGravity = buf.readBoolean();
         server.execute(() -> {
-            getGravityComponent(player).ifPresent(gc -> gc.invertGravity(inverted));
+            getGravityComponent(player).ifPresent(gc -> gc.invertGravity(inverted, rotationParameters, initialGravity));
         });
     }
 

@@ -267,9 +267,10 @@ public class GravityDirectionComponent implements GravityComponent, ServerTickin
         prevGravityDirection = Direction.byId(nbt.getInt("PrevGravityDirection"));
         defaultGravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
         isInverted = nbt.getBoolean("IsGravityInverted");
-        updateGravity(new RotationParameters().rotationTime(0).rotateView(false).rotateVelocity(false).alternateCenter(false), true);
+        RotationParameters rp = new RotationParameters(false, false, false, 0);
+        updateGravity(rp, true);
         if(oldDefaultGravity != defaultGravityDirection) {
-            NetworkUtil.sendDefaultGravityToClient(entity, defaultGravityDirection, 0);
+            NetworkUtil.sendDefaultGravityToClient(entity, defaultGravityDirection, rp, true);
         }
         if(!(oldList.isEmpty() && gravityList.isEmpty())) {
             NetworkUtil.sendOverwriteGravityListToClient(entity, gravityList, true);

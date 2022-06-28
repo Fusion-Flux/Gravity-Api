@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.item;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
+import com.fusionflux.gravity_api.api.RotationParameters;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -27,7 +28,7 @@ public class GravityChangerItemAOE extends Item {
             Box box = user.getBoundingBox().expand(3);
             List<Entity> list = world.getEntitiesByClass(Entity.class, box, e -> !(e instanceof PlayerEntity));
             for (Entity entity : list) {
-                GravityChangerAPI.setDefaultGravityDirection(entity, gravityDirection);
+                GravityChangerAPI.setDefaultGravityDirection(entity, gravityDirection, new RotationParameters());
             }
         }
         return TypedActionResult.success(user.getStackInHand(hand));

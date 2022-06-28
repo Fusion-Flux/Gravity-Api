@@ -9,10 +9,19 @@ public class RotationParameters {
     private boolean alternateCenter;
     private int rotationTime;//Milliseconds
     public RotationParameters(){
-        rotateVelocity = !GravityChangerMod.config.worldVelocity;
-        rotateView = !GravityChangerMod.config.keepWorldLook;
-        alternateCenter = false;
-        rotationTime = GravityChangerMod.config.rotationTime;
+        this(
+                !GravityChangerMod.config.worldVelocity,
+                !GravityChangerMod.config.keepWorldLook,
+                false,
+                GravityChangerMod.config.rotationTime
+        );
+    }
+
+    public RotationParameters(boolean _rotateVelocity, boolean _rotateView, boolean _alternateCenter, int _rotationTime){
+        rotateVelocity = _rotateVelocity;
+        rotateView = _rotateView;
+        alternateCenter = _alternateCenter;
+        rotationTime = _rotationTime;
     }
 
     public boolean rotateVelocity() {

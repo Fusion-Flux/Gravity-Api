@@ -149,7 +149,7 @@ public abstract class GravityChangerAPI {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.invertGravity(isInverted, rotationParameters, false);
-                    NetworkUtil.sendInvertedToClient(entity, isInverted);
+                    NetworkUtil.sendInvertedToClient(entity, isInverted, rotationParameters, false);
                 });
             }
         }
@@ -160,7 +160,7 @@ public abstract class GravityChangerAPI {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.invertGravity(isInverted, rotationParameters, false);
-                    NetworkUtil.sendInvertedToServer(isInverted);
+                    NetworkUtil.sendInvertedToServer(isInverted, rotationParameters, false);
                 });
             }
         }
@@ -193,7 +193,7 @@ public abstract class GravityChangerAPI {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.setDefaultGravityDirection(gravityDirection, rotationParameters, false);
-                    NetworkUtil.sendDefaultGravityToClient(entity, gravityDirection, rotationParameters);
+                    NetworkUtil.sendDefaultGravityToClient(entity, gravityDirection, rotationParameters, false);
                 });
             }
         }
@@ -204,7 +204,7 @@ public abstract class GravityChangerAPI {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.setDefaultGravityDirection(gravityDirection, rotationParameters, false);
-                    NetworkUtil.sendDefaultGravityToServer(gravityDirection, rotationParameters);
+                    NetworkUtil.sendDefaultGravityToServer(gravityDirection, rotationParameters, false);
                 });
             }
         }
