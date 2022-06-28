@@ -1,7 +1,9 @@
 package com.fusionflux.gravity_api.util;
 
 import com.fusionflux.gravity_api.RotationAnimation;
+import com.fusionflux.gravity_api.api.Gravity;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
+import com.fusionflux.gravity_api.api.RotationParameters;
 import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import net.minecraft.entity.AreaEffectCloudEntity;
@@ -16,6 +18,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +40,7 @@ public class GravityDirectionComponent implements GravityComponent, ServerTickin
         this.entity = entity;
     }
     
-    public void onGravityChanged(Direction oldGravity, Direction newGravity, boolean initialGravity) {
+    public void onGravityChanged(Direction oldGravity, Direction newGravity, RotationParameters rotationParameters, boolean initialGravity) {
         entity.fallDistance = 0;
         entity.setPosition(entity.getPos());//Causes bounding box recalculation
         
@@ -46,16 +49,10 @@ public class GravityDirectionComponent implements GravityComponent, ServerTickin
         }
         
         // Keep world velocity when changing gravity
-        if(entity instanceof PlayerEntity) {
-            if (oldGravity.getOpposite() != newGravity) {
-                entity.setVelocity(RotationUtil.vecPlayerToWorld(
-                        RotationUtil.vecWorldToPlayer(entity.getVelocity().multiply(-1), oldGravity), newGravity)
-                );
-            } else {
-                entity.setVelocity(RotationUtil.vecPlayerToWorld(
-                        RotationUtil.vecWorldToPlayer(entity.getVelocity(), oldGravity), newGravity)
-                );
-            }
+        if (rotationParameters.rotateVelocity()) {
+            entity.setVelocity(RotationUtil.vecPlayerToWorld(
+                    RotationUtil.vecWorldToPlayer(entity.getVelocity(), oldGravity), newGravity)
+            );
         }
     }
     
@@ -142,22 +139,22 @@ public class GravityDirectionComponent implements GravityComponent, ServerTickin
         }
         return Direction.DOWN;
     }
-    
+
     @Override
-    public void updateGravity(boolean initialGravity, int animationDuration) {
+    public void updateGravity(RotationParameters rotationParameters, boolean initialGravity) {
         if (canChangeGravity()) {
             Direction newGravity = getActualGravityDirection();
             Direction oldGravity = gravityDirection;
             if (oldGravity != newGravity) {
                 long timeMs = entity.world.getTime() * 50;
                 animation.applyRotationAnimation(
-                    newGravity, oldGravity,
-                    initialGravity ? 0 : animationDuration,
-                    entity, timeMs
+                        newGravity, oldGravity,
+                        initialGravity ? 0 : rotationParameters.rotationTime(),
+                        entity, timeMs, rotationParameters.rotateView()
                 );
                 prevGravityDirection = oldGravity;
                 gravityDirection = newGravity;
-                onGravityChanged(oldGravity, newGravity, initialGravity);
+                onGravityChanged(oldGravity, newGravity, rotationParameters, initialGravity);
             }
         }
     }
@@ -165,20 +162,30 @@ public class GravityDirectionComponent implements GravityComponent, ServerTickin
     @Override
     public Direction getActualGravityDirection() {
         Direction newGravity = getDefaultGravityDirection();
-        if (!gravityList.isEmpty()) {
-            newGravity = Collections.max(gravityList, Comparator.comparingInt(Gravity::priority)).direction();
+        Gravity highestPriority = getHighestPriority();
+        if (highestPriority != null) {
+            newGravity = highestPriority.direction();
         }
         if (isInverted) {
             newGravity = newGravity.getOpposite();
         }
         return newGravity;
     }
-    
+
+    @Nullable
+    private Gravity getHighestPriority() {
+        if(!gravityList.isEmpty()) {
+            return Collections.max(gravityList, Comparator.comparingInt(Gravity::priority));
+        }else{
+            return null;
+        }
+    }
+
     @Override
-    public void setDefaultGravityDirection(Direction gravityDirection, int animationDurationMs) {
+    public void setDefaultGravityDirection(Direction gravityDirection, RotationParameters rotationParameters, boolean initialGravity) {
         if (canChangeGravity()) {
-            this.defaultGravityDirection = gravityDirection;
-            updateGravity(false, animationDurationMs);
+            defaultGravityDirection = gravityDirection;
+            updateGravity(rotationParameters, initialGravity);
         }
     }
     
@@ -188,7 +195,7 @@ public class GravityDirectionComponent implements GravityComponent, ServerTickin
             gravityList.removeIf(g -> Objects.equals(g.source(), gravity.source()));
             if(gravity.direction() != null)
                 gravityList.add(gravity);
-            updateGravity(initialGravity, 500);
+            updateGravity(gravity.rotationParameters(), initialGravity);
         }
     }
     
@@ -196,28 +203,40 @@ public class GravityDirectionComponent implements GravityComponent, ServerTickin
     public ArrayList<Gravity> getGravity() {
         return gravityList;
     }
-    
+
     @Override
     public void setGravity(ArrayList<Gravity> _gravityList, boolean initialGravity) {
+        Gravity highestBefore = getHighestPriority();
         gravityList = _gravityList;
-        updateGravity(initialGravity, 500);
+        Gravity highestAfter = getHighestPriority();
+        if(highestBefore != highestAfter){
+            if(highestBefore == null){
+                updateGravity(highestAfter.rotationParameters(), initialGravity);
+            }else if(highestAfter == null){
+                updateGravity(highestBefore.rotationParameters(), initialGravity);
+            }else if(highestBefore.priority() > highestAfter.priority()){
+                updateGravity(highestBefore.rotationParameters(), initialGravity);
+            }else{
+                updateGravity(highestAfter.rotationParameters(), initialGravity);
+            }
+        }
     }
-    
+
     @Override
-    public void invertGravity(boolean _isInverted) {
+    public void invertGravity(boolean _isInverted, RotationParameters rotationParameters, boolean initialGravity) {
         isInverted = _isInverted;
-        updateGravity(false, 500);
+        updateGravity(rotationParameters, initialGravity);
     }
     
     @Override
     public boolean getInvertGravity() {
         return this.isInverted;
     }
-    
+
     @Override
-    public void clearGravity() {
+    public void clearGravity(RotationParameters rotationParameters, boolean initialGravity) {
         gravityList.clear();
-        updateGravity(false, 500);
+        updateGravity(rotationParameters, initialGravity);
     }
     
     @Override
@@ -231,7 +250,7 @@ public class GravityDirectionComponent implements GravityComponent, ServerTickin
         ArrayList<Gravity> oldList = gravityList;
         if (nbt.contains("ListSize", NbtElement.INT_TYPE)) {
             int listSize = nbt.getInt("ListSize");
-            ArrayList<Gravity> newGravityList = new ArrayList<Gravity>();
+            ArrayList<Gravity> newGravityList = new ArrayList<>();
             if (listSize != 0) {
                 for (int index = 0; index < listSize; index++) {
                     Gravity newGravity = new Gravity(
@@ -248,7 +267,7 @@ public class GravityDirectionComponent implements GravityComponent, ServerTickin
         prevGravityDirection = Direction.byId(nbt.getInt("PrevGravityDirection"));
         defaultGravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
         isInverted = nbt.getBoolean("IsGravityInverted");
-        updateGravity(true, 0);
+        updateGravity(new RotationParameters().rotationTime(0).rotateView(false).rotateVelocity(false).alternateCenter(false), true);
         if(oldDefaultGravity != defaultGravityDirection) {
             NetworkUtil.sendDefaultGravityToClient(entity, defaultGravityDirection, 0);
         }
@@ -291,8 +310,12 @@ public class GravityDirectionComponent implements GravityComponent, ServerTickin
             addGravity(new Gravity(GravityChangerAPI.getGravityDirection(vehicle), 99999999, 2, "vehicle"), true);
         }
         ArrayList<Gravity> gravityList = getGravity();
+        Gravity highestBefore = getHighestPriority();
         if(gravityList.removeIf(g -> g.duration() == 0)){
-            updateGravity(false, 500);
+            Gravity highestAfter = getHighestPriority();
+            if(highestBefore != null && highestBefore != highestAfter) {
+                updateGravity(highestBefore.rotationParameters(), false);
+            }
         }
         for (Gravity temp : gravityList) {
             if (temp.duration() > 0) {

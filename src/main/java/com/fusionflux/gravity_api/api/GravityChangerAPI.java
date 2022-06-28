@@ -7,7 +7,6 @@ import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.util.*;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
@@ -145,84 +144,70 @@ public abstract class GravityChangerAPI {
         }
     }
 
-    public static void setIsInverted(Entity entity, boolean isInverted) {
+    public static void setIsInverted(Entity entity, boolean isInverted, RotationParameters rotationParameters) {
         if(onCorrectSide(entity, true)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
-                    gc.invertGravity(isInverted);
+                    gc.invertGravity(isInverted, rotationParameters, false);
                     NetworkUtil.sendInvertedToClient(entity, isInverted);
                 });
             }
         }
     }
 
-    public static void setIsInvertedClient(ClientPlayerEntity entity, boolean isInverted) {
+    public static void setIsInvertedClient(ClientPlayerEntity entity, boolean isInverted, RotationParameters rotationParameters) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
-                    gc.invertGravity(isInverted);
+                    gc.invertGravity(isInverted, rotationParameters, false);
                     NetworkUtil.sendInvertedToServer(isInverted);
                 });
             }
         }
     }
 
-    public static void clearGravity(Entity entity) {
+    public static void clearGravity(Entity entity, RotationParameters rotationParameters) {
         if(onCorrectSide(entity, true)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
-                    gc.clearGravity();
+                    gc.clearGravity(rotationParameters, false);
                     NetworkUtil.sendOverwriteGravityListToClient(entity, new ArrayList<>(), false);
                 });
             }
         }
     }
 
-    public static void clearGravityClient(ClientPlayerEntity entity) {
+    public static void clearGravityClient(ClientPlayerEntity entity, RotationParameters rotationParameters) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
-                    gc.clearGravity();
+                    gc.clearGravity(rotationParameters, false);
                     NetworkUtil.sendOverwriteGravityListToServer(new ArrayList<>(), false);
                 });
             }
         }
     }
 
-    public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection, int animationDurationMs) {
+    public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection, RotationParameters rotationParameters) {
         if(onCorrectSide(entity, true)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
-                    gc.setDefaultGravityDirection(gravityDirection, animationDurationMs);
-                    NetworkUtil.sendDefaultGravityToClient(entity, gravityDirection, animationDurationMs);
+                    gc.setDefaultGravityDirection(gravityDirection, rotationParameters, false);
+                    NetworkUtil.sendDefaultGravityToClient(entity, gravityDirection, rotationParameters);
                 });
             }
         }
     }
 
-    public static void setDefaultGravityDirectionClient(ClientPlayerEntity entity, Direction gravityDirection, int animationDurationMs) {
+    public static void setDefaultGravityDirectionClient(ClientPlayerEntity entity, Direction gravityDirection, RotationParameters rotationParameters) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
-                    gc.setDefaultGravityDirection(gravityDirection, animationDurationMs);
-                    NetworkUtil.sendDefaultGravityToServer(gravityDirection, animationDurationMs);
+                    gc.setDefaultGravityDirection(gravityDirection, rotationParameters, false);
+                    NetworkUtil.sendDefaultGravityToServer(gravityDirection, rotationParameters);
                 });
             }
         }
-    }
-    
-    public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection) {
-        setDefaultGravityDirection(
-            entity, gravityDirection,
-            GravityChangerMod.config.rotationTime
-        );
-    }
-
-    public static void setDefaultGravityDirectionClient(ClientPlayerEntity entity, Direction gravityDirection) {
-        setDefaultGravityDirectionClient(
-                entity, gravityDirection,
-                GravityChangerMod.config.rotationTime
-        );
     }
 
     /**

@@ -3,7 +3,6 @@ package com.fusionflux.gravity_api.mixin;
 import com.fusionflux.gravity_api.GravityChangerMod;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
-import com.fusionflux.gravity_api.util.Gravity;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -18,7 +17,6 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(Entity.class)

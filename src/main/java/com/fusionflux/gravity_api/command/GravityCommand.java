@@ -1,7 +1,7 @@
 package com.fusionflux.gravity_api.command;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
-import com.fusionflux.gravity_api.util.Gravity;
+import com.fusionflux.gravity_api.api.Gravity;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
