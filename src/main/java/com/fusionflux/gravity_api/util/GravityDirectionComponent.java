@@ -8,14 +8,13 @@ import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,14 +44,30 @@ public class GravityDirectionComponent implements GravityComponent, ServerTickin
         entity.setPosition(entity.getPos());//Causes bounding box recalculation
         
         if (!initialGravity) {
+            if(rotationParameters.alternateCenter()) {
+                // Adjust position to avoid suffocation in blocks when changing gravity
+                EntityDimensions dimensions = entity.getDimensions(entity.getPose());
+                Direction relativeDirection = RotationUtil.dirWorldToPlayer(gravityDirection, prevGravityDirection);
+                Vec3d relativePosOffset = switch (relativeDirection) {
+                    case DOWN -> Vec3d.ZERO;
+                    case UP -> new Vec3d(0.0D, dimensions.height - 1.0E-6D, 0.0D);
+                    default -> Vec3d.of(relativeDirection.getVector())
+                            .multiply(dimensions.width / 2 - (gravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D))
+                            .add(0.0D, dimensions.width / 2 - (prevGravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D), 0.0D);
+                };
+                entity.setPosition(entity.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, prevGravityDirection)));
+            }
+
             adjustEntityPosition(oldGravity, newGravity);
-        }
-        
-        // Keep world velocity when changing gravity
-        if (rotationParameters.rotateVelocity()) {
-            entity.setVelocity(RotationUtil.vecPlayerToWorld(
-                    RotationUtil.vecWorldToPlayer(entity.getVelocity(), oldGravity), newGravity)
-            );
+
+            // Keep world velocity when changing gravity
+            if(rotationParameters.rotateVelocity()) {
+                Vec3f worldSpaceVec = new Vec3f(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection));
+                worldSpaceVec.rotate(RotationUtil.getRotationBetween(prevGravityDirection, gravityDirection));
+                entity.setVelocity(RotationUtil.vecWorldToPlayer(new Vec3d(worldSpaceVec), gravityDirection));
+            }else{
+                entity.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection), gravityDirection));
+            }
         }
     }
     
