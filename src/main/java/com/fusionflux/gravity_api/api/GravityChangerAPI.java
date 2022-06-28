@@ -5,9 +5,9 @@ import java.util.Optional;
 
 import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.RotationAnimation;
-import com.fusionflux.gravity_api.util.RotationUtil;
-import com.fusionflux.gravity_api.util.EntityTags;
-import com.fusionflux.gravity_api.util.Gravity;
+import com.fusionflux.gravity_api.util.*;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
@@ -15,7 +15,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 
-import com.fusionflux.gravity_api.util.GravityComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -103,40 +102,112 @@ public abstract class GravityChangerAPI {
      * This may not immediately change the applied gravity direction for the player, see GravityChangerAPI#getAppliedGravityDirection
      */
     public static void addGravity(Entity entity, Gravity gravity) {
-        if (EntityTags.canChangeGravity(entity)) {
-            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.addGravity(gravity, false));
+        if(onCorrectSide(entity, true)) {
+            if (EntityTags.canChangeGravity(entity)) {
+                maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
+                    gc.addGravity(gravity, false);
+                    NetworkUtil.sendUpdateGravityListToClient(entity, gravity, false);
+                });
+            }
         }
     }
-    
-    public static void updateGravity(Entity entity) {
-        if (EntityTags.canChangeGravity(entity)) {
-            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.updateGravity(false));
+
+    public static void addGravityClient(ClientPlayerEntity entity, Gravity gravity) {
+        if(onCorrectSide(entity, false)) {
+            if (EntityTags.canChangeGravity(entity)) {
+                maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
+                    gc.addGravity(gravity, false);
+                    NetworkUtil.sendUpdateGravityListToServer(gravity, false);
+                });
+            }
         }
     }
 
     public static void setGravity(Entity entity, ArrayList<Gravity> gravity) {
-        if (EntityTags.canChangeGravity(entity)) {
-            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.setGravity(gravity, false));
+        if(onCorrectSide(entity, true)) {
+            if (EntityTags.canChangeGravity(entity)) {
+                maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
+                    gc.setGravity(gravity, false);
+                    NetworkUtil.sendOverwriteGravityListToClient(entity, gravity, false);
+                });
+            }
+        }
+    }
+
+    public static void setGravityClient(ClientPlayerEntity entity, ArrayList<Gravity> gravity) {
+        if(onCorrectSide(entity, false)) {
+            if (EntityTags.canChangeGravity(entity)) {
+                maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
+                    gc.setGravity(gravity, false);
+                    NetworkUtil.sendOverwriteGravityListToServer(gravity, false);
+                });
+            }
         }
     }
 
     public static void setIsInverted(Entity entity, boolean isInverted) {
-        if (EntityTags.canChangeGravity(entity)) {
-            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.invertGravity(isInverted));
+        if(onCorrectSide(entity, true)) {
+            if (EntityTags.canChangeGravity(entity)) {
+                maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
+                    gc.invertGravity(isInverted);
+                    NetworkUtil.sendInvertedToClient(entity, isInverted);
+                });
+            }
+        }
+    }
+
+    public static void setIsInvertedClient(ClientPlayerEntity entity, boolean isInverted) {
+        if(onCorrectSide(entity, false)) {
+            if (EntityTags.canChangeGravity(entity)) {
+                maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
+                    gc.invertGravity(isInverted);
+                    NetworkUtil.sendInvertedToServer(isInverted);
+                });
+            }
         }
     }
 
     public static void clearGravity(Entity entity) {
-        if (EntityTags.canChangeGravity(entity)) {
-            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(GravityComponent::clearGravity);
+        if(onCorrectSide(entity, true)) {
+            if (EntityTags.canChangeGravity(entity)) {
+                maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
+                    gc.clearGravity();
+                    NetworkUtil.sendOverwriteGravityListToClient(entity, new ArrayList<>(), false);
+                });
+            }
+        }
+    }
+
+    public static void clearGravityClient(ClientPlayerEntity entity) {
+        if(onCorrectSide(entity, false)) {
+            if (EntityTags.canChangeGravity(entity)) {
+                maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
+                    gc.clearGravity();
+                    NetworkUtil.sendOverwriteGravityListToServer(new ArrayList<>(), false);
+                });
+            }
         }
     }
 
     public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection, int animationDurationMs) {
-        if (EntityTags.canChangeGravity(entity)) {
-            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(
-                gc -> gc.setDefaultGravityDirection(gravityDirection, animationDurationMs)
-            );
+        if(onCorrectSide(entity, true)) {
+            if (EntityTags.canChangeGravity(entity)) {
+                maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
+                    gc.setDefaultGravityDirection(gravityDirection, animationDurationMs);
+                    NetworkUtil.sendDefaultGravityToClient(entity, gravityDirection, animationDurationMs);
+                });
+            }
+        }
+    }
+
+    public static void setDefaultGravityDirectionClient(ClientPlayerEntity entity, Direction gravityDirection, int animationDurationMs) {
+        if(onCorrectSide(entity, false)) {
+            if (EntityTags.canChangeGravity(entity)) {
+                maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
+                    gc.setDefaultGravityDirection(gravityDirection, animationDurationMs);
+                    NetworkUtil.sendDefaultGravityToServer(gravityDirection, animationDurationMs);
+                });
+            }
         }
     }
     
@@ -145,6 +216,21 @@ public abstract class GravityChangerAPI {
             entity, gravityDirection,
             GravityChangerMod.config.rotationTime
         );
+    }
+
+    public static void setDefaultGravityDirectionClient(ClientPlayerEntity entity, Direction gravityDirection) {
+        setDefaultGravityDirectionClient(
+                entity, gravityDirection,
+                GravityChangerMod.config.rotationTime
+        );
+    }
+
+    /**
+     * For internal use only, direct calls on GravityComponent will cause de-sync between client and server.
+     */
+    @Nullable
+    public static GravityComponent getGravityComponent(Entity entity){
+        return maybeGetSafe(GRAVITY_COMPONENT, entity).orElse(null);
     }
     
     /**
@@ -157,16 +243,28 @@ public abstract class GravityChangerAPI {
 
     /**
      * Sets the world relative velocity for the given player
-     * Using minecraft's methods to set the velocity of a the player will set player relative velocity
+     * Using minecraft's methods to set the velocity of an entity will set player relative velocity
      */
     public static void setWorldVelocity(Entity entity, Vec3d worldVelocity) {
         entity.setVelocity(RotationUtil.vecWorldToPlayer(worldVelocity, getGravityDirection(entity)));
     }
 
     /**
-     * Returns eye position offset from feet position for the given player
+     * Returns eye position offset from feet position for the given entity
      */
     public static Vec3d getEyeOffset(Entity entity) {
         return RotationUtil.vecPlayerToWorld(0, (double) entity.getStandingEyeHeight(), 0, getGravityDirection(entity));
+    }
+
+    private static boolean onCorrectSide(Entity entity, boolean shouldBeOnServer){
+        if(entity.world.isClient && shouldBeOnServer) {
+            GravityChangerMod.LOGGER.error("GravityChangerAPI function cannot be called from the server, use dedicated client server. ", new Exception());
+            return false;
+        }
+        if(!entity.world.isClient && !shouldBeOnServer) {
+            GravityChangerMod.LOGGER.error("GravityChangerAPI function cannot be called from the client, use dedicated client client. ", new Exception());
+            return false;
+        }
+        return true;
     }
 }

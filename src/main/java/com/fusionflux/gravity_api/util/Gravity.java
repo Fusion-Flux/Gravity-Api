@@ -1,36 +1,37 @@
 package com.fusionflux.gravity_api.util;
 
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.Direction;
 
+import java.util.Objects;
+
 public class Gravity {
-    Direction gravityDirection;
-    int gravityDuration;
-    int priority;
-    String source;
+    private final Direction direction;
+    private int duration;
+    private final int priority;
+    private final String source;
 
-    public Gravity(Direction gravDirection,int priority,int gravityDuration, String source) {
-        this.gravityDirection = gravDirection;
-        this.priority = priority;
-        this.gravityDuration = gravityDuration;
-        this.source = source;
+    public Gravity(Direction _direction, int _priority, int _duration, String _source) {
+        direction = _direction;
+        priority = _priority;
+        duration = _duration;
+        source = _source;
     }
 
-    public int getGravityDuration() {
-        return gravityDuration;
+    public Direction direction() {
+        return direction;
     }
-
-    public void decreaseDuration() {
-        gravityDuration--;
+    public int duration() {
+        return duration;
     }
-
-    public Direction getGravityDirection() {
-        return gravityDirection;
-    }
-    public int getPriority() {
+    public int priority() {
         return priority;
     }
-    public String getSource() {
+    public String source() {
         return source;
     }
 
+    public void decrementDuration() {
+        duration--;
+    }
 }

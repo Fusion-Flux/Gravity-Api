@@ -16,24 +16,20 @@ import java.util.List;
 public class GravityChangerItemAOE extends Item {
     public final Direction gravityDirection;
 
-    public GravityChangerItemAOE(Settings settings, Direction gravityDirection) {
+    public GravityChangerItemAOE(Settings settings, Direction _gravityDirection) {
         super(settings);
-
-        this.gravityDirection = gravityDirection;
+        gravityDirection = _gravityDirection;
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        Box box = user.getBoundingBox().expand(3);
+        if(!world.isClient()) {
+            Box box = user.getBoundingBox().expand(3);
             List<Entity> list = world.getEntitiesByClass(Entity.class, box, e -> !(e instanceof PlayerEntity));
             for (Entity entity : list) {
-                if (!(entity instanceof PlayerEntity))
-                            GravityChangerAPI.setDefaultGravityDirection(entity, gravityDirection);
-                GravityChangerAPI.updateGravity(entity);
+                GravityChangerAPI.setDefaultGravityDirection(entity, gravityDirection);
             }
+        }
         return TypedActionResult.success(user.getStackInHand(hand));
     }
-
-
-
 }

@@ -12,33 +12,15 @@ import net.minecraft.world.World;
 public class GravityChangerItem extends Item {
     public final Direction gravityDirection;
 
-    public GravityChangerItem(Settings settings, Direction gravityDirection) {
+    public GravityChangerItem(Settings settings, Direction _gravityDirection) {
         super(settings);
-
-        this.gravityDirection = gravityDirection;
+        gravityDirection = _gravityDirection;
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if(!world.isClient)
-            GravityChangerAPI.setDefaultGravityDirection(user, this.gravityDirection);
-            //GravityChangerAPI.updateGravity(user);
+            GravityChangerAPI.setDefaultGravityDirection(user, gravityDirection);
         return TypedActionResult.success(user.getStackInHand(hand));
     }
-
-   // @Override
-   // public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-   //     if(!(entity instanceof PlayerEntity))
-   //     if (!user.isSneaking()) {
-   //         if (GravityChangerAPI.getGravityDirection(entity) == this.gravityDirection) {
-   //             GravityChangerAPI.setDefaultGravityDirection(entity, this.gravityDirection);
-   //         } else {
-   //             GravityChangerAPI.setGravityDirection(entity, this.gravityDirection);
-   //         }
-   //     } else {
-   //         GravityChangerAPI.setGravityDirection(entity, GravityChangerAPI.getDefaultGravityDirection(entity));
-   //     }
-   //     return ActionResult.PASS;
-   // }
-
 }
