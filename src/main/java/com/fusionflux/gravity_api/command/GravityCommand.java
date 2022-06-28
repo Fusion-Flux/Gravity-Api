@@ -1,7 +1,8 @@
 package com.fusionflux.gravity_api.command;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
-import com.fusionflux.gravity_api.util.Gravity;
+import com.fusionflux.gravity_api.api.Gravity;
+import com.fusionflux.gravity_api.api.RotationParameters;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -91,7 +92,7 @@ public class GravityCommand {
         int i = 0;
         for (Entity entity : entities) {
             if (GravityChangerAPI.getDefaultGravityDirection(entity) != gravityDirection) {
-                GravityChangerAPI.setDefaultGravityDirection(entity, gravityDirection);
+                GravityChangerAPI.setDefaultGravityDirection(entity, gravityDirection, new RotationParameters());
                 //GravityChangerAPI.updateGravity(entity);
                 getSendFeedback(source, entity, gravityDirection);
                 i++;
@@ -110,7 +111,7 @@ public class GravityCommand {
                 case FORWARD, BACKWARD, LEFT, RIGHT -> Direction.fromHorizontal(relativeDirection.getHorizontalOffset() + Direction.fromRotation(entity.getYaw()).getHorizontal());
             };
             Direction newGravityDirection = RotationUtil.dirPlayerToWorld(combinedRelativeDirection, gravityDirection);
-            GravityChangerAPI.setDefaultGravityDirection(entity, newGravityDirection);
+            GravityChangerAPI.setDefaultGravityDirection(entity, newGravityDirection, new RotationParameters());
             //GravityChangerAPI.updateGravity(entity);
             getSendFeedback(source, entity, newGravityDirection);
             i++;
@@ -123,7 +124,7 @@ public class GravityCommand {
         for (Entity entity : entities) {
             Direction gravityDirection = Direction.random(source.getWorld().random);
             if (GravityChangerAPI.getGravityDirection(entity) != gravityDirection) {
-                GravityChangerAPI.setDefaultGravityDirection(entity, gravityDirection);
+                GravityChangerAPI.setDefaultGravityDirection(entity, gravityDirection, new RotationParameters());
                 //GravityChangerAPI.updateGravity(entity);
                 getSendFeedback(source, entity, gravityDirection);
                 i++;
@@ -135,7 +136,7 @@ public class GravityCommand {
     private static int executeClearGravity(ServerCommandSource source, Collection<? extends Entity> entities) {
         int i = 0;
         for (Entity entity : entities) {
-            GravityChangerAPI.clearGravity(entity);
+            GravityChangerAPI.clearGravity(entity, new RotationParameters());
             i++;
         }
         return i;

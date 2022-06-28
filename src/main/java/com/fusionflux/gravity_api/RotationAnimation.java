@@ -16,7 +16,7 @@ public class RotationAnimation {
     private long startTimeMs;
     private long endTimeMs;
     
-    public void applyRotationAnimation(Direction newGravity, Direction prevGravity, long durationTimeMs, Entity entity, long timeMs) {
+    public void applyRotationAnimation(Direction newGravity, Direction prevGravity, long durationTimeMs, Entity entity, long timeMs, boolean rotateView) {
         if (durationTimeMs == 0) {
             inAnimation = false;
             return;

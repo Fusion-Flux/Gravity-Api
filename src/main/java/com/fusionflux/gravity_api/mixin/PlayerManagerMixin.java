@@ -23,7 +23,7 @@ public abstract class PlayerManagerMixin {
             )
     )
     private void inject_onPlayerConnect_sendPacket_0(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
-        //TODO
+        //Not need because (I think) player gravity is synced when nbt is loaded
         //((ServerPlayerEntityAccessor) player).gravitychanger$sendGravityPacket(GravityChangerAPI.getGravityDirection(player), false);
     }
 
@@ -38,7 +38,7 @@ public abstract class PlayerManagerMixin {
             )
     )
     private void inject_respawnPlayer_sendPacket_1(ServerPlayerEntity player, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir) {
-        //TODO
+        //Not need because (I think) player gravity is synced when nbt is loaded
         //((ServerPlayerEntityAccessor) player).gravitychanger$sendGravityPacket(GravityChangerAPI.getGravityDirection(player), false);
     }
 }

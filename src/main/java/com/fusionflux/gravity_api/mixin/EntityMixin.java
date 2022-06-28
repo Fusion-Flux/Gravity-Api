@@ -3,7 +3,6 @@ package com.fusionflux.gravity_api.mixin;
 import com.fusionflux.gravity_api.GravityChangerMod;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
-import com.fusionflux.gravity_api.util.Gravity;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -18,7 +17,6 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(Entity.class)
@@ -105,10 +102,6 @@ public abstract class EntityMixin{
     public abstract double getEyeY();
 
     @Shadow
-    @Nullable
-    public abstract Entity getVehicle();
-
-    @Shadow
     public abstract float getYaw(float tickDelta);
 
     @Shadow
@@ -118,49 +111,6 @@ public abstract class EntityMixin{
     public abstract float getPitch();
 
     @Shadow @Final protected Random random;
-
-    /*@Override
-    public Direction gravitychanger$getAppliedGravityDirection() {
-        //Entity vehicle = this.getVehicle();
-        //if(vehicle != null) {
-        //    GravityChangerAPI.addGravity((Entity)(Object)this,new Gravity(GravityChangerAPI.getGravityDirection(vehicle),999,2,"vehicle"));
-        //    //GravityChangerAPI.setGravityDirection((Entity)(Object)this,GravityChangerAPI.getGravityDirection(vehicle));
-        //    return GravityChangerAPI.getGravityDirection(vehicle);
-        //}
-
-        return GravityChangerAPI.getGravityDirection((Entity)(Object)this);
-    }*/
-
-    @Inject(
-            method = "tick",
-            at = @At("TAIL")
-    )
-    private void inject_tick(CallbackInfo ci) {
-if(!world.isClient) {
-    Entity vehicle = this.getVehicle();
-    if (vehicle != null) {
-        Direction vehicleGravity = GravityChangerAPI.getGravityDirection(vehicle);
-        if (GravityChangerAPI.getIsInverted((Entity) (Object) this)) {
-            vehicleGravity = vehicleGravity.getOpposite();
-        }
-        if(vehicleGravity != GravityChangerAPI.getDefaultGravityDirection((Entity) (Object) this))
-        GravityChangerAPI.addGravity((Entity) (Object) this, new Gravity(vehicleGravity, 99999999, 2, "vehicle"));
-    }
-    ArrayList<Gravity> gravityList = GravityChangerAPI.getGravityList((Entity) (Object) this);
-    ArrayList<Gravity> goodList = new ArrayList<Gravity>();
-    if (!gravityList.isEmpty()) {
-        for (Gravity temp : gravityList) {
-            if (temp.getGravityDuration() != 0) {
-                temp.decreaseDuration();
-                goodList.add(temp);
-            }
-        }
-
-        GravityChangerAPI.setGravity((Entity) (Object) this, goodList);
-        GravityChangerAPI.updateGravity((Entity) (Object) this);
-    }
-}
-    }
 
     @Inject(
             method = "calculateBoundingBox",

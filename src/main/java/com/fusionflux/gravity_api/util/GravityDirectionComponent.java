@@ -1,32 +1,34 @@
 package com.fusionflux.gravity_api.util;
 
 import com.fusionflux.gravity_api.RotationAnimation;
-import com.fusionflux.gravity_api.mixin.AccessorEntity;
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import com.fusionflux.gravity_api.api.Gravity;
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
+import com.fusionflux.gravity_api.api.RotationParameters;
+import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
+import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Objects;
 
-@SuppressWarnings({"deprecation", "CommentedOutCode"})
-public class GravityDirectionComponent implements GravityComponent, AutoSyncedComponent {
+public class GravityDirectionComponent implements GravityComponent, ServerTickingComponent, ClientTickingComponent {
     Direction gravityDirection = Direction.DOWN;
     Direction defaultGravityDirection = Direction.DOWN;
     Direction prevGravityDirection = Direction.DOWN;
-    boolean initalSpawn = true;
     boolean isInverted = false;
-    int animationDuration = 500;
     RotationAnimation animation = new RotationAnimation();
     
     ArrayList<Gravity> gravityList = new ArrayList<>();
@@ -37,24 +39,34 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         this.entity = entity;
     }
     
-    public void onGravityChanged(Direction oldGravity, Direction newGravity, boolean initialGravity) {
+    public void onGravityChanged(Direction oldGravity, Direction newGravity, RotationParameters rotationParameters, boolean initialGravity) {
         entity.fallDistance = 0;
-        entity.setBoundingBox(((AccessorEntity) entity).gravity$calculateBoundingBox());
+        entity.setPosition(entity.getPos());//Causes bounding box recalculation
         
         if (!initialGravity) {
+            if(rotationParameters.alternateCenter()) {
+                // Adjust position to avoid suffocation in blocks when changing gravity
+                EntityDimensions dimensions = entity.getDimensions(entity.getPose());
+                Direction relativeDirection = RotationUtil.dirWorldToPlayer(gravityDirection, prevGravityDirection);
+                Vec3d relativePosOffset = switch (relativeDirection) {
+                    case DOWN -> Vec3d.ZERO;
+                    case UP -> new Vec3d(0.0D, dimensions.height - 1.0E-6D, 0.0D);
+                    default -> Vec3d.of(relativeDirection.getVector())
+                            .multiply(dimensions.width / 2 - (gravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D))
+                            .add(0.0D, dimensions.width / 2 - (prevGravityDirection.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0E-6D : 0.0D), 0.0D);
+                };
+                entity.setPosition(entity.getPos().add(RotationUtil.vecPlayerToWorld(relativePosOffset, prevGravityDirection)));
+            }
+
             adjustEntityPosition(oldGravity, newGravity);
-        }
-        
-        // Keep world velocity when changing gravity
-        if(entity instanceof PlayerEntity) {
-            if (oldGravity.getOpposite() != newGravity) {
-                entity.setVelocity(RotationUtil.vecPlayerToWorld(
-                        RotationUtil.vecWorldToPlayer(entity.getVelocity().multiply(-1), oldGravity), newGravity)
-                );
-            } else {
-                entity.setVelocity(RotationUtil.vecPlayerToWorld(
-                        RotationUtil.vecWorldToPlayer(entity.getVelocity(), oldGravity), newGravity)
-                );
+
+            // Keep world velocity when changing gravity
+            if(rotationParameters.rotateVelocity()) {
+                Vec3f worldSpaceVec = new Vec3f(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection));
+                worldSpaceVec.rotate(RotationUtil.getRotationBetween(prevGravityDirection, gravityDirection));
+                entity.setVelocity(RotationUtil.vecWorldToPlayer(new Vec3d(worldSpaceVec), gravityDirection));
+            }else{
+                entity.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection), gravityDirection));
             }
         }
     }
@@ -142,77 +154,63 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
         }
         return Direction.DOWN;
     }
-    
+
     @Override
-    public void updateGravity(boolean initialGravity) {
+    public void updateGravity(RotationParameters rotationParameters, boolean initialGravity) {
         if (canChangeGravity()) {
             Direction newGravity = getActualGravityDirection();
             Direction oldGravity = gravityDirection;
             if (oldGravity != newGravity) {
                 long timeMs = entity.world.getTime() * 50;
                 animation.applyRotationAnimation(
-                    newGravity, oldGravity,
-                    initialGravity ? 0 : animationDuration,
-                    entity, timeMs
+                        newGravity, oldGravity,
+                        initialGravity ? 0 : rotationParameters.rotationTime(),
+                        entity, timeMs, rotationParameters.rotateView()
                 );
                 prevGravityDirection = oldGravity;
                 gravityDirection = newGravity;
-                onGravityChanged(oldGravity, newGravity, initialGravity);
+                onGravityChanged(oldGravity, newGravity, rotationParameters, initialGravity);
             }
-            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
         }
     }
     
     @Override
     public Direction getActualGravityDirection() {
-        Gravity primaryGravity = null;
-        for (Gravity temp : gravityList) {
-            if (primaryGravity != null) {
-                if (temp.priority > primaryGravity.priority) {
-                    primaryGravity = temp;
-                }
-            }
-            else {
-                primaryGravity = temp;
-            }
-        }
         Direction newGravity = getDefaultGravityDirection();
-        if (primaryGravity != null) {
-            newGravity = primaryGravity.gravityDirection;
+        Gravity highestPriority = getHighestPriority();
+        if (highestPriority != null) {
+            newGravity = highestPriority.direction();
         }
         if (isInverted) {
             newGravity = newGravity.getOpposite();
         }
         return newGravity;
     }
-    
+
+    @Nullable
+    private Gravity getHighestPriority() {
+        if(!gravityList.isEmpty()) {
+            return Collections.max(gravityList, Comparator.comparingInt(Gravity::priority));
+        }else{
+            return null;
+        }
+    }
+
     @Override
-    public void setDefaultGravityDirection(Direction gravityDirection, int animationDurationMs) {
+    public void setDefaultGravityDirection(Direction gravityDirection, RotationParameters rotationParameters, boolean initialGravity) {
         if (canChangeGravity()) {
-            this.defaultGravityDirection = gravityDirection;
-            this.animationDuration = animationDurationMs;
-            this.updateGravity(false);
-            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+            defaultGravityDirection = gravityDirection;
+            updateGravity(rotationParameters, initialGravity);
         }
     }
     
     @Override
     public void addGravity(Gravity gravity, boolean initialGravity) {
         if (canChangeGravity()) {
-            int index = 0;
-            boolean addValue = true;
-            for (Gravity temp : gravityList) {
-                if (Objects.equals(temp.source, gravity.source)) {
-                    gravityList.set(index, gravity);
-                    addValue = false;
-                    break;
-                }
-                index++;
-            }
-            if (addValue)
-                this.gravityList.add(gravity);
-            //this.updateGravity(initialGravity);
-            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+            gravityList.removeIf(g -> Objects.equals(g.source(), gravity.source()));
+            if(gravity.direction() != null)
+                gravityList.add(gravity);
+            updateGravity(gravity.rotationParameters(), initialGravity);
         }
     }
     
@@ -220,33 +218,40 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     public ArrayList<Gravity> getGravity() {
         return gravityList;
     }
-    
+
     @Override
-    public void setGravity(ArrayList<Gravity> gravityList, boolean initalGravity) {
-        this.gravityList = gravityList;
-        //this.updateGravity(initalGravity);
-        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
-        //this.updateGravity(initalGravity);
+    public void setGravity(ArrayList<Gravity> _gravityList, boolean initialGravity) {
+        Gravity highestBefore = getHighestPriority();
+        gravityList = _gravityList;
+        Gravity highestAfter = getHighestPriority();
+        if(highestBefore != highestAfter){
+            if(highestBefore == null){
+                updateGravity(highestAfter.rotationParameters(), initialGravity);
+            }else if(highestAfter == null){
+                updateGravity(highestBefore.rotationParameters(), initialGravity);
+            }else if(highestBefore.priority() > highestAfter.priority()){
+                updateGravity(highestBefore.rotationParameters(), initialGravity);
+            }else{
+                updateGravity(highestAfter.rotationParameters(), initialGravity);
+            }
+        }
     }
-    
+
     @Override
-    public void invertGravity(boolean isInverted) {
-        this.isInverted = isInverted;
-        this.updateGravity(false);
-        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+    public void invertGravity(boolean _isInverted, RotationParameters rotationParameters, boolean initialGravity) {
+        isInverted = _isInverted;
+        updateGravity(rotationParameters, initialGravity);
     }
     
     @Override
     public boolean getInvertGravity() {
         return this.isInverted;
     }
-    
+
     @Override
-    public void clearGravity() {
-        this.gravityList = new ArrayList<Gravity>();
-        this.updateGravity(false);
-        GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
-        //this.updateGravity(false);
+    public void clearGravity(RotationParameters rotationParameters, boolean initialGravity) {
+        gravityList.clear();
+        updateGravity(rotationParameters, initialGravity);
     }
     
     @Override
@@ -256,9 +261,11 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
     
     @Override
     public void readFromNbt(NbtCompound nbt) {
+        Direction oldDefaultGravity = defaultGravityDirection;
+        ArrayList<Gravity> oldList = gravityList;
         if (nbt.contains("ListSize", NbtElement.INT_TYPE)) {
             int listSize = nbt.getInt("ListSize");
-            ArrayList<Gravity> newGravityList = new ArrayList<Gravity>();
+            ArrayList<Gravity> newGravityList = new ArrayList<>();
             if (listSize != 0) {
                 for (int index = 0; index < listSize; index++) {
                     Gravity newGravity = new Gravity(
@@ -270,44 +277,66 @@ public class GravityDirectionComponent implements GravityComponent, AutoSyncedCo
                     newGravityList.add(newGravity);
                 }
             }
-            this.gravityList = (newGravityList);
+            gravityList = newGravityList;
         }
-        if (nbt.contains("PrevGravityDirection", NbtElement.INT_TYPE)) {
-            this.prevGravityDirection = (Direction.byId(nbt.getInt("PrevGravityDirection")));
+        prevGravityDirection = Direction.byId(nbt.getInt("PrevGravityDirection"));
+        defaultGravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
+        isInverted = nbt.getBoolean("IsGravityInverted");
+        RotationParameters rp = new RotationParameters(false, false, false, 0);
+        updateGravity(rp, true);
+        if(oldDefaultGravity != defaultGravityDirection) {
+            NetworkUtil.sendDefaultGravityToClient(entity, defaultGravityDirection, rp, true);
         }
-        if (nbt.contains("DefaultGravityDirection", NbtElement.INT_TYPE)) {
-            this.defaultGravityDirection = (Direction.byId(nbt.getInt("DefaultGravityDirection")));
+        if(!(oldList.isEmpty() && gravityList.isEmpty())) {
+            NetworkUtil.sendOverwriteGravityListToClient(entity, gravityList, true);
         }
-        this.isInverted = (nbt.getBoolean("IsGravityInverted"));
-        this.animationDuration = nbt.getInt("animationTimeMs");
-        this.animation.fromNbt(nbt);
-        
-        this.updateGravity(initalSpawn);
-        
-        if (initalSpawn) {
-            initalSpawn = false;
-        }
-        
     }
     
     @Override
     public void writeToNbt(@NotNull NbtCompound nbt) {
         int index = 0;
-        if (!this.getGravity().isEmpty())
-            for (Gravity temp : this.getGravity()) {
-                if (temp.gravityDirection != null)
-                    nbt.putInt("GravityDirection " + index, temp.getGravityDirection().getId());
-                nbt.putInt("GravityPriority " + index, temp.getPriority());
-                nbt.putInt("GravityDuration " + index, temp.getGravityDuration());
-                if (temp.source != null)
-                    nbt.putString("GravitySource " + index, temp.getSource());
+        for (Gravity temp : getGravity()) {
+            if (temp.direction() != null && temp.source() != null) {
+                nbt.putInt("GravityDirection " + index, temp.direction().getId());
+                nbt.putInt("GravityPriority " + index, temp.priority());
+                nbt.putInt("GravityDuration " + index, temp.duration());
+                nbt.putString("GravitySource " + index, temp.source());
                 index++;
             }
+        }
         nbt.putInt("ListSize", index);
         nbt.putInt("PrevGravityDirection", this.getPrevGravityDirection().getId());
         nbt.putInt("DefaultGravityDirection", this.getDefaultGravityDirection().getId());
         nbt.putBoolean("IsGravityInverted", this.getInvertGravity());
-        nbt.putInt("animationTimeMs", animationDuration);
-        this.animation.toNbt(nbt);
+    }
+
+    @Override
+    public void serverTick() {
+        tick();
+    }
+
+    @Override
+    public void clientTick() {
+        tick();
+    }
+
+    private void tick(){
+        Entity vehicle = entity.getVehicle();
+        if (vehicle != null) {
+            addGravity(new Gravity(GravityChangerAPI.getGravityDirection(vehicle), 99999999, 2, "vehicle"), true);
+        }
+        ArrayList<Gravity> gravityList = getGravity();
+        Gravity highestBefore = getHighestPriority();
+        if(gravityList.removeIf(g -> g.duration() == 0)){
+            Gravity highestAfter = getHighestPriority();
+            if(highestBefore != null && highestBefore != highestAfter) {
+                updateGravity(highestBefore.rotationParameters(), false);
+            }
+        }
+        for (Gravity temp : gravityList) {
+            if (temp.duration() > 0) {
+                temp.decrementDuration();
+            }
+        }
     }
 }
