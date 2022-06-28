@@ -26,32 +26,6 @@ public abstract class FishingBobberEntityMixin extends Entity {
     }
 
 
-    /*@Override
-    public Direction gravitychanger$getAppliedGravityDirection() {
-        Entity vehicle = this.getVehicle();
-        if(vehicle != null) {
-            return GravityChangerAPI.getGravityDirection(vehicle);
-        }
-
-        return GravityChangerAPI.getGravityDirection((FishingBobberEntity)(Object)this);
-    }*/
-
-/*
-    @ModifyVariable(
-            method = "tick",
-            at = @At(
-                    value = "STORE"
-            )
-            ,ordinal = 0
-    )
-    public Vec3d tick(Vec3d modify){
-        modify = new Vec3d(modify.x, modify.y+0.05, modify.z);
-        modify = RotationUtil.vecWorldToPlayer(modify,gravitychanger$getGravityDirection());
-        modify = new Vec3d(modify.x, modify.y-0.05, modify.z);
-        modify = RotationUtil.vecPlayerToWorld(modify,gravitychanger$getGravityDirection());
-        return  modify;
-    }*/
-
     @Redirect(
             method = "<init>(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/world/World;II)V",
             at = @At(

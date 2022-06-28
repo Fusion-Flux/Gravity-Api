@@ -205,7 +205,7 @@ public abstract class EntityMixin{
             at = @At("HEAD"),
             cancellable = true
     )
-    private void inject_getBrightnessAtEyes(CallbackInfoReturnable<Float> cir) {
+    private void inject_getBrightnessAtFEyes(CallbackInfoReturnable<Float> cir) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
 

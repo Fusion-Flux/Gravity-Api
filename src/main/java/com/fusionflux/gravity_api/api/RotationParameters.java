@@ -10,7 +10,7 @@ public class RotationParameters {
     private int rotationTime;//Milliseconds
     public RotationParameters(){
         this(
-                !GravityChangerMod.config.worldVelocity,
+                GravityChangerMod.config.worldVelocity,
                 !GravityChangerMod.config.keepWorldLook,
                 false,
                 GravityChangerMod.config.rotationTime
