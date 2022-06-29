@@ -45,12 +45,15 @@ public class NetworkUtil {
     }
 
     private static void sendToTracking(Entity entity, Identifier channel, PacketByteBuf buf){
-        for (ServerPlayerEntity player : PlayerLookup.tracking(entity))
-            if(player != entity)
-                ServerPlayNetworking.send(player, channel, buf);
         //PlayerLookup.tracking(entity) might not return the player if entity is a player, so it has to be done separately
         if(entity instanceof ServerPlayerEntity player)
             ServerPlayNetworking.send(player, channel, buf);
+        sendToTrackingExcludingSelf(entity, channel, buf);
+    }
+    private static void sendToTrackingExcludingSelf(Entity entity, Identifier channel, PacketByteBuf buf){
+        for (ServerPlayerEntity player : PlayerLookup.tracking(entity))
+            if(player != entity)
+                ServerPlayNetworking.send(player, channel, buf);
     }
 
     public static void write(PacketByteBuf buf, Direction direction){
@@ -66,8 +69,8 @@ public class NetworkUtil {
 
     public static void write(PacketByteBuf buf, Gravity gravity){
         write(buf, gravity.direction());
-        buf.writeInt(gravity.duration());
         buf.writeInt(gravity.priority());
+        buf.writeInt(gravity.duration());
         buf.writeString(gravity.source());
         write(buf, gravity.rotationParameters());
     }

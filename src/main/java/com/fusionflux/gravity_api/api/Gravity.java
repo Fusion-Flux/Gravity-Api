@@ -4,8 +4,8 @@ import net.minecraft.util.math.Direction;
 
 public class Gravity {
     private final Direction direction;
-    private int duration;
     private final int priority;
+    private int duration;
     private final String source;
     private final RotationParameters rotationParameters;
 
