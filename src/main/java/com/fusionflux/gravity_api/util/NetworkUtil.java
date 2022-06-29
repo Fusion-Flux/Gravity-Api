@@ -24,10 +24,13 @@ import java.util.Optional;
 
 
 public class NetworkUtil {
+    //Channels
     public static final Identifier CHANNEL_OVERWRITE_GRAVITY_LIST = GravityChangerMod.id("overwrite_gravity_list");
     public static final Identifier CHANNEL_UPDATE_GRAVITY_LIST = GravityChangerMod.id("update_gravity_list");
     public static final Identifier CHANNEL_DEFAULT_GRAVITY = GravityChangerMod.id("default_gravity");
     public static final Identifier CHANNEL_INVERTED = GravityChangerMod.id("inverted");
+
+    //Access gravity component
 
     private static Optional<GravityComponent> getGravityComponent(MinecraftClient client, int entityId){
         if(client.world == null) return Optional.empty();
@@ -44,17 +47,22 @@ public class NetworkUtil {
         return Optional.of(gc);
     }
 
+    //Sending packets to players that are tracking an entity
+
     private static void sendToTracking(Entity entity, Identifier channel, PacketByteBuf buf){
         //PlayerLookup.tracking(entity) might not return the player if entity is a player, so it has to be done separately
         if(entity instanceof ServerPlayerEntity player)
             ServerPlayNetworking.send(player, channel, buf);
         sendToTrackingExcludingSelf(entity, channel, buf);
     }
+
     private static void sendToTrackingExcludingSelf(Entity entity, Identifier channel, PacketByteBuf buf){
         for (ServerPlayerEntity player : PlayerLookup.tracking(entity))
             if(player != entity)
                 ServerPlayNetworking.send(player, channel, buf);
     }
+
+    //Writing to buffer
 
     public static void write(PacketByteBuf buf, Direction direction){
         buf.writeByte(direction == null ? -1 : direction.getId());
@@ -74,6 +82,8 @@ public class NetworkUtil {
         buf.writeString(gravity.source());
         write(buf, gravity.rotationParameters());
     }
+
+    //Reading from buffer
 
     public static RotationParameters readRotationParameters(PacketByteBuf buf){
         return new RotationParameters(
