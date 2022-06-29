@@ -7,6 +7,7 @@ import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.util.*;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.command.argument.RotationArgumentType;
 import org.jetbrains.annotations.Nullable;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
@@ -122,6 +123,19 @@ public abstract class GravityChangerAPI {
         }
     }
 
+    /**
+    * Update gravity should always be automatically called when you call any api function
+    * that could result in a gravityDirection change.
+    * */
+    public static void updateGravity(Entity entity) {
+        updateGravity(entity, new RotationParameters());
+    }
+    public static void updateGravity(Entity entity, RotationParameters rotationParameters) {
+        if (EntityTags.canChangeGravity(entity)) {
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.updateGravity(rotationParameters,false));
+        }
+    }
+
     public static void setGravity(Entity entity, ArrayList<Gravity> gravity) {
         if(onCorrectSide(entity, true)) {
             if (EntityTags.canChangeGravity(entity)) {
@@ -142,6 +156,10 @@ public abstract class GravityChangerAPI {
                 });
             }
         }
+    }
+
+    public static void setIsInverted(Entity entity, boolean isInverted){
+        setIsInverted(entity, isInverted, new RotationParameters());
     }
 
     public static void setIsInverted(Entity entity, boolean isInverted, RotationParameters rotationParameters) {
@@ -166,6 +184,10 @@ public abstract class GravityChangerAPI {
         }
     }
 
+    public static void clearGravity(Entity entity){
+        clearGravity(entity, new RotationParameters());
+    }
+
     public static void clearGravity(Entity entity, RotationParameters rotationParameters) {
         if(onCorrectSide(entity, true)) {
             if (EntityTags.canChangeGravity(entity)) {
@@ -186,6 +208,15 @@ public abstract class GravityChangerAPI {
                 });
             }
         }
+    }
+
+    @Deprecated
+    public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection, int animationDurationMs) {
+        setDefaultGravityDirection(entity, gravityDirection, new RotationParameters().rotationTime(animationDurationMs));
+    }
+
+    public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection) {
+        setDefaultGravityDirection(entity, gravityDirection, new RotationParameters());
     }
 
     public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection, RotationParameters rotationParameters) {
