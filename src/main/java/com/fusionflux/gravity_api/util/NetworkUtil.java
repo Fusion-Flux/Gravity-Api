@@ -1,7 +1,6 @@
 package com.fusionflux.gravity_api.util;
 
 import com.fusionflux.gravity_api.GravityChangerMod;
-import com.fusionflux.gravity_api.api.Gravity;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.api.GravityVerifier;
 import com.fusionflux.gravity_api.api.RotationParameters;
@@ -219,9 +218,6 @@ public class NetworkUtil {
         boolean initialGravity = buf.readBoolean();
         server.execute(() -> {
             getGravityComponent(player).ifPresent(gc -> {
-                GravityVerifier.SetDefaultGravityVerifier test = GravityVerifier.getForSetDefaultGravity(new Identifier(GravityChangerMod.MOD_ID, "test"));
-                if(test == null) return;
-                if(!test.check(player, PacketByteBufs.create(), direction)) return;
                 gc.setDefaultGravityDirection(direction, rotationParameters, initialGravity);
             });
         });

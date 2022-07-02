@@ -1,6 +1,7 @@
 package com.fusionflux.gravity_api.api;
 
 import com.fusionflux.gravity_api.GravityChangerMod;
+import com.fusionflux.gravity_api.util.Gravity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -10,48 +11,23 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class GravityVerifier {
-    private static final HashMap<Identifier, AddGravityVerifier> addGravityMap = new HashMap<>();
-    private static final HashMap<Identifier, SetDefaultGravityVerifier> setDefaultGravityMap = new HashMap<>();
-    private static final HashMap<Identifier, SetGravityVerifier> setGravityMap = new HashMap<>();
-    private static final HashMap<Identifier, SetInvertedVerifier> setInvertedMap = new HashMap<>();
+public class GravityVerifier<VF> {
+    public static final GravityVerifier<AddGravityVerifier> ADD_GRAVITY = new GravityVerifier<>();
+    public static final GravityVerifier<SetDefaultGravityVerifier> SET_DEFAULT_GRAVITY = new GravityVerifier<>();
+    public static final GravityVerifier<SetGravityVerifier> SET_GRAVITY = new GravityVerifier<>();
+    public static final GravityVerifier<SetInvertedVerifier> SET_INVERTED = new GravityVerifier<>();
 
-    public static void registerForAddGravity(Identifier id, AddGravityVerifier func){
-        if(addGravityMap.containsKey(id))
+    private final HashMap<Identifier, VF> map = new HashMap<>();
+
+    public void register(Identifier id, VF func){
+        if(map.containsKey(id))
             GravityChangerMod.LOGGER.error("AddGravityVerifier function already set for identifier "+id, new Exception());
-        addGravityMap.put(id, func);
-    }
-    public static void registerForSetDefaultGravity(Identifier id, SetDefaultGravityVerifier func){
-        if(setDefaultGravityMap.containsKey(id))
-            GravityChangerMod.LOGGER.error("SetDefaultGravityVerifier function already set for identifier "+id, new Exception());
-        setDefaultGravityMap.put(id, func);
-    }
-    public static void registerForSetGravity(Identifier id, SetGravityVerifier func){
-        if(setGravityMap.containsKey(id))
-            GravityChangerMod.LOGGER.error("SetGravityVerifier function already set for identifier "+id, new Exception());
-        setGravityMap.put(id, func);
-    }
-    public static void registerForSetInverted(Identifier id, SetInvertedVerifier func){
-        if(setInvertedMap.containsKey(id))
-            GravityChangerMod.LOGGER.error("SetInvertedVerifier function already set for identifier "+id, new Exception());
-        setInvertedMap.put(id, func);
+        map.put(id, func);
     }
 
     @Nullable
-    public static AddGravityVerifier getForAddGravity(Identifier id){
-        return addGravityMap.get(id);
-    }
-    @Nullable
-    public static SetDefaultGravityVerifier getForSetDefaultGravity(Identifier id){
-        return setDefaultGravityMap.get(id);
-    }
-    @Nullable
-    public static SetGravityVerifier getForSetGravity(Identifier id){
-        return setGravityMap.get(id);
-    }
-    @Nullable
-    public static SetInvertedVerifier getForSetInverted(Identifier id){
-        return setInvertedMap.get(id);
+    public VF get(Identifier id){
+        return map.get(id);
     }
 
     public interface AddGravityVerifier{ boolean check(ServerPlayerEntity player, PacketByteBuf buf, Gravity gravity);}

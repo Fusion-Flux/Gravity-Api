@@ -7,7 +7,6 @@ import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.util.*;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.command.argument.RotationArgumentType;
 import org.jetbrains.annotations.Nullable;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
