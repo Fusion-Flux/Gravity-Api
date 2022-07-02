@@ -1,21 +1,22 @@
-package com.fusionflux.gravity_api.util;
+package com.fusionflux.gravity_api.util.packet;
 
 import com.fusionflux.gravity_api.api.RotationParameters;
+import com.fusionflux.gravity_api.util.GravityComponent;
+import com.fusionflux.gravity_api.util.NetworkUtil;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.math.Direction;
 
 public class InvertGravityPacket extends GravityPacket{
-    private final boolean inverted;
-    private final RotationParameters rotationParameters;
-    private final boolean initialGravity;
+    final boolean inverted;
+    final RotationParameters rotationParameters;
+    final boolean initialGravity;
 
-    InvertGravityPacket(boolean _inverted, RotationParameters _rotationParameters, boolean _initialGravity){
+    public InvertGravityPacket(boolean _inverted, RotationParameters _rotationParameters, boolean _initialGravity){
         inverted = _inverted;
         rotationParameters = _rotationParameters;
         initialGravity = _initialGravity;
     }
 
-    InvertGravityPacket(PacketByteBuf buf) {
+    public InvertGravityPacket(PacketByteBuf buf) {
         this(
             buf.readBoolean(),
             NetworkUtil.readRotationParameters(buf),

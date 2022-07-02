@@ -294,7 +294,7 @@ public class GravityDirectionComponent implements GravityComponent {
         //Update
         RotationParameters rp = new RotationParameters(false, false, false, 0);
         updateGravity(rp, true);
-        //Check if an initial sync is required (actual sync happens in tick() because networkhandler isn't initialised here yet)
+        //Check if an initial sync is required (actual sync happens in tick() because the network handler isn't initialised here yet)
         if (oldDefaultGravity != defaultGravityDirection) needsInitialSync = true;
         if (oldList.isEmpty() != gravityList.isEmpty()) needsInitialSync = true;
         if (oldIsInverted != isInverted) needsInitialSync = true;
@@ -338,10 +338,7 @@ public class GravityDirectionComponent implements GravityComponent {
         }
         if(!entity.world.isClient && needsInitialSync){
             needsInitialSync = false;
-            RotationParameters rp = new RotationParameters(false, false, false, 0);
-            NetworkUtil.sendOverwriteGravityListToClient(entity, gravityList, true);
-            NetworkUtil.sendDefaultGravityToClient(entity, defaultGravityDirection, rp, true);
-            NetworkUtil.sendInvertedToClient(entity, isInverted, rp, true);
+            GravityChannel.sendFullStatePacket(entity, NetworkUtil.PacketMode.EVERYONE);
         }
     }
 }

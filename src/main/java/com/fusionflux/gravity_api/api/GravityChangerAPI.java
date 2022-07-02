@@ -6,7 +6,12 @@ import java.util.Optional;
 import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.util.*;
+import com.fusionflux.gravity_api.util.packet.DefaultGravityPacket;
+import com.fusionflux.gravity_api.util.packet.InvertGravityPacket;
+import com.fusionflux.gravity_api.util.packet.OverwriteGravityPacket;
+import com.fusionflux.gravity_api.util.packet.UpdateGravityPacket;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.network.PacketByteBuf;
 import org.jetbrains.annotations.Nullable;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
@@ -105,18 +110,18 @@ public abstract class GravityChangerAPI {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.addGravity(gravity, false);
-                    NetworkUtil.sendUpdateGravityListToClient(entity, gravity, false);
+                    GravityChannel.UPDATE_GRAVITY.sendToClient(entity, new UpdateGravityPacket(gravity, false), NetworkUtil.PacketMode.EVERYONE);
                 });
             }
         }
     }
 
-    public static void addGravityClient(ClientPlayerEntity entity, Gravity gravity) {
+    public static void addGravityClient(ClientPlayerEntity entity, Gravity gravity, Identifier verifier, PacketByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.addGravity(gravity, false);
-                    NetworkUtil.sendUpdateGravityListToServer(gravity, false);
+                    GravityChannel.UPDATE_GRAVITY.sendToServer(new UpdateGravityPacket(gravity, false), verifier, verifierInfo);
                 });
             }
         }
@@ -140,18 +145,18 @@ public abstract class GravityChangerAPI {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.setGravity(gravity, false);
-                    NetworkUtil.sendOverwriteGravityListToClient(entity, gravity, false);
+                    GravityChannel.OVERWRITE_GRAVITY.sendToClient(entity, new OverwriteGravityPacket(gravity, false), NetworkUtil.PacketMode.EVERYONE);
                 });
             }
         }
     }
 
-    public static void setGravityClient(ClientPlayerEntity entity, ArrayList<Gravity> gravity) {
+    public static void setGravityClient(ClientPlayerEntity entity, ArrayList<Gravity> gravity, Identifier verifier, PacketByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.setGravity(gravity, false);
-                    NetworkUtil.sendOverwriteGravityListToServer(gravity, false);
+                    GravityChannel.OVERWRITE_GRAVITY.sendToServer(new OverwriteGravityPacket(gravity, false), verifier, verifierInfo);
                 });
             }
         }
@@ -166,18 +171,18 @@ public abstract class GravityChangerAPI {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.invertGravity(isInverted, rotationParameters, false);
-                    NetworkUtil.sendInvertedToClient(entity, isInverted, rotationParameters, false);
+                    GravityChannel.INVERT_GRAVITY.sendToClient(entity, new InvertGravityPacket(isInverted, rotationParameters, false), NetworkUtil.PacketMode.EVERYONE);
                 });
             }
         }
     }
 
-    public static void setIsInvertedClient(ClientPlayerEntity entity, boolean isInverted, RotationParameters rotationParameters) {
+    public static void setIsInvertedClient(ClientPlayerEntity entity, boolean isInverted, RotationParameters rotationParameters, Identifier verifier, PacketByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.invertGravity(isInverted, rotationParameters, false);
-                    NetworkUtil.sendInvertedToServer(isInverted, rotationParameters, false);
+                    GravityChannel.INVERT_GRAVITY.sendToServer(new InvertGravityPacket(isInverted, rotationParameters, false), verifier, verifierInfo);
                 });
             }
         }
@@ -192,18 +197,18 @@ public abstract class GravityChangerAPI {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.clearGravity(rotationParameters, false);
-                    NetworkUtil.sendOverwriteGravityListToClient(entity, new ArrayList<>(), false);
+                    GravityChannel.OVERWRITE_GRAVITY.sendToClient(entity, new OverwriteGravityPacket( new ArrayList<>(), false), NetworkUtil.PacketMode.EVERYONE);
                 });
             }
         }
     }
 
-    public static void clearGravityClient(ClientPlayerEntity entity, RotationParameters rotationParameters) {
+    public static void clearGravityClient(ClientPlayerEntity entity, RotationParameters rotationParameters, Identifier verifier, PacketByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.clearGravity(rotationParameters, false);
-                    NetworkUtil.sendOverwriteGravityListToServer(new ArrayList<>(), false);
+                    GravityChannel.OVERWRITE_GRAVITY.sendToServer(new OverwriteGravityPacket(new ArrayList<>(), false), verifier, verifierInfo);
                 });
             }
         }
@@ -223,18 +228,18 @@ public abstract class GravityChangerAPI {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.setDefaultGravityDirection(gravityDirection, rotationParameters, false);
-                    NetworkUtil.sendDefaultGravityToClient(entity, gravityDirection, rotationParameters, false);
+                    GravityChannel.DEFAULT_GRAVITY.sendToClient(entity, new DefaultGravityPacket(gravityDirection, rotationParameters, false), NetworkUtil.PacketMode.EVERYONE);
                 });
             }
         }
     }
 
-    public static void setDefaultGravityDirectionClient(ClientPlayerEntity entity, Direction gravityDirection, RotationParameters rotationParameters) {
+    public static void setDefaultGravityDirectionClient(ClientPlayerEntity entity, Direction gravityDirection, RotationParameters rotationParameters, Identifier verifier, PacketByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.setDefaultGravityDirection(gravityDirection, rotationParameters, false);
-                    NetworkUtil.sendDefaultGravityToServer(gravityDirection, rotationParameters, false);
+                    GravityChannel.DEFAULT_GRAVITY.sendToServer(new DefaultGravityPacket(gravityDirection, rotationParameters, false), verifier, verifierInfo);
                 });
             }
         }

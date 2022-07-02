@@ -1,8 +1,13 @@
 package com.fusionflux.gravity_api.util;
 
+import com.fusionflux.gravity_api.GravityChangerMod;
+import com.fusionflux.gravity_api.api.GravityVerifierRegistry;
+import com.fusionflux.gravity_api.api.RotationParameters;
+import com.fusionflux.gravity_api.util.packet.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.Entity;
@@ -15,12 +20,19 @@ import net.minecraft.util.Identifier;
 import static com.fusionflux.gravity_api.util.NetworkUtil.*;
 
 public class GravityChannel<P extends GravityPacket> {
+    public static GravityChannel<OverwriteGravityPacket> OVERWRITE_GRAVITY = new GravityChannel<>(OverwriteGravityPacket::new, GravityChangerMod.id("overwrite_gravity_list"));
+    public static GravityChannel<UpdateGravityPacket> UPDATE_GRAVITY = new GravityChannel<>(UpdateGravityPacket::new, GravityChangerMod.id("update_gravity_list"));
+    public static GravityChannel<DefaultGravityPacket> DEFAULT_GRAVITY = new GravityChannel<>(DefaultGravityPacket::new, GravityChangerMod.id("default_gravity"));
+    public static GravityChannel<InvertGravityPacket> INVERT_GRAVITY = new GravityChannel<>(InvertGravityPacket::new, GravityChangerMod.id("inverted"));
+
     private final Factory<P> packetFactory;
     private final Identifier channel;
+    private final GravityVerifierRegistry<P> gravityVerifierRegistry;
 
     GravityChannel(Factory<P> _packetFactory, Identifier _channel){
         packetFactory = _packetFactory;
         channel = _channel;
+        gravityVerifierRegistry = new GravityVerifierRegistry<>();
     }
 
     public void sendToClient(Entity entity, P packet, PacketMode mode){
@@ -32,7 +44,7 @@ public class GravityChannel<P extends GravityPacket> {
 
     public void receiveFromServer(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender){
         int entityId = buf.readInt();
-        GravityPacket packet = packetFactory.read(buf);
+        P packet = packetFactory.read(buf);
         client.execute(() -> {
             getGravityComponent(client, entityId).ifPresent(packet::run);
         });
@@ -47,13 +59,55 @@ public class GravityChannel<P extends GravityPacket> {
     }
 
     public void receiveFromClient(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender){
-        int listSize = buf.readInt();
-        GravityPacket packet = packetFactory.read(buf);
+        P packet = packetFactory.read(buf);
         Identifier verifier = buf.readIdentifier();
         PacketByteBuf verifierInfoBuf = PacketByteBufs.create().writeByteArray(buf.readByteArray());
         server.execute(() -> {
-            getGravityComponent(player).ifPresent(packet::run);
+            getGravityComponent(player).ifPresent(gc -> {
+                GravityVerifierRegistry.VerifierFunction<P> v = gravityVerifierRegistry.get(verifier);
+                if (v != null && v.check(player, verifierInfoBuf, packet)) {
+                    packet.run(gc);
+                    sendToClient(player, packet, PacketMode.EVERYONE_BUT_SELF);
+                }else {
+                    sendFullStatePacket(player, PacketMode.ONLY_SELF);
+                }
+            });
         });
+    }
+
+    public static void sendFullStatePacket(Entity entity, PacketMode mode){
+        getGravityComponent(entity).ifPresent(gc -> {
+            RotationParameters rp = new RotationParameters(false, false, false, 0);
+            OVERWRITE_GRAVITY.sendToClient(entity, new OverwriteGravityPacket(gc.getGravity(), true), mode);
+            DEFAULT_GRAVITY.sendToClient(entity, new DefaultGravityPacket(gc.getDefaultGravityDirection(), rp, true), mode);
+            INVERT_GRAVITY.sendToClient(entity, new InvertGravityPacket(gc.getInvertGravity(), rp, true), mode);
+        });
+    }
+
+    public GravityVerifierRegistry<P> getVerifierRegistry(){
+        return gravityVerifierRegistry;
+    }
+
+    public void registerClientReceiver(){
+        ClientPlayNetworking.registerGlobalReceiver(channel, this::receiveFromServer);
+    }
+
+    public void registerServerReceiver(){
+        ServerPlayNetworking.registerGlobalReceiver(channel, this::receiveFromClient);
+    }
+
+    public static void initClient() {
+        DEFAULT_GRAVITY.registerClientReceiver();
+        UPDATE_GRAVITY.registerClientReceiver();
+        OVERWRITE_GRAVITY.registerClientReceiver();
+        INVERT_GRAVITY.registerClientReceiver();
+    }
+
+    public static void initServer() {
+        DEFAULT_GRAVITY.registerServerReceiver();
+        UPDATE_GRAVITY.registerServerReceiver();
+        OVERWRITE_GRAVITY.registerServerReceiver();
+        INVERT_GRAVITY.registerServerReceiver();
     }
 
     @FunctionalInterface

@@ -1,9 +1,10 @@
 package com.fusionflux.gravity_api.util;
 
-import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.api.RotationParameters;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import com.fusionflux.gravity_api.util.packet.DefaultGravityPacket;
+import com.fusionflux.gravity_api.util.packet.InvertGravityPacket;
+import com.fusionflux.gravity_api.util.packet.OverwriteGravityPacket;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
@@ -17,17 +18,6 @@ import java.util.Optional;
 
 
 public class NetworkUtil {
-    //Channels
-    public static final Identifier CHANNEL_OVERWRITE_GRAVITY_LIST = GravityChangerMod.id("overwrite_gravity_list");
-    public static final Identifier CHANNEL_UPDATE_GRAVITY_LIST = GravityChangerMod.id("update_gravity_list");
-    public static final Identifier CHANNEL_DEFAULT_GRAVITY = GravityChangerMod.id("default_gravity");
-    public static final Identifier CHANNEL_INVERTED = GravityChangerMod.id("inverted");
-
-    public static GravityChannel<OverwriteGravityPacket> OVERWRITE_GRAVITY = new GravityChannel<>(OverwriteGravityPacket::new, CHANNEL_OVERWRITE_GRAVITY_LIST);
-    public static GravityChannel<UpdateGravityPacket> UPDATE_GRAVITY = new GravityChannel<>(UpdateGravityPacket::new, CHANNEL_UPDATE_GRAVITY_LIST);
-    public static GravityChannel<DefaultGravityPacket> DEFAULT_GRAVITY = new GravityChannel<>(DefaultGravityPacket::new, CHANNEL_DEFAULT_GRAVITY);
-    public static GravityChannel<InvertGravityPacket> INVERT_GRAVITY = new GravityChannel<>(InvertGravityPacket::new, CHANNEL_INVERTED);
-
     //PacketMode
     public enum PacketMode{
         EVERYONE,
@@ -46,8 +36,8 @@ public class NetworkUtil {
         return Optional.of(gc);
     }
 
-    public static Optional<GravityComponent> getGravityComponent(ServerPlayerEntity player){
-        GravityComponent gc = GravityChangerAPI.getGravityComponent(player);
+    public static Optional<GravityComponent> getGravityComponent(Entity entity){
+        GravityComponent gc = GravityChangerAPI.getGravityComponent(entity);
         if(gc == null) return Optional.empty();
         return Optional.of(gc);
     }
@@ -110,21 +100,5 @@ public class NetworkUtil {
                 buf.readString(),
                 readRotationParameters(buf)
         );
-    }
-
-    //Initialise Client and Server
-
-    public static void initClient() {
-        ClientPlayNetworking.registerGlobalReceiver(CHANNEL_DEFAULT_GRAVITY, DEFAULT_GRAVITY::receiveFromServer);
-        ClientPlayNetworking.registerGlobalReceiver(CHANNEL_UPDATE_GRAVITY_LIST, UPDATE_GRAVITY::receiveFromServer);
-        ClientPlayNetworking.registerGlobalReceiver(CHANNEL_OVERWRITE_GRAVITY_LIST, OVERWRITE_GRAVITY::receiveFromServer);
-        ClientPlayNetworking.registerGlobalReceiver(CHANNEL_INVERTED, INVERT_GRAVITY::receiveFromServer);
-    }
-
-    public static void initServer() {
-        ServerPlayNetworking.registerGlobalReceiver(CHANNEL_DEFAULT_GRAVITY, DEFAULT_GRAVITY::receiveFromClient);
-        ServerPlayNetworking.registerGlobalReceiver(CHANNEL_UPDATE_GRAVITY_LIST, UPDATE_GRAVITY::receiveFromClient);
-        ServerPlayNetworking.registerGlobalReceiver(CHANNEL_OVERWRITE_GRAVITY_LIST, OVERWRITE_GRAVITY::receiveFromClient);
-        ServerPlayNetworking.registerGlobalReceiver(CHANNEL_INVERTED, INVERT_GRAVITY::receiveFromClient);
     }
 }

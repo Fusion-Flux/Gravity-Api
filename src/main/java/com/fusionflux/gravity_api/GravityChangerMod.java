@@ -1,9 +1,9 @@
 package com.fusionflux.gravity_api;
 
-import com.fusionflux.gravity_api.api.GravityVerifier;
 import com.fusionflux.gravity_api.command.GravityCommand;
 import com.fusionflux.gravity_api.config.GravityChangerConfig;
 import com.fusionflux.gravity_api.item.ModItems;
+import com.fusionflux.gravity_api.util.GravityChannel;
 import com.fusionflux.gravity_api.util.NetworkUtil;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,14 +30,14 @@ public class GravityChangerMod implements ModInitializer {
     @Override
     public void onInitialize() {
         ModItems.init();
-        NetworkUtil.initServer();
+        GravityChannel.initServer();
 
         AutoConfig.register(GravityChangerConfig.class, GsonConfigSerializer::new);
         config = AutoConfig.getConfigHolder(GravityChangerConfig.class).getConfig();
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> GravityCommand.register(dispatcher));
 
-        GravityVerifier.ADD_GRAVITY.register(TEST_VERIFIER, (player, packetByteBuf, gravity) -> true);
+        GravityChannel.DEFAULT_GRAVITY.getVerifierRegistry().register(TEST_VERIFIER, (player, packetByteBuf, packet) -> packet.direction != Direction.NORTH);
     }
 
     public static Identifier id(String path) {
