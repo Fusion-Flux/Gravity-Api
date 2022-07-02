@@ -15,13 +15,8 @@ public class DefaultGravityPacket extends GravityPacket {
         initialGravity = _initialGravity;
     }
 
-    @Override
-    public GravityPacket read(PacketByteBuf buf) {
-        return new DefaultGravityPacket(
-                NetworkUtil.readDirection(buf),
-                NetworkUtil.readRotationParameters(buf),
-                buf.readBoolean()
-        );
+    DefaultGravityPacket(PacketByteBuf buf){
+        this(NetworkUtil.readDirection(buf), NetworkUtil.readRotationParameters(buf), buf.readBoolean());
     }
 
     @Override

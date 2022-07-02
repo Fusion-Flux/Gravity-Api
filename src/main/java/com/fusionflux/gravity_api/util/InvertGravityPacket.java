@@ -15,12 +15,11 @@ public class InvertGravityPacket extends GravityPacket{
         initialGravity = _initialGravity;
     }
 
-    @Override
-    public GravityPacket read(PacketByteBuf buf) {
-        return new InvertGravityPacket(
-                buf.readBoolean(),
-                NetworkUtil.readRotationParameters(buf),
-                buf.readBoolean()
+    InvertGravityPacket(PacketByteBuf buf) {
+        this(
+            buf.readBoolean(),
+            NetworkUtil.readRotationParameters(buf),
+            buf.readBoolean()
         );
     }
 

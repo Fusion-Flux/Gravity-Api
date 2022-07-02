@@ -23,10 +23,17 @@ public class NetworkUtil {
     public static final Identifier CHANNEL_DEFAULT_GRAVITY = GravityChangerMod.id("default_gravity");
     public static final Identifier CHANNEL_INVERTED = GravityChangerMod.id("inverted");
 
-    public static GravityChannel<OverwriteGravityPacket> OVERWRITE_GRAVITY = new GravityChannel<>(new OverwriteGravityPacket(null, false), CHANNEL_OVERWRITE_GRAVITY_LIST);
-    public static GravityChannel<UpdateGravityPacket> UPDATE_GRAVITY = new GravityChannel<>(new UpdateGravityPacket(null, false), CHANNEL_UPDATE_GRAVITY_LIST);
-    public static GravityChannel<DefaultGravityPacket> DEFAULT_GRAVITY = new GravityChannel<>(new DefaultGravityPacket(null, null, false), CHANNEL_DEFAULT_GRAVITY);
-    public static GravityChannel<InvertGravityPacket> INVERT_GRAVITY = new GravityChannel<>(new InvertGravityPacket(false, null, false), CHANNEL_INVERTED);
+    public static GravityChannel<OverwriteGravityPacket> OVERWRITE_GRAVITY = new GravityChannel<>(OverwriteGravityPacket::new, CHANNEL_OVERWRITE_GRAVITY_LIST);
+    public static GravityChannel<UpdateGravityPacket> UPDATE_GRAVITY = new GravityChannel<>(UpdateGravityPacket::new, CHANNEL_UPDATE_GRAVITY_LIST);
+    public static GravityChannel<DefaultGravityPacket> DEFAULT_GRAVITY = new GravityChannel<>(DefaultGravityPacket::new, CHANNEL_DEFAULT_GRAVITY);
+    public static GravityChannel<InvertGravityPacket> INVERT_GRAVITY = new GravityChannel<>(InvertGravityPacket::new, CHANNEL_INVERTED);
+
+    //PacketMode
+    public enum PacketMode{
+        EVERYONE,
+        EVERYONE_BUT_SELF,
+        ONLY_SELF
+    }
 
     //Access gravity component
 
@@ -47,17 +54,15 @@ public class NetworkUtil {
 
     //Sending packets to players that are tracking an entity
 
-    public static void sendToTracking(Entity entity, Identifier channel, PacketByteBuf buf){
+    public static void sendToTracking(Entity entity, Identifier channel, PacketByteBuf buf, PacketMode mode){
         //PlayerLookup.tracking(entity) might not return the player if entity is a player, so it has to be done separately
-        if(entity instanceof ServerPlayerEntity player)
-            ServerPlayNetworking.send(player, channel, buf);
-        sendToTrackingExcludingSelf(entity, channel, buf);
-    }
-
-    public static void sendToTrackingExcludingSelf(Entity entity, Identifier channel, PacketByteBuf buf){
-        for (ServerPlayerEntity player : PlayerLookup.tracking(entity))
-            if(player != entity)
+        if(mode != PacketMode.EVERYONE_BUT_SELF)
+            if(entity instanceof ServerPlayerEntity player)
                 ServerPlayNetworking.send(player, channel, buf);
+        if(mode != PacketMode.ONLY_SELF)
+            for (ServerPlayerEntity player : PlayerLookup.tracking(entity))
+                if(player != entity)
+                    ServerPlayNetworking.send(player, channel, buf);
     }
 
     //Writing to buffer

@@ -13,16 +13,12 @@ public class OverwriteGravityPacket extends GravityPacket {
         initialGravity = _initialGravity;
     }
 
-    @Override
-    public GravityPacket read(PacketByteBuf buf) {
+    OverwriteGravityPacket(PacketByteBuf buf) {
         int listSize = buf.readInt();
-        ArrayList<Gravity> list = new ArrayList<>();
+        gravityList = new ArrayList<>();
         for (int i = 0; i < listSize; i++)
-            list.add(NetworkUtil.readGravity(buf));
-        return new OverwriteGravityPacket(
-                list,
-                buf.readBoolean()
-        );
+            gravityList.add(NetworkUtil.readGravity(buf));
+        initialGravity = buf.readBoolean();
     }
 
     @Override

@@ -11,11 +11,10 @@ public class UpdateGravityPacket extends GravityPacket{
         initialGravity = _initialGravity;
     }
 
-    @Override
-    public GravityPacket read(PacketByteBuf buf) {
-        return new UpdateGravityPacket(
-                NetworkUtil.readGravity(buf),
-                buf.readBoolean()
+    UpdateGravityPacket(PacketByteBuf buf) {
+        this(
+            NetworkUtil.readGravity(buf),
+            buf.readBoolean()
         );
     }
 
