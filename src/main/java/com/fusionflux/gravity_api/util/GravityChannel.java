@@ -69,6 +69,7 @@ public class GravityChannel<P extends GravityPacket> {
                     packet.run(gc);
                     sendToClient(player, packet, PacketMode.EVERYONE_BUT_SELF);
                 }else {
+                    GravityChangerMod.LOGGER.info("VerifierFunction returned FALSE");
                     sendFullStatePacket(player, PacketMode.ONLY_SELF, packet.getRotationParameters(), false);
                 }
             });

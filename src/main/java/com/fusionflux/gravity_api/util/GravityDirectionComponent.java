@@ -1,5 +1,6 @@
 package com.fusionflux.gravity_api.util;
 
+import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.api.RotationParameters;
@@ -168,11 +169,13 @@ public class GravityDirectionComponent implements GravityComponent {
             Direction oldGravity = gravityDirection;
             if (oldGravity != newGravity) {
                 long timeMs = entity.world.getTime() * 50;
-                animation.applyRotationAnimation(
-                        newGravity, oldGravity,
-                        initialGravity ? 0 : rotationParameters.rotationTime(),
-                        entity, timeMs, rotationParameters.rotateView()
-                );
+                if(entity.world.isClient) {
+                    animation.applyRotationAnimation(
+                            newGravity, oldGravity,
+                            initialGravity ? 0 : rotationParameters.rotationTime(),
+                            entity, timeMs, rotationParameters.rotateView()
+                    );
+                }
                 prevGravityDirection = oldGravity;
                 gravityDirection = newGravity;
                 onGravityChanged(oldGravity, newGravity, rotationParameters, initialGravity);

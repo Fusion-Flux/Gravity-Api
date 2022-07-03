@@ -10,6 +10,8 @@ import com.fusionflux.gravity_api.util.packet.DefaultGravityPacket;
 import com.fusionflux.gravity_api.util.packet.InvertGravityPacket;
 import com.fusionflux.gravity_api.util.packet.OverwriteGravityPacket;
 import com.fusionflux.gravity_api.util.packet.UpdateGravityPacket;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import org.jetbrains.annotations.Nullable;
@@ -116,6 +118,7 @@ public abstract class GravityChangerAPI {
         }
     }
 
+    @Environment(EnvType.CLIENT)
     public static void addGravityClient(ClientPlayerEntity entity, Gravity gravity, Identifier verifier, PacketByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
@@ -134,6 +137,7 @@ public abstract class GravityChangerAPI {
     public static void updateGravity(Entity entity) {
         updateGravity(entity, new RotationParameters());
     }
+
     public static void updateGravity(Entity entity, RotationParameters rotationParameters) {
         if (EntityTags.canChangeGravity(entity)) {
             maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.updateGravity(rotationParameters,false));
@@ -150,7 +154,7 @@ public abstract class GravityChangerAPI {
             }
         }
     }
-
+    @Environment(EnvType.CLIENT)
     public static void setGravityClient(ClientPlayerEntity entity, ArrayList<Gravity> gravity, Identifier verifier, PacketByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
@@ -176,7 +180,7 @@ public abstract class GravityChangerAPI {
             }
         }
     }
-
+    @Environment(EnvType.CLIENT)
     public static void setIsInvertedClient(ClientPlayerEntity entity, boolean isInverted, RotationParameters rotationParameters, Identifier verifier, PacketByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
@@ -202,7 +206,7 @@ public abstract class GravityChangerAPI {
             }
         }
     }
-
+    @Environment(EnvType.CLIENT)
     public static void clearGravityClient(ClientPlayerEntity entity, RotationParameters rotationParameters, Identifier verifier, PacketByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
@@ -233,7 +237,7 @@ public abstract class GravityChangerAPI {
             }
         }
     }
-
+    @Environment(EnvType.CLIENT)
     public static void setDefaultGravityDirectionClient(ClientPlayerEntity entity, Direction gravityDirection, RotationParameters rotationParameters, Identifier verifier, PacketByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
