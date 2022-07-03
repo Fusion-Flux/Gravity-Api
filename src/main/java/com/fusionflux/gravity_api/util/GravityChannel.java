@@ -60,7 +60,8 @@ public class GravityChannel<P extends GravityPacket> {
     public void receiveFromClient(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender){
         P packet = packetFactory.read(buf);
         Identifier verifier = buf.readIdentifier();
-        PacketByteBuf verifierInfoBuf = PacketByteBufs.create().writeByteArray(buf.readByteArray());
+        PacketByteBuf verifierInfoBuf = PacketByteBufs.create();
+        verifierInfoBuf.writeBytes(buf.readByteArray());
         server.execute(() -> {
             getGravityComponent(player).ifPresent(gc -> {
                 GravityVerifierRegistry.VerifierFunction<P> v = gravityVerifierRegistry.get(verifier);
@@ -68,7 +69,6 @@ public class GravityChannel<P extends GravityPacket> {
                     packet.run(gc);
                     sendToClient(player, packet, PacketMode.EVERYONE_BUT_SELF);
                 }else {
-                    //DEFAULT_GRAVITY.sendToClient(player, new DefaultGravityPacket(gc.getDefaultGravityDirection(), packet.getRotationParameters(), false), PacketMode.ONLY_SELF);
                     sendFullStatePacket(player, PacketMode.ONLY_SELF, packet.getRotationParameters(), false);
                 }
             });
