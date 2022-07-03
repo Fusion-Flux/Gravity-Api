@@ -338,7 +338,8 @@ public class GravityDirectionComponent implements GravityComponent {
         }
         if(!entity.world.isClient && needsInitialSync){
             needsInitialSync = false;
-            GravityChannel.sendFullStatePacket(entity, NetworkUtil.PacketMode.EVERYONE);
+            RotationParameters rotationParameters = new RotationParameters(false, false, false, 0);
+            GravityChannel.sendFullStatePacket(entity, NetworkUtil.PacketMode.EVERYONE, rotationParameters, true);
         }
     }
 }

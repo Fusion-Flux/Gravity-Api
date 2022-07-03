@@ -33,5 +33,8 @@ public class DefaultGravityPacket extends GravityPacket {
         gc.setDefaultGravityDirection(direction, rotationParameters, initialGravity);
     }
 
-
+    @Override
+    public RotationParameters getRotationParameters() {
+        return rotationParameters;
+    }
 }

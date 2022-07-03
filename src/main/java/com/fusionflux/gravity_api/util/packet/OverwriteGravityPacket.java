@@ -1,11 +1,14 @@
 package com.fusionflux.gravity_api.util.packet;
 
+import com.fusionflux.gravity_api.api.RotationParameters;
 import com.fusionflux.gravity_api.util.Gravity;
 import com.fusionflux.gravity_api.util.GravityComponent;
 import com.fusionflux.gravity_api.util.NetworkUtil;
 import net.minecraft.network.PacketByteBuf;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Optional;
 
 public class OverwriteGravityPacket extends GravityPacket {
     final ArrayList<Gravity> gravityList;
@@ -34,5 +37,12 @@ public class OverwriteGravityPacket extends GravityPacket {
     @Override
     public void run(GravityComponent gc) {
         gc.setGravity(gravityList, initialGravity);
+    }
+
+    @Override
+    public RotationParameters getRotationParameters() {
+        Optional<Gravity> max = gravityList.stream().max(Comparator.comparingInt(Gravity::priority));
+        if(max.isEmpty()) return new RotationParameters();
+        return max.get().rotationParameters();
     }
 }

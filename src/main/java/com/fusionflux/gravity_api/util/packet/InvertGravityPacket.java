@@ -35,4 +35,9 @@ public class InvertGravityPacket extends GravityPacket{
     public void run(GravityComponent gc) {
         gc.invertGravity(inverted, rotationParameters, initialGravity);
     }
+
+    @Override
+    public RotationParameters getRotationParameters() {
+        return rotationParameters;
+    }
 }

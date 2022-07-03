@@ -69,18 +69,18 @@ public class GravityChannel<P extends GravityPacket> {
                     packet.run(gc);
                     sendToClient(player, packet, PacketMode.EVERYONE_BUT_SELF);
                 }else {
-                    sendFullStatePacket(player, PacketMode.ONLY_SELF);
+                    //DEFAULT_GRAVITY.sendToClient(player, new DefaultGravityPacket(gc.getDefaultGravityDirection(), packet.getRotationParameters(), false), PacketMode.ONLY_SELF);
+                    sendFullStatePacket(player, PacketMode.ONLY_SELF, packet.getRotationParameters(), false);
                 }
             });
         });
     }
 
-    public static void sendFullStatePacket(Entity entity, PacketMode mode){
+    public static void sendFullStatePacket(Entity entity, PacketMode mode, RotationParameters rp, boolean initialGravity){
         getGravityComponent(entity).ifPresent(gc -> {
-            RotationParameters rp = new RotationParameters(false, false, false, 0);
-            OVERWRITE_GRAVITY.sendToClient(entity, new OverwriteGravityPacket(gc.getGravity(), true), mode);
-            DEFAULT_GRAVITY.sendToClient(entity, new DefaultGravityPacket(gc.getDefaultGravityDirection(), rp, true), mode);
-            INVERT_GRAVITY.sendToClient(entity, new InvertGravityPacket(gc.getInvertGravity(), rp, true), mode);
+            OVERWRITE_GRAVITY.sendToClient(entity, new OverwriteGravityPacket(gc.getGravity(), initialGravity), mode);
+            DEFAULT_GRAVITY.sendToClient(entity, new DefaultGravityPacket(gc.getDefaultGravityDirection(), rp, initialGravity), mode);
+            INVERT_GRAVITY.sendToClient(entity, new InvertGravityPacket(gc.getInvertGravity(), rp, initialGravity), mode);
         });
     }
 
