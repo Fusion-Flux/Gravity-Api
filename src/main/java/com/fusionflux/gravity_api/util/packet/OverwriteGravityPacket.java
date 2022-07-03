@@ -11,8 +11,8 @@ import java.util.Comparator;
 import java.util.Optional;
 
 public class OverwriteGravityPacket extends GravityPacket {
-    final ArrayList<Gravity> gravityList;
-    final boolean initialGravity;
+    public final ArrayList<Gravity> gravityList;
+    public final boolean initialGravity;
 
     public OverwriteGravityPacket(ArrayList<Gravity> _gravityList, boolean _initialGravity){
         gravityList = _gravityList;

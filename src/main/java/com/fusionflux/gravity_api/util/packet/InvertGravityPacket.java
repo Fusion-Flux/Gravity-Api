@@ -6,9 +6,9 @@ import com.fusionflux.gravity_api.util.NetworkUtil;
 import net.minecraft.network.PacketByteBuf;
 
 public class InvertGravityPacket extends GravityPacket{
-    final boolean inverted;
-    final RotationParameters rotationParameters;
-    final boolean initialGravity;
+    public final boolean inverted;
+    public final RotationParameters rotationParameters;
+    public final boolean initialGravity;
 
     public InvertGravityPacket(boolean _inverted, RotationParameters _rotationParameters, boolean _initialGravity){
         inverted = _inverted;
