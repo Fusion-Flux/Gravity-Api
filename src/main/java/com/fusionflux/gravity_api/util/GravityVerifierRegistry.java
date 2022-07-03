@@ -1,4 +1,4 @@
-package com.fusionflux.gravity_api.api;
+package com.fusionflux.gravity_api.util;
 
 import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.util.packet.GravityPacket;
