@@ -14,7 +14,7 @@ public class GravityVerifierRegistry<T extends GravityPacket> {
 
     public void register(Identifier id, VerifierFunction<T> func){
         if(map.containsKey(id))
-            GravityChangerMod.LOGGER.error("AddGravityVerifier function already set for identifier "+id, new Exception());
+            GravityChangerMod.LOGGER.error(new Exception("Verifier function already set for identifier "+id));
         map.put(id, func);
     }
 
