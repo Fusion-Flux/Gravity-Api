@@ -20,7 +20,7 @@ public class GravityChangerItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if(!world.isClient)
+        if(!world.isClient())
             GravityChangerAPI.setDefaultGravityDirection(user, gravityDirection, new RotationParameters());
         return TypedActionResult.success(user.getStackInHand(hand));
     }

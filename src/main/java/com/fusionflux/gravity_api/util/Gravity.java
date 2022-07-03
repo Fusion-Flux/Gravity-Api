@@ -1,11 +1,12 @@
-package com.fusionflux.gravity_api.api;
+package com.fusionflux.gravity_api.util;
 
+import com.fusionflux.gravity_api.api.RotationParameters;
 import net.minecraft.util.math.Direction;
 
 public class Gravity {
     private final Direction direction;
-    private int duration;
     private final int priority;
+    private int duration;
     private final String source;
     private final RotationParameters rotationParameters;
 
