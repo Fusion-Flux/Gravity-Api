@@ -11,6 +11,7 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -45,21 +46,22 @@ public class GravityDirectionComponent implements GravityComponent {
         entity.setPosition(entity.getPos());//Causes bounding box recalculation
         
         if (!initialGravity) {
-            //A relativeRotationCentre of zero will result in zero translation
-            Vec3d relativeRotationCentre = getCentreOfRotation(oldGravity, newGravity, rotationParameters);
-            Vec3d translation = RotationUtil.vecPlayerToWorld(relativeRotationCentre, oldGravity).subtract(RotationUtil.vecPlayerToWorld(relativeRotationCentre, newGravity));
-            Direction relativeDirection = RotationUtil.dirWorldToPlayer(newGravity, oldGravity);
-            Vec3d smidge = new Vec3d(
-                    relativeDirection == Direction.EAST ? -1.0E-6D : 0.0D,
-                    relativeDirection == Direction.UP ? -1.0E-6D : 0.0D,
-                    relativeDirection == Direction.SOUTH ? -1.0E-6D : 0.0D
-            );
-            smidge = RotationUtil.vecPlayerToWorld(smidge, oldGravity);
-            entity.setPosition(entity.getPos().add(translation).add(smidge));
+            if(!(entity instanceof ServerPlayerEntity)) {
+                //A relativeRotationCentre of zero will result in zero translation
+                Vec3d relativeRotationCentre = getCentreOfRotation(oldGravity, newGravity, rotationParameters);
+                Vec3d translation = RotationUtil.vecPlayerToWorld(relativeRotationCentre, oldGravity).subtract(RotationUtil.vecPlayerToWorld(relativeRotationCentre, newGravity));
+                Direction relativeDirection = RotationUtil.dirWorldToPlayer(newGravity, oldGravity);
+                Vec3d smidge = new Vec3d(
+                        relativeDirection == Direction.EAST ? -1.0E-6D : 0.0D,
+                        relativeDirection == Direction.UP ? -1.0E-6D : 0.0D,
+                        relativeDirection == Direction.SOUTH ? -1.0E-6D : 0.0D
+                );
+                smidge = RotationUtil.vecPlayerToWorld(smidge, oldGravity);
+                entity.setPosition(entity.getPos().add(translation).add(smidge));
 
-            //Adjust entity position to avoid suffocation and collision
-            adjustEntityPosition(oldGravity, newGravity);
-
+                //Adjust entity position to avoid suffocation and collision
+                adjustEntityPosition(oldGravity, newGravity);
+            }
             if(rotationParameters.rotateVelocity()) {
                 //Rotate velocity with gravity, this will cause things to appear to take a sharp turn
                 Vec3f worldSpaceVec = new Vec3f(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection));
