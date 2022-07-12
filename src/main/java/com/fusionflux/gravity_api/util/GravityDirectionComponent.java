@@ -4,11 +4,14 @@ import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.api.RotationParameters;
+import com.fusionflux.gravity_api.mixin.PersistentProjectileEntityMixin;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.thrown.ThrownEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -58,18 +61,21 @@ public class GravityDirectionComponent implements GravityComponent {
                 );
                 smidge = RotationUtil.vecPlayerToWorld(smidge, oldGravity);
                 entity.setPosition(entity.getPos().add(translation).add(smidge));
-
-                //Adjust entity position to avoid suffocation and collision
-                adjustEntityPosition(oldGravity, newGravity);
+                if(!(entity instanceof ProjectileEntity)) {
+                    //Adjust entity position to avoid suffocation and collision
+                    adjustEntityPosition(oldGravity, newGravity);
+                }
             }
-            if(rotationParameters.rotateVelocity()) {
-                //Rotate velocity with gravity, this will cause things to appear to take a sharp turn
-                Vec3f worldSpaceVec = new Vec3f(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection));
-                worldSpaceVec.rotate(RotationUtil.getRotationBetween(prevGravityDirection, gravityDirection));
-                entity.setVelocity(RotationUtil.vecWorldToPlayer(new Vec3d(worldSpaceVec), gravityDirection));
-            }else{
-                //Velocity will be conserved relative to the world, will result in more natural motion
-                entity.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection), gravityDirection));
+            if(!(entity instanceof ProjectileEntity)) {
+                if (rotationParameters.rotateVelocity()) {
+                    //Rotate velocity with gravity, this will cause things to appear to take a sharp turn
+                    Vec3f worldSpaceVec = new Vec3f(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection));
+                    worldSpaceVec.rotate(RotationUtil.getRotationBetween(prevGravityDirection, gravityDirection));
+                    entity.setVelocity(RotationUtil.vecWorldToPlayer(new Vec3d(worldSpaceVec), gravityDirection));
+                } else {
+                    //Velocity will be conserved relative to the world, will result in more natural motion
+                    entity.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection), gravityDirection));
+                }
             }
         }
     }
