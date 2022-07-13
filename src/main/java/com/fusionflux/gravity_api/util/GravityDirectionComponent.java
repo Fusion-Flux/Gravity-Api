@@ -61,12 +61,12 @@ public class GravityDirectionComponent implements GravityComponent {
                 );
                 smidge = RotationUtil.vecPlayerToWorld(smidge, oldGravity);
                 entity.setPosition(entity.getPos().add(translation).add(smidge));
-                if(!(entity instanceof ProjectileEntity)) {
+                if(!(entity instanceof PersistentProjectileEntity || entity instanceof ThrownEntity)) {
                     //Adjust entity position to avoid suffocation and collision
                     adjustEntityPosition(oldGravity, newGravity);
                 }
             }
-            if(!(entity instanceof ProjectileEntity)) {
+            if(!(entity instanceof PersistentProjectileEntity || entity instanceof ThrownEntity)) {
                 if (rotationParameters.rotateVelocity()) {
                     //Rotate velocity with gravity, this will cause things to appear to take a sharp turn
                     Vec3f worldSpaceVec = new Vec3f(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection));
