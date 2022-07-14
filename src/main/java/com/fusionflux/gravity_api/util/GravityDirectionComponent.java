@@ -60,7 +60,7 @@ public class GravityDirectionComponent implements GravityComponent {
                 );
                 smidge = RotationUtil.vecPlayerToWorld(smidge, oldGravity);
                 entity.setPosition(entity.getPos().add(translation).add(smidge));
-                if(shouldChangeVelocity()) {
+                if(shouldChangeVelocity() && !rotationParameters.alternateCenter()) {
                     //Adjust entity position to avoid suffocation and collision
                     adjustEntityPosition(oldGravity, newGravity);
                 }
