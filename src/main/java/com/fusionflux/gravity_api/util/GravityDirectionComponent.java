@@ -9,8 +9,7 @@ import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.*;
 import net.minecraft.entity.projectile.thrown.ThrownEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -61,12 +60,12 @@ public class GravityDirectionComponent implements GravityComponent {
                 );
                 smidge = RotationUtil.vecPlayerToWorld(smidge, oldGravity);
                 entity.setPosition(entity.getPos().add(translation).add(smidge));
-                if(!(entity instanceof ProjectileEntity)) {
+                if(shouldChangeVelocity() && !rotationParameters.alternateCenter()) {
                     //Adjust entity position to avoid suffocation and collision
                     adjustEntityPosition(oldGravity, newGravity);
                 }
             }
-            if(!(entity instanceof ProjectileEntity)) {
+            if(shouldChangeVelocity()) {
                 if (rotationParameters.rotateVelocity()) {
                     //Rotate velocity with gravity, this will cause things to appear to take a sharp turn
                     Vec3f worldSpaceVec = new Vec3f(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection));
@@ -78,6 +77,12 @@ public class GravityDirectionComponent implements GravityComponent {
                 }
             }
         }
+    }
+
+    private boolean shouldChangeVelocity() {
+        if(entity instanceof FishingBobberEntity) return true;
+        if(entity instanceof FireworkRocketEntity) return true;
+        return !(entity instanceof ProjectileEntity);
     }
 
     @NotNull
