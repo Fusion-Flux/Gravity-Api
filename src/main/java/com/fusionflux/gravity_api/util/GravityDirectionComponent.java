@@ -1,16 +1,14 @@
 package com.fusionflux.gravity_api.util;
 
-import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.api.RotationParameters;
-import com.fusionflux.gravity_api.mixin.PersistentProjectileEntityMixin;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.*;
-import net.minecraft.entity.projectile.thrown.ThrownEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -66,19 +64,35 @@ public class GravityDirectionComponent implements GravityComponent {
                 }
             }
             if(shouldChangeVelocity()) {
+                Vec3d realWorldVelocity = getRealWorldVelocity(entity, prevGravityDirection);
                 if (rotationParameters.rotateVelocity()) {
                     //Rotate velocity with gravity, this will cause things to appear to take a sharp turn
-                    Vec3f worldSpaceVec = new Vec3f(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection));
+                    Vec3f worldSpaceVec = new Vec3f(realWorldVelocity);
                     worldSpaceVec.rotate(RotationUtil.getRotationBetween(prevGravityDirection, gravityDirection));
                     entity.setVelocity(RotationUtil.vecWorldToPlayer(new Vec3d(worldSpaceVec), gravityDirection));
                 } else {
                     //Velocity will be conserved relative to the world, will result in more natural motion
-                    entity.setVelocity(RotationUtil.vecWorldToPlayer(RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection), gravityDirection));
+                    entity.setVelocity(RotationUtil.vecWorldToPlayer(realWorldVelocity, gravityDirection));
                 }
             }
         }
     }
-
+    
+    // getVelocity() does not return the actual velocity. It returns the velocity plus acceleration.
+    // Even if the entity is standing still, getVelocity() will still give a downwards vector.
+    // The real velocity is this tick position subtract last tick position
+    private Vec3d getRealWorldVelocity(Entity entity, Direction prevGravityDirection) {
+        if (entity.isLogicalSideForUpdatingMovement()) {
+            return new Vec3d(
+                entity.getX() - entity.prevX,
+                entity.getY() - entity.prevY,
+                entity.getZ() - entity.prevZ
+            );
+        }
+        
+        return RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection);
+    }
+    
     private boolean shouldChangeVelocity() {
         if(entity instanceof FishingBobberEntity) return true;
         if(entity instanceof FireworkRocketEntity) return true;

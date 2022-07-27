@@ -27,6 +27,46 @@
     {
       "id":"create:seat",
       "required": false
+    },
+    {
+      "id":"immersive_portals:portal",
+      "required": false
+    },
+    {
+      "id":"immersive_portals:nether_portal_new",
+      "required": false
+    },
+    {
+      "id":"immersive_portals:end_portal",
+      "required": false
+    },
+    {
+      "id":"immersive_portals:mirror",
+      "required": false
+    },
+    {
+      "id":"immersive_portals:breakable_mirror",
+      "required": false
+    },
+    {
+      "id":"immersive_portals:global_tracked_portal",
+      "required": false
+    },
+    {
+      "id":"immersive_portals:border_portal",
+      "required": false
+    },
+    {
+      "id":"immersive_portals:end_floor_portal",
+      "required": false
+    },
+    {
+      "id":"immersive_portals:general_breakable_portal",
+      "required": false
+    },
+    {
+      "id":"mini_scaled:portal",
+      "required": false
     }
   ]
 }
