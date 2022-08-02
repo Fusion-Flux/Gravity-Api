@@ -282,11 +282,11 @@ public abstract class GravityChangerAPI {
 
     private static boolean onCorrectSide(Entity entity, boolean shouldBeOnServer){
         if(entity.world.isClient && shouldBeOnServer) {
-            GravityChangerMod.LOGGER.error("GravityChangerAPI function cannot be called from the server, use dedicated client server. ", new Exception());
+            GravityChangerMod.LOGGER.error("GravityChangerAPI server-side function should not be called on the client.", new Exception());
             return false;
         }
         if(!entity.world.isClient && !shouldBeOnServer) {
-            GravityChangerMod.LOGGER.error("GravityChangerAPI function cannot be called from the client, use dedicated client client. ", new Exception());
+            GravityChangerMod.LOGGER.error("GravityChangerAPI client-side function should not be called on the server.", new Exception());
             return false;
         }
         return true;
