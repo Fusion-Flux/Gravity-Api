@@ -41,7 +41,9 @@
     "fabric": "*",
     "minecraft": "1.19.x",
     "java": ">=17",
-    "cloth-config2": "*"
+    "cloth-config2": "*",
+    "cardinal-components-base": "*",
+    "cardinal-components-entity": "*"
   },
   "custom": {
     "cardinal-components": [
