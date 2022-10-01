@@ -5,10 +5,10 @@ import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.QuaternionUtil;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import com.fusionflux.gravity_api.util.EntityTags;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
@@ -46,7 +46,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_0(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity) && !entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
+        if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity) && !entity.getType().isIn(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
             if (!this.renderShadows) return;
 
@@ -68,7 +68,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_1(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity) && !entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
+        if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity) && !entity.getType().isIn(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
             if (!this.renderShadows) return;
 
@@ -86,7 +86,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_2(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity) && !entity.getType().getRegistryEntry().isIn(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
+        if(!(entity instanceof ProjectileEntity) && !(entity instanceof ExperienceOrbEntity) && !entity.getType().isIn(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
             if (gravityDirection == Direction.DOWN) return;
             if (!this.renderShadows) return;

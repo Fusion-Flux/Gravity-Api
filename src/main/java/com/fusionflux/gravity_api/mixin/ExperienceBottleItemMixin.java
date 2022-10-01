@@ -25,7 +25,7 @@ public abstract class ExperienceBottleItemMixin extends Item {
         if (!world.isClient) {
             ExperienceBottleEntity experienceBottleEntity = new ExperienceBottleEntity(world, user);
             experienceBottleEntity.setItem(itemStack);
-            experienceBottleEntity.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 0.7F, 1.0F);
+            experienceBottleEntity.setProperties(user, user.getPitch(), user.getYaw(), 0.0F, 0.7F, 1.0F);
             world.spawnEntity(experienceBottleEntity);
         }
 

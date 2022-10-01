@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(ProjectileEntity.class)
 public abstract class ProjectileEntityMixin {
     @ModifyVariable(
-            method = "setVelocity(Lnet/minecraft/entity/Entity;FFFFF)V",
+            method = "setProperties(Lnet/minecraft/entity/Entity;FFFFF)V",
             at = @At("HEAD"),
             ordinal = 0
     )
@@ -27,7 +27,7 @@ public abstract class ProjectileEntityMixin {
     }
 
     @ModifyVariable(
-            method = "setVelocity(Lnet/minecraft/entity/Entity;FFFFF)V",
+            method = "setProperties(Lnet/minecraft/entity/Entity;FFFFF)V",
             at = @At("HEAD"),
             ordinal = 1
     )

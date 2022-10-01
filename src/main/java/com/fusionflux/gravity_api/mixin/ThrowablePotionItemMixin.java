@@ -24,7 +24,7 @@ public abstract class ThrowablePotionItemMixin extends PotionItem {
         if (!world.isClient) {
             PotionEntity potionEntity = new PotionEntity(world, user);
             potionEntity.setItem(itemStack);
-            potionEntity.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 0.5F, 1.0F);
+            potionEntity.setProperties(user, user.getPitch(), user.getYaw(), 0.0F, 0.5F, 1.0F);
             world.spawnEntity(potionEntity);
         }
 
