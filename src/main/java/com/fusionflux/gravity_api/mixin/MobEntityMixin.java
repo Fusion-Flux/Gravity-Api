@@ -3,17 +3,21 @@ package com.fusionflux.gravity_api.mixin;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.util.math.Direction;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.util.math.Direction;
+
 @Mixin(MobEntity.class)
 public abstract class MobEntityMixin {
-    @Redirect(
+    @WrapOperation(
             method = "tryAttack",
             at = @At(
                     value = "INVOKE",
@@ -21,16 +25,16 @@ public abstract class MobEntityMixin {
                     ordinal = 0
             )
     )
-    private float redirect_tryAttack_getYaw_0(MobEntity attacker, Entity target) {
+    private float wrapOperation_tryAttack_getYaw_0(MobEntity attacker, Operation<Float> original, Entity target) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
-            return attacker.getYaw();
+            return original.call(attacker);
         }
 
-        return RotationUtil.rotWorldToPlayer(attacker.getYaw(), attacker.getPitch(), gravityDirection).x;
+        return RotationUtil.rotWorldToPlayer(original.call(attacker), attacker.getPitch(), gravityDirection).x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "tryAttack",
             at = @At(
                     value = "INVOKE",
@@ -38,13 +42,13 @@ public abstract class MobEntityMixin {
                     ordinal = 1
             )
     )
-    private float redirect_tryAttack_getYaw_1(MobEntity attacker, Entity target) {
+    private float wrapOperation_tryAttack_getYaw_1(MobEntity attacker, Operation<Float> original, Entity target) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
-            return attacker.getYaw();
+            return original.call(attacker);
         }
 
-        return RotationUtil.rotWorldToPlayer(attacker.getYaw(), attacker.getPitch(), gravityDirection).x;
+        return RotationUtil.rotWorldToPlayer(original.call(attacker), attacker.getPitch(), gravityDirection).x;
     }
 
     @Redirect(

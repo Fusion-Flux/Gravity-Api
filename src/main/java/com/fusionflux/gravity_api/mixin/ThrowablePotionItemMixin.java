@@ -1,39 +1,32 @@
 package com.fusionflux.gravity_api.mixin;
 
-import net.minecraft.entity.player.PlayerEntity;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.PotionItem;
 import net.minecraft.item.ThrowablePotionItem;
-import net.minecraft.stat.Stats;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(ThrowablePotionItem.class)
+@Mixin(value = ThrowablePotionItem.class, priority = 1001)
 public abstract class ThrowablePotionItemMixin extends PotionItem {
 
     public ThrowablePotionItemMixin(Settings settings) {
         super(settings);
     }
 
-    @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ItemStack itemStack = user.getStackInHand(hand);
-        if (!world.isClient) {
-            PotionEntity potionEntity = new PotionEntity(world, user);
-            potionEntity.setItem(itemStack);
-            potionEntity.setProperties(user, user.getPitch(), user.getYaw(), 0.0F, 0.5F, 1.0F);
-            world.spawnEntity(potionEntity);
-        }
-
-        user.incrementStat(Stats.USED.getOrCreateStat(this));
-        if (!user.getAbilities().creativeMode) {
-            itemStack.decrement(1);
-        }
-
-        return TypedActionResult.success(itemStack, world.isClient());
+    @WrapOperation(
+            method = "use",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/projectile/thrown/PotionEntity;setProperties(Lnet/minecraft/entity/Entity;FFFFF)V"
+            )
+    )
+    public void wrapOperation_use_setProperties(PotionEntity target, Entity user, float pitch, float yaw, float roll, float modifierZ, float modifierXYZ, Operation<Void> original) {
+        original.call(target, user, pitch, yaw, 0.0F, modifierZ, modifierXYZ);
     }
 
 }
