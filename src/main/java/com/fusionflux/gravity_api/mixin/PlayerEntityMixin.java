@@ -1,21 +1,34 @@
 package com.fusionflux.gravity_api.mixin;
 
-import com.fusionflux.gravity_api.util.RotationUtil;
-
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
-import net.minecraft.entity.*;
-import net.minecraft.entity.player.PlayerAbilities;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
+import com.fusionflux.gravity_api.util.RotationUtil;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityPose;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MovementType;
+import net.minecraft.entity.player.PlayerAbilities;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
@@ -32,7 +45,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         super(entityType, world);
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "travel",
             at = @At(
                     value = "INVOKE",
@@ -40,13 +53,13 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                     ordinal = 0
             )
     )
-    private Vec3d redirect_travel_getRotationVector_0(PlayerEntity playerEntity) {
+    private Vec3d wrapOperation_travel_getRotationVector_0(PlayerEntity playerEntity, Operation<Vec3d> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
         if(gravityDirection == Direction.DOWN) {
-            return playerEntity.getRotationVector();
+            return original.call(playerEntity);
         }
 
-        return RotationUtil.vecWorldToPlayer(playerEntity.getRotationVector(), gravityDirection);
+        return RotationUtil.vecWorldToPlayer(original.call(playerEntity), gravityDirection);
     }
 
 
@@ -101,21 +114,22 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         return new ItemEntity(world, vec3d.x, vec3d.y, vec3d.z, stack);
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/ItemEntity;setVelocity(DDD)V"
             )
     )
-    private void redirect_dropItem_setVelocity(ItemEntity itemEntity, double x, double y, double z) {
+    private void wrapOperation_dropItem_setVelocity(ItemEntity itemEntity, double x, double y, double z, Operation<Void> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if(gravityDirection == Direction.DOWN) {
-            itemEntity.setVelocity(x, y, z);
+            original.call(itemEntity, x, y, z);
             return;
         }
 
-        itemEntity.setVelocity(RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection));
+        Vec3d world = RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection);
+        original.call(itemEntity, world.x, world.y, world.z);
     }
 
     @Inject(
@@ -178,7 +192,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         }
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "isAboveGround",
             at = @At(
                     value = "INVOKE",
@@ -186,16 +200,17 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                     ordinal = 0
             )
     )
-    private Box redirect_method_30263_offset_0(Box box, double x, double y, double z) {
+    private Box wrapOperation_method_30263_offset_0(Box box, double x, double y, double z, Operation<Box> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if(gravityDirection == Direction.DOWN) {
-            return box.offset(x, y, z);
+            return original.call(box, x, y, z);
         }
 
-        return box.offset(RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection));
+        Vec3d world = RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection);
+        return original.call(box, world.x, world.y, world.z);
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "attack",
             at = @At(
                     value = "INVOKE",
@@ -203,17 +218,17 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                     ordinal = 0
             )
     )
-    private float redirect_attack_getYaw_0(PlayerEntity attacker, Entity target) {
+    private float wrapOperation_attack_getYaw_0(PlayerEntity attacker, Operation<Float> original, Entity target) {
         Direction targetGravityDirection = GravityChangerAPI.getGravityDirection(target);
         Direction attackerGravityDirection = GravityChangerAPI.getGravityDirection(attacker);
         if(targetGravityDirection == attackerGravityDirection) {
-            return attacker.getYaw();
+            return original.call(attacker);
         }
 
-        return RotationUtil.rotWorldToPlayer(RotationUtil.rotPlayerToWorld(attacker.getYaw(), attacker.getPitch(), attackerGravityDirection), targetGravityDirection).x;
+        return RotationUtil.rotWorldToPlayer(RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getPitch(), attackerGravityDirection), targetGravityDirection).x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "attack",
             at = @At(
                     value = "INVOKE",
@@ -221,17 +236,17 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                     ordinal = 1
             )
     )
-    private float redirect_attack_getYaw_1(PlayerEntity attacker, Entity target) {
+    private float wrapOperation_attack_getYaw_1(PlayerEntity attacker, Operation<Float> original, Entity target) {
         Direction targetGravityDirection = GravityChangerAPI.getGravityDirection(target);
         Direction attackerGravityDirection = GravityChangerAPI.getGravityDirection(attacker);
         if(targetGravityDirection == attackerGravityDirection) {
-            return attacker.getYaw();
+            return original.call(attacker);
         }
 
-        return RotationUtil.rotWorldToPlayer(RotationUtil.rotPlayerToWorld(attacker.getYaw(), attacker.getPitch(), attackerGravityDirection), targetGravityDirection).x;
+        return RotationUtil.rotWorldToPlayer(RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getPitch(), attackerGravityDirection), targetGravityDirection).x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "attack",
             at = @At(
                     value = "INVOKE",
@@ -239,16 +254,16 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                     ordinal = 2
             )
     )
-    private float redirect_attack_getYaw_2(PlayerEntity attacker) {
+    private float wrapOperation_attack_getYaw_2(PlayerEntity attacker, Operation<Float> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(attacker);
         if(gravityDirection == Direction.DOWN) {
-            return attacker.getYaw();
+            return original.call(attacker);
         }
 
-        return RotationUtil.rotPlayerToWorld(attacker.getYaw(), attacker.getPitch(), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getPitch(), gravityDirection).x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "attack",
             at = @At(
                     value = "INVOKE",
@@ -256,13 +271,13 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                     ordinal = 3
             )
     )
-    private float redirect_attack_getYaw_3(PlayerEntity attacker) {
+    private float wrapOperation_attack_getYaw_3(PlayerEntity attacker, Operation<Float> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(attacker);
         if(gravityDirection == Direction.DOWN) {
-            return attacker.getYaw();
+            return original.call(attacker);
         }
 
-        return RotationUtil.rotPlayerToWorld(attacker.getYaw(), attacker.getPitch(), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getPitch(), gravityDirection).x;
     }
 
     @ModifyArgs(

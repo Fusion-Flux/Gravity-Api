@@ -3,6 +3,8 @@ package com.fusionflux.gravity_api.mixin;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.mob.ShulkerEntity;
@@ -10,11 +12,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ShulkerEntity.class)
 public abstract class ShulkerEntityMixin {
-    @Redirect(
+    @WrapOperation(
             method = "moveEntities",
             at = @At(
                     value = "INVOKE",
@@ -22,13 +23,13 @@ public abstract class ShulkerEntityMixin {
                     ordinal = 0
             )
     )
-    private void redirect_pushEntities_move_0(Entity entity, MovementType movementType, Vec3d vec3d) {
+    private void wrapOperation_pushEntities_move_0(Entity entity, MovementType movementType, Vec3d vec3d, Operation<Void> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
-            entity.move(movementType, vec3d);
+            original.call(entity, movementType, vec3d);
             return;
         }
 
-        entity.move(movementType, RotationUtil.vecWorldToPlayer(vec3d, gravityDirection));
+        original.call(entity, movementType, RotationUtil.vecWorldToPlayer(vec3d, gravityDirection));
     }
 }

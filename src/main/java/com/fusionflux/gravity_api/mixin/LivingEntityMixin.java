@@ -3,16 +3,32 @@ package com.fusionflux.gravity_api.mixin;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
-import net.minecraft.entity.*;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityPose;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -207,7 +223,7 @@ public abstract class LivingEntityMixin extends Entity {
         entity.limbAngle += entity.limbDistance;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "tick",
             at = @At(
                     value = "INVOKE",
@@ -215,16 +231,16 @@ public abstract class LivingEntityMixin extends Entity {
                     ordinal = 0
             )
     )
-    private double redirect_tick_getX_0(LivingEntity livingEntity) {
+    private double wrapOperation_tick_getX_0(LivingEntity livingEntity, Operation<Double> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(livingEntity);
         if(gravityDirection == Direction.DOWN) {
-            return livingEntity.getX();
+            return original.call(livingEntity);
         }
 
-        return RotationUtil.vecWorldToPlayer(livingEntity.getX() - livingEntity.prevX, livingEntity.getY() - livingEntity.prevY, livingEntity.getZ() - livingEntity.prevZ, gravityDirection).x + livingEntity.prevX;
+        return RotationUtil.vecWorldToPlayer(original.call(livingEntity) - livingEntity.prevX, livingEntity.getY() - livingEntity.prevY, livingEntity.getZ() - livingEntity.prevZ, gravityDirection).x + livingEntity.prevX;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "tick",
             at = @At(
                     value = "INVOKE",
@@ -232,13 +248,13 @@ public abstract class LivingEntityMixin extends Entity {
                     ordinal = 0
             )
     )
-    private double redirect_tick_getZ_0(LivingEntity livingEntity) {
+    private double wrapOperation_tick_getZ_0(LivingEntity livingEntity, Operation<Double> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(livingEntity);
         if(gravityDirection == Direction.DOWN) {
-            return livingEntity.getZ();
+            return original.call(livingEntity);
         }
 
-        return RotationUtil.vecWorldToPlayer(livingEntity.getX() - livingEntity.prevX, livingEntity.getY() - livingEntity.prevY, livingEntity.getZ() - livingEntity.prevZ, gravityDirection).z + livingEntity.prevZ;
+        return RotationUtil.vecWorldToPlayer(livingEntity.getX() - livingEntity.prevX, livingEntity.getY() - livingEntity.prevY, original.call(livingEntity) - livingEntity.prevZ, gravityDirection).z + livingEntity.prevZ;
     }
 
     @Redirect(
@@ -411,7 +427,7 @@ public abstract class LivingEntityMixin extends Entity {
         return new BlockPos(this.getEyePos());
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "spawnItemParticles",
             at = @At(
                     value = "INVOKE",
@@ -419,13 +435,14 @@ public abstract class LivingEntityMixin extends Entity {
                     ordinal = 0
             )
     )
-    private Vec3d redirect_spawnItemParticles_add_0(Vec3d vec3d, double x, double y, double z) {
+    private Vec3d wrapOperation_spawnItemParticles_add_0(Vec3d vec3d, double x, double y, double z, Operation<Vec3d> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if(gravityDirection == Direction.DOWN) {
-            return vec3d.add(x, y, z);
+            return original.call(vec3d, x, y, z);
         }
 
-        return this.getEyePos().add(RotationUtil.vecPlayerToWorld(vec3d, gravityDirection));
+        Vec3d rotated = RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
+        return original.call(this.getEyePos(), rotated.x, rotated.y, rotated.z);
     }
 
     @ModifyVariable(

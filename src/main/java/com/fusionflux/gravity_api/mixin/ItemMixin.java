@@ -2,16 +2,19 @@ package com.fusionflux.gravity_api.mixin;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.Direction;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Item.class)
 public class ItemMixin {
-    @Redirect(
+    @WrapOperation(
             method="raycast",
             at = @At(
                     value = "INVOKE",
@@ -19,13 +22,13 @@ public class ItemMixin {
                     ordinal = 0
             )
     )
-    private static float redirect_raycast_getYaw(PlayerEntity player){
+    private static float wrapOperation_raycast_getYaw(PlayerEntity player, Operation<Float> original){
         Direction direction = GravityChangerAPI.getGravityDirection(player);
-        if(direction == Direction.DOWN) return player.getYaw();
-        return RotationUtil.rotPlayerToWorld(player.getYaw(), player.getPitch(), direction).x;
+        if(direction == Direction.DOWN) return original.call(player);
+        return RotationUtil.rotPlayerToWorld(original.call(player), player.getPitch(), direction).x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method="raycast",
             at = @At(
                     value = "INVOKE",
@@ -33,9 +36,9 @@ public class ItemMixin {
                     ordinal = 0
             )
     )
-    private static float redirect_raycast_getPitch(PlayerEntity player){
+    private static float wrapOperation_raycast_getPitch(PlayerEntity player, Operation<Float> original){
         Direction direction = GravityChangerAPI.getGravityDirection(player);
-        if(direction == Direction.DOWN) return player.getPitch();
-        return RotationUtil.rotPlayerToWorld(player.getYaw(), player.getPitch(), direction).y;
+        if(direction == Direction.DOWN) return original.call(player);
+        return RotationUtil.rotPlayerToWorld(player.getYaw(), original.call(player), direction).y;
     }
 }
