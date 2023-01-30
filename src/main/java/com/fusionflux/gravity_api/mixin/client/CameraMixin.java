@@ -22,7 +22,7 @@ import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.BlockView;
 
-@Mixin(Camera.class)
+@Mixin(value = Camera.class, priority = 1001)
 public abstract class CameraMixin {
     @Shadow protected abstract void setPos(double x, double y, double z);
 

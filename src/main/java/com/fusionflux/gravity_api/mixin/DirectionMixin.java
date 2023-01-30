@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
 
-@Mixin(Direction.class)
+@Mixin(value = Direction.class, priority = 1001)
 public abstract class DirectionMixin {
     @WrapOperation(
             method = "getEntityFacingOrder",

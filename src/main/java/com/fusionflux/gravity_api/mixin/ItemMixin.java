@@ -12,7 +12,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.Direction;
 
-@Mixin(Item.class)
+@Mixin(value = Item.class, priority = 1001)
 public class ItemMixin {
     @WrapOperation(
             method="raycast",

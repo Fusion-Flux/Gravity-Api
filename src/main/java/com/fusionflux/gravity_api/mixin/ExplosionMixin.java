@@ -15,7 +15,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.explosion.Explosion;
 
-@Mixin(Explosion.class)
+@Mixin(value = Explosion.class, priority = 1001)
 public abstract class ExplosionMixin {
     @Redirect(
             method = "collectBlocksAndDamageEntities",

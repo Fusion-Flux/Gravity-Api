@@ -15,7 +15,7 @@ import net.minecraft.entity.ai.brain.task.RamImpactTask;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
-@Mixin(RamImpactTask.class)
+@Mixin(value = RamImpactTask.class, priority = 1001)
 public abstract class RamImpactTaskMixin {
     @Shadow private Vec3d direction;
 

@@ -11,7 +11,7 @@ import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.item.PotionItem;
 import net.minecraft.item.ThrowablePotionItem;
 
-@Mixin(ThrowablePotionItem.class)
+@Mixin(value = ThrowablePotionItem.class, priority = 1001)
 public abstract class ThrowablePotionItemMixin extends PotionItem {
 
     public ThrowablePotionItemMixin(Settings settings) {

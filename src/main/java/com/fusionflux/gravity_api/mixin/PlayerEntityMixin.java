@@ -30,7 +30,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-@Mixin(PlayerEntity.class)
+@Mixin(value = PlayerEntity.class, priority = 1001)
 public abstract class PlayerEntityMixin extends LivingEntity {
     @Shadow @Final private PlayerAbilities abilities;
 

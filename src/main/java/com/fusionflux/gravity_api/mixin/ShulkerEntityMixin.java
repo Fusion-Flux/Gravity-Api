@@ -13,7 +13,7 @@ import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(ShulkerEntity.class)
+@Mixin(value = ShulkerEntity.class, priority = 1001)
 public abstract class ShulkerEntityMixin {
     @WrapOperation(
             method = "moveEntities",

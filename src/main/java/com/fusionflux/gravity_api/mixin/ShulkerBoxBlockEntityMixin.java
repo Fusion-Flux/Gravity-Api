@@ -15,7 +15,7 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
-@Mixin(ShulkerBoxBlockEntity.class)
+@Mixin(value = ShulkerBoxBlockEntity.class, priority = 1001)
 public abstract class ShulkerBoxBlockEntityMixin {
     @WrapOperation(
             method = "pushEntities",
