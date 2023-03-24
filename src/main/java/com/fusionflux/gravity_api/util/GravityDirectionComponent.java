@@ -187,6 +187,11 @@ public class GravityDirectionComponent implements GravityComponent {
     }
 
     @Override
+    public double getDefaultGravityStrength() {
+        return defaultGravityStrength;
+    }
+
+    @Override
     public void setDefaultGravityStrength(double strength) {
         if (canChangeGravity()) {
             defaultGravityStrength = strength;

@@ -80,6 +80,13 @@ public abstract class GravityChangerAPI {
         return Direction.DOWN;
     }
 
+    public static double getDefaultGravityStrength(Entity entity) {
+        if (EntityTags.canChangeGravity(entity)) {
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getDefaultGravityStrength).orElse(1d);
+        }
+        return 1;
+    }
+
     public static double getGravityStrength(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravityStrength).orElse(1d);

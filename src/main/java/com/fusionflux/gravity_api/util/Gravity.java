@@ -7,7 +7,7 @@ public class Gravity {
     private final Direction direction;
     private final int priority;
     private int duration;
-    private double strength;
+    private final double strength;
     private final String source;
     private final RotationParameters rotationParameters;
     public Gravity(Direction _direction, int _priority, double _strength, int _duration, String _source, RotationParameters _rotationParameters) {
@@ -24,7 +24,7 @@ public class Gravity {
     }
 
     public Gravity(Direction _direction, int _priority, double _strength, int _duration, String _source) {
-        this(_direction, _priority,_strength, _duration, _source, new RotationParameters());
+        this(_direction, _priority, _strength, _duration, _source, new RotationParameters());
     }
 
     public Direction direction() {
