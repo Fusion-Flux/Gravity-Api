@@ -1,27 +1,30 @@
-package com.fusionflux.gravity_api.mixin;
+package com.fusionflux.gravity_api.mixin.client.mixin;
 
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.thrown.ThrownEntity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
-@Mixin(PersistentProjectileEntity.class)
-public abstract class PersistentProjectileEntityMixin extends Entity {
+@Mixin(ThrownEntity.class)
+public abstract class ThrownEntityMixin{
 
-    public PersistentProjectileEntityMixin(EntityType<?> type, World world) {
-        super(type, world);
-    }
+    @Shadow protected abstract float getGravity();
 
+    /*@Override
+    public Direction gravitychanger$getAppliedGravityDirection() {
+        return GravityChangerAPI.getGravityDirection((ThrownEntity)(Object)this);
+    }*/
 
     @ModifyVariable(
             method = "tick",
@@ -31,19 +34,20 @@ public abstract class PersistentProjectileEntityMixin extends Entity {
             ,ordinal = 0
     )
     public Vec3d tick(Vec3d modify){
-        modify = new Vec3d(modify.x, modify.y+0.05, modify.z);
-        modify = RotationUtil.vecWorldToPlayer(modify,GravityChangerAPI.getGravityDirection(this));
-        modify = new Vec3d(modify.x, modify.y-0.05, modify.z);
-        modify = RotationUtil.vecPlayerToWorld(modify,GravityChangerAPI.getGravityDirection(this));
+        //if(this instanceof RotatableEntityAccessor) {
+            modify = new Vec3d(modify.x, modify.y + this.getGravity(), modify.z);
+            modify = RotationUtil.vecWorldToPlayer(modify, GravityChangerAPI.getGravityDirection((ThrownEntity)(Object)this));
+            modify = new Vec3d(modify.x, modify.y - this.getGravity(), modify.z);
+            modify = RotationUtil.vecPlayerToWorld(modify, GravityChangerAPI.getGravityDirection((ThrownEntity)(Object)this));
+       // }
         return  modify;
     }
-
 
     @ModifyArgs(
             method = "<init>(Lnet/minecraft/entity/EntityType;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/projectile/PersistentProjectileEntity;<init>(Lnet/minecraft/entity/EntityType;DDDLnet/minecraft/world/World;)V",
+                    target = "Lnet/minecraft/entity/projectile/thrown/ThrownEntity;<init>(Lnet/minecraft/entity/EntityType;DDDLnet/minecraft/world/World;)V",
                     ordinal = 0
             )
     )
@@ -55,10 +59,5 @@ public abstract class PersistentProjectileEntityMixin extends Entity {
         args.set(1, pos.x);
         args.set(2, pos.y);
         args.set(3, pos.z);
-    }
-
-    @ModifyConstant(method = "tick", constant = @Constant(doubleValue = 0.05000000074505806))
-    private double multiplyGravity(double constant) {
-        return constant * GravityChangerAPI.getGravityStrength(this);
     }
 }

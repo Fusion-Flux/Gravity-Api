@@ -1,4 +1,4 @@
-package com.fusionflux.gravity_api.mixin;
+package com.fusionflux.gravity_api.mixin.client.mixin;
 
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
@@ -12,7 +12,9 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(PersistentProjectileEntity.class)
@@ -55,10 +57,5 @@ public abstract class PersistentProjectileEntityMixin extends Entity {
         args.set(1, pos.x);
         args.set(2, pos.y);
         args.set(3, pos.z);
-    }
-
-    @ModifyConstant(method = "tick", constant = @Constant(doubleValue = 0.05000000074505806))
-    private double multiplyGravity(double constant) {
-        return constant * GravityChangerAPI.getGravityStrength(this);
     }
 }

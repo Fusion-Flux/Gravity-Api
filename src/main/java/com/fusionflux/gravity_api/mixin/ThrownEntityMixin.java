@@ -3,6 +3,8 @@ package com.fusionflux.gravity_api.mixin;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.thrown.ThrownEntity;
@@ -59,5 +61,10 @@ public abstract class ThrownEntityMixin{
         args.set(1, pos.x);
         args.set(2, pos.y);
         args.set(3, pos.z);
+    }
+
+    @ModifyReturnValue(method = "getGravity", at = @At("RETURN"))
+    private float multiplyGravity(float original) {
+        return original * (float)GravityChangerAPI.getGravityStrength(((Entity) (Object) this));
     }
 }

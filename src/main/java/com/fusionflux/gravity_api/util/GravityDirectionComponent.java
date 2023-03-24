@@ -28,6 +28,8 @@ import java.util.Objects;
 public class GravityDirectionComponent implements GravityComponent {
     Direction gravityDirection = Direction.DOWN;
     Direction defaultGravityDirection = Direction.DOWN;
+
+    double defaultGravityStrength = 1;
     Direction prevGravityDirection = Direction.DOWN;
     boolean isInverted = false;
     RotationAnimation animation = new RotationAnimation();
@@ -173,7 +175,24 @@ public class GravityDirectionComponent implements GravityComponent {
         
         return new Vec3d(movingDirection.getUnitVector()).multiply(offset);
     }
-    
+
+    @Override
+    public double getGravityStrength() {
+        double strength = defaultGravityStrength;
+        Gravity highestPriority = getHighestPriority();
+        if (highestPriority != null) {
+            strength = highestPriority.strength();
+        }
+        return strength;
+    }
+
+    @Override
+    public void setDefaultGravityStrength(double strength) {
+        if (canChangeGravity()) {
+            defaultGravityStrength = strength;
+        }
+    }
+
     @Override
     public Direction getGravityDirection() {
         if (canChangeGravity()) {
@@ -322,7 +341,8 @@ public class GravityDirectionComponent implements GravityComponent {
                 for (int index = 0; index < listSize; index++) {
                     Gravity newGravity = new Gravity(
                         Direction.byId(nbt.getInt("GravityDirection " + index)),
-                        nbt.getInt("GravityPriority " + index),
+                            nbt.getInt("GravityPriority " + index),
+                            nbt.getDouble("GravityStrength " + index),
                         nbt.getInt("GravityDuration " + index),
                         nbt.getString("GravitySource " + index)
                     );
@@ -350,6 +370,7 @@ public class GravityDirectionComponent implements GravityComponent {
             if (temp.direction() != null && temp.source() != null) {
                 nbt.putInt("GravityDirection " + index, temp.direction().getId());
                 nbt.putInt("GravityPriority " + index, temp.priority());
+                nbt.putDouble("GravityStrength " + index, temp.strength());
                 nbt.putInt("GravityDuration " + index, temp.duration());
                 nbt.putString("GravitySource " + index, temp.source());
                 index++;
