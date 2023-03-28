@@ -5,6 +5,7 @@ import com.fusionflux.gravity_api.util.Gravity;
 import com.fusionflux.gravity_api.api.RotationParameters;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -55,10 +56,14 @@ public class GravityCommand {
                         .executes(context -> executeClearGravity(context.getSource(), Collections.singleton(context.getSource().getPlayer())))
                         .then(argument("entities", EntityArgumentType.entity())
                                 .executes(context -> executeClearGravity(context.getSource(), EntityArgumentType.getEntities(context, "entities")))))
+                .then(literal("setdefaultgravitystrength")
+                        .executes(context -> executeSetDefaultStrength(context.getSource(), DoubleArgumentType.getDouble(context, "double"), Collections.singleton(context.getSource().getPlayer())))
+                        .then(argument("entities", EntityArgumentType.entity()).then(argument("double", DoubleArgumentType.doubleArg())
+                                .executes(context -> executeSetDefaultStrength(context.getSource(), DoubleArgumentType.getDouble(context, "double"), Collections.singleton(context.getSource().getPlayer())))))
                 .then(literalSet).then(literalSetDefault).then(literalRotate).then(literal("randomise")
                         .executes(context -> executeRandomise(context.getSource(), Collections.singleton(context.getSource().getPlayer())))
                         .then(argument("entities", EntityArgumentType.entities())
-                                .executes(context -> executeRandomise(context.getSource(), EntityArgumentType.getEntities(context, "entities"))))));
+                                .executes(context -> executeRandomise(context.getSource(), EntityArgumentType.getEntities(context, "entities")))))));
     }
 
     private static void getSendFeedback(ServerCommandSource source, Entity entity, Direction gravityDirection) {
@@ -71,7 +76,7 @@ public class GravityCommand {
     }
 
     private static void getStrengthSendFeedback(ServerCommandSource source, Entity entity, double strength) {
-        Text text = Text.translatable("strength." + strength);
+        Text text = Text.translatable("strength " + strength);
         if (source.getEntity() != null && source.getEntity() == entity) {
             source.sendFeedback(Text.translatable("commands.gravity.get.self", text), true);
         } else {

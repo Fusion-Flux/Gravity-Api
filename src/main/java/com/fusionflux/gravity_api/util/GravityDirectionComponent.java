@@ -185,7 +185,14 @@ public class GravityDirectionComponent implements GravityComponent {
         if (highestPriority != null) {
             strength = highestPriority.strength();
         }
-        return defaultGravityStrength * strength;
+        System.out.println("START");
+        System.out.println(defaultGravityStrength);
+        System.out.println(GravityChangerAPI.getDimensionGravityStrength(entity.world));
+        System.out.println(strength);
+        System.out.println(defaultGravityStrength * GravityChangerAPI.getDimensionGravityStrength(entity.world) * strength);
+        System.out.println("END");
+        //System.out.println(defaultGravityStrength * GravityChangerAPI.getDimensionGravityStrength(entity.world) * strength);
+        return defaultGravityStrength * GravityChangerAPI.getDimensionGravityStrength(entity.world) * strength;
     }
 
     @Override
@@ -338,6 +345,7 @@ public class GravityDirectionComponent implements GravityComponent {
     public void readFromNbt(NbtCompound nbt) {
         //Store old values
         Direction oldDefaultGravity = defaultGravityDirection;
+        double oldDefaultStrength = defaultGravityStrength;
         ArrayList<Gravity> oldList = gravityList;
         boolean oldIsInverted = isInverted;
         //Load values from nbt
@@ -367,6 +375,7 @@ public class GravityDirectionComponent implements GravityComponent {
         updateGravity(rp, true);
         //Check if an initial sync is required (actual sync happens in tick() because the network handler isn't initialised here yet)
         if (oldDefaultGravity != defaultGravityDirection) needsInitialSync = true;
+        if (oldDefaultStrength != defaultGravityStrength) needsInitialSync = true;
         if (oldList.isEmpty() != gravityList.isEmpty()) needsInitialSync = true;
         if (oldIsInverted != isInverted) needsInitialSync = true;
     }

@@ -12,7 +12,7 @@ public class DefaultGravityStrengthPacket extends GravityPacket {
     }
 
     public DefaultGravityStrengthPacket(PacketByteBuf buf){
-        this(buf.readFloat());
+        this(buf.readDouble());
     }
 
     @Override
