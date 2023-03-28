@@ -56,7 +56,7 @@ public class GravityCommand {
                         .executes(context -> executeClearGravity(context.getSource(), Collections.singleton(context.getSource().getPlayer())))
                         .then(argument("entities", EntityArgumentType.entity())
                                 .executes(context -> executeClearGravity(context.getSource(), EntityArgumentType.getEntities(context, "entities")))))
-                .then(literal("setdefaultgravitystrength")
+                .then(literal("setdefaultstrength")
                         .executes(context -> executeSetDefaultStrength(context.getSource(), DoubleArgumentType.getDouble(context, "double"), Collections.singleton(context.getSource().getPlayer())))
                         .then(argument("entities", EntityArgumentType.entity()).then(argument("double", DoubleArgumentType.doubleArg())
                                 .executes(context -> executeSetDefaultStrength(context.getSource(), DoubleArgumentType.getDouble(context, "double"), Collections.singleton(context.getSource().getPlayer())))))
