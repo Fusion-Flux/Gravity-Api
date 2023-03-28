@@ -70,6 +70,15 @@ public class GravityCommand {
         }
     }
 
+    private static void getStrengthSendFeedback(ServerCommandSource source, Entity entity, double strength) {
+        Text text = Text.translatable("strength." + strength);
+        if (source.getEntity() != null && source.getEntity() == entity) {
+            source.sendFeedback(Text.translatable("commands.gravity.get.self", text), true);
+        } else {
+            source.sendFeedback(Text.translatable("commands.gravity.get.other", entity.getDisplayName(), text), true);
+        }
+    }
+
     private static int executeGet(ServerCommandSource source, Entity entity) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         getSendFeedback(source, entity, gravityDirection);
@@ -95,6 +104,18 @@ public class GravityCommand {
                 GravityChangerAPI.setDefaultGravityDirection(entity, gravityDirection, new RotationParameters());
                 //GravityChangerAPI.updateGravity(entity);
                 getSendFeedback(source, entity, gravityDirection);
+                i++;
+            }
+        }
+        return i;
+    }
+
+    private static int executeSetDefaultStrength(ServerCommandSource source, double gravityStrength, Collection<? extends Entity> entities) {
+        int i = 0;
+        for (Entity entity : entities) {
+            if (GravityChangerAPI.getDefaultGravityStrength(entity) != gravityStrength) {
+                GravityChangerAPI.setDefualtGravityStrength(entity, gravityStrength);
+                getStrengthSendFeedback(source, entity, gravityStrength);
                 i++;
             }
         }

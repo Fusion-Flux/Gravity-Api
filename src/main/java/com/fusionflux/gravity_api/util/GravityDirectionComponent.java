@@ -1,8 +1,10 @@
 package com.fusionflux.gravity_api.util;
 
+import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.api.RotationParameters;
+import com.fusionflux.gravity_api.config.GravityChangerConfig;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
@@ -29,7 +31,7 @@ public class GravityDirectionComponent implements GravityComponent {
     Direction gravityDirection = Direction.DOWN;
     Direction defaultGravityDirection = Direction.DOWN;
 
-    double defaultGravityStrength = 1;
+    double defaultGravityStrength = GravityChangerConfig.worldDefaultGravityStrength;
     Direction prevGravityDirection = Direction.DOWN;
     boolean isInverted = false;
     RotationAnimation animation = new RotationAnimation();
@@ -178,12 +180,12 @@ public class GravityDirectionComponent implements GravityComponent {
 
     @Override
     public double getGravityStrength() {
-        double strength = defaultGravityStrength;
+        double strength = 1;
         Gravity highestPriority = getHighestPriority();
         if (highestPriority != null) {
             strength = highestPriority.strength();
         }
-        return strength;
+        return defaultGravityStrength * strength;
     }
 
     @Override
@@ -357,6 +359,7 @@ public class GravityDirectionComponent implements GravityComponent {
             gravityList = newGravityList;
         }
         prevGravityDirection = Direction.byId(nbt.getInt("PrevGravityDirection"));
+        defaultGravityStrength = nbt.getDouble("DefaultGravityStrength");
         defaultGravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
         isInverted = nbt.getBoolean("IsGravityInverted");
         //Update
@@ -383,6 +386,7 @@ public class GravityDirectionComponent implements GravityComponent {
         }
         nbt.putInt("ListSize", index);
         nbt.putInt("PrevGravityDirection", this.getPrevGravityDirection().getId());
+        nbt.putDouble("DefaultGravityStrength", this.getDefaultGravityStrength());
         nbt.putInt("DefaultGravityDirection", this.getDefaultGravityDirection().getId());
         nbt.putBoolean("IsGravityInverted", this.getInvertGravity());
     }

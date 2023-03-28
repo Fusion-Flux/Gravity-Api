@@ -44,6 +44,10 @@ dependencies {
 	// Includes Cardinal Components API as a Jar-in-Jar dependency (optional but recommended)
 	include "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.0.1"
 
+	modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.1"
+	// Includes Cardinal Components API as a Jar-in-Jar dependency (optional but recommended)
+	include "dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.1"
+
 	implementation("com.github.LlamaLad7:MixinExtras:0.1.0")
 	include("com.github.LlamaLad7:MixinExtras:0.1.0")
 	annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.0")

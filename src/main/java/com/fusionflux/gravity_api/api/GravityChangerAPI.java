@@ -6,10 +6,7 @@ import java.util.Optional;
 import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.util.*;
-import com.fusionflux.gravity_api.util.packet.DefaultGravityPacket;
-import com.fusionflux.gravity_api.util.packet.InvertGravityPacket;
-import com.fusionflux.gravity_api.util.packet.OverwriteGravityPacket;
-import com.fusionflux.gravity_api.util.packet.UpdateGravityPacket;
+import com.fusionflux.gravity_api.util.packet.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -86,6 +83,8 @@ public abstract class GravityChangerAPI {
         }
         return 1;
     }
+
+
 
     public static double getGravityStrength(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
@@ -190,6 +189,17 @@ public abstract class GravityChangerAPI {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.invertGravity(isInverted, rotationParameters, false);
                     GravityChannel.INVERT_GRAVITY.sendToClient(entity, new InvertGravityPacket(isInverted, rotationParameters, false), NetworkUtil.PacketMode.EVERYONE);
+                });
+            }
+        }
+    }
+
+    public static void setDefualtGravityStrength(Entity entity, double strength) {
+        if(onCorrectSide(entity, true)) {
+            if (EntityTags.canChangeGravity(entity)) {
+                maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
+                    gc.setDefaultGravityStrength(strength);
+                    GravityChannel.DEFAULT_GRAVITY_STRENGTH.sendToClient(entity, new DefaultGravityStrengthPacket(strength), NetworkUtil.PacketMode.EVERYONE);
                 });
             }
         }
