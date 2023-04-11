@@ -185,13 +185,6 @@ public class GravityDirectionComponent implements GravityComponent {
         if (highestPriority != null) {
             strength = highestPriority.strength();
         }
-        System.out.println("START");
-        System.out.println(defaultGravityStrength);
-        System.out.println(GravityChangerAPI.getDimensionGravityStrength(entity.world));
-        System.out.println(strength);
-        System.out.println(defaultGravityStrength * GravityChangerAPI.getDimensionGravityStrength(entity.world) * strength);
-        System.out.println("END");
-        //System.out.println(defaultGravityStrength * GravityChangerAPI.getDimensionGravityStrength(entity.world) * strength);
         return defaultGravityStrength * GravityChangerAPI.getDimensionGravityStrength(entity.world) * strength;
     }
 

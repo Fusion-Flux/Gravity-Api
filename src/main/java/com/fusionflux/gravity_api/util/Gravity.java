@@ -19,6 +19,9 @@ public class Gravity {
         rotationParameters = _rotationParameters;
     }
 
+    public Gravity(Direction _direction, int _priority, int _duration, String _source, RotationParameters _rotationParameters) {
+        this(_direction, _priority,1, _duration, _source, _rotationParameters);
+    }
     public Gravity(Direction _direction, int _priority, int _duration, String _source) {
         this(_direction, _priority,1, _duration, _source, new RotationParameters());
     }

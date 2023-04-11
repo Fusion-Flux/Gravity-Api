@@ -5,8 +5,8 @@ import com.fusionflux.gravity_api.util.packet.GravityPacket;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 
 public class GravityVerifierRegistry<T extends GravityPacket> {

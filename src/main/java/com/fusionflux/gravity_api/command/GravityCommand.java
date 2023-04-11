@@ -59,11 +59,11 @@ public class GravityCommand {
                 .then(literal("setdefaultstrength")
                         .executes(context -> executeSetDefaultStrength(context.getSource(), DoubleArgumentType.getDouble(context, "double"), Collections.singleton(context.getSource().getPlayer())))
                         .then(argument("entities", EntityArgumentType.entity()).then(argument("double", DoubleArgumentType.doubleArg())
-                                .executes(context -> executeSetDefaultStrength(context.getSource(), DoubleArgumentType.getDouble(context, "double"), Collections.singleton(context.getSource().getPlayer())))))
+                                .executes(context -> executeSetDefaultStrength(context.getSource(), DoubleArgumentType.getDouble(context, "double"), Collections.singleton(EntityArgumentType.getEntity(context, "entities")))))))
                 .then(literalSet).then(literalSetDefault).then(literalRotate).then(literal("randomise")
                         .executes(context -> executeRandomise(context.getSource(), Collections.singleton(context.getSource().getPlayer())))
                         .then(argument("entities", EntityArgumentType.entities())
-                                .executes(context -> executeRandomise(context.getSource(), EntityArgumentType.getEntities(context, "entities")))))));
+                                .executes(context -> executeRandomise(context.getSource(), EntityArgumentType.getEntities(context, "entities"))))));
     }
 
     private static void getSendFeedback(ServerCommandSource source, Entity entity, Direction gravityDirection) {

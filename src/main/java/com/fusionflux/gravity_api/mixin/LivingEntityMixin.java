@@ -555,6 +555,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @ModifyVariable(method = "computeFallDamage", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private float diminishFallDamage(float value) {
-        return value * (float)Math.sqrt(GravityChangerAPI.getGravityStrength(this));
+        return value * (float)(GravityChangerAPI.getGravityStrength(this));
     }
+
 }
