@@ -1,6 +1,8 @@
 package com.fusionflux.gravity_api.config;
 
 
+import eu.midnightdust.lib.config.MidnightConfig;
+
 public class GravityChangerConfig extends MidnightConfig {
 
     @Entry public static boolean keepWorldLook = false;

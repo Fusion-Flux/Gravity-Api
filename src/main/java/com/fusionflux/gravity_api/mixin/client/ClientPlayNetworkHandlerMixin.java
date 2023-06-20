@@ -79,7 +79,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
     }
 
     @WrapOperation(
-            method = "onExplosion",
+            method = "onExplosionOccurs",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/util/math/Vec3d;add(DDD)Lnet/minecraft/util/math/Vec3d;",

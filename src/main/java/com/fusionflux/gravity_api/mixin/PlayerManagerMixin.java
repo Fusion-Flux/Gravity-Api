@@ -13,32 +13,32 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerManager.class)
 public abstract class PlayerManagerMixin {
 
-    @Inject(
-            method = "onPlayerConnect",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/Packet;)V",
-                    ordinal = 0,
-                    shift = At.Shift.AFTER
-            )
-    )
-    private void inject_onPlayerConnect_sendPacket_0(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
-        //Not need because (I think) player gravity is synced when nbt is loaded
-        //((ServerPlayerEntityAccessor) player).gravitychanger$sendGravityPacket(GravityChangerAPI.getGravityDirection(player), false);
-    }
-
-    // This uses the old player instance but it should be ok as long as the gravity is not changed between new player creation and this
-    @Inject(
-            method = "respawnPlayer",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/Packet;)V",
-                    ordinal = 1,
-                    shift = At.Shift.AFTER
-            )
-    )
-    private void inject_respawnPlayer_sendPacket_1(ServerPlayerEntity player, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir) {
-        //Not need because (I think) player gravity is synced when nbt is loaded
-        //((ServerPlayerEntityAccessor) player).gravitychanger$sendGravityPacket(GravityChangerAPI.getGravityDirection(player), false);
-    }
+    //@Inject(
+    //        method = "onPlayerConnect",
+    //        at = @At(
+    //                value = "INVOKE",
+    //                target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/Packet;)V",
+    //                ordinal = 0,
+    //                shift = At.Shift.AFTER
+    //        )
+    //)
+    //private void inject_onPlayerConnect_sendPacket_0(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
+    //    //Not need because (I think) player gravity is synced when nbt is loaded
+    //    //((ServerPlayerEntityAccessor) player).gravitychanger$sendGravityPacket(GravityChangerAPI.getGravityDirection(player), false);
+    //}
+//
+    //// This uses the old player instance but it should be ok as long as the gravity is not changed between new player creation and this
+    //@Inject(
+    //        method = "respawnPlayer",
+    //        at = @At(
+    //                value = "INVOKE",
+    //                target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/Packet;)V",
+    //                ordinal = 1,
+    //                shift = At.Shift.AFTER
+    //        )
+    //)
+    //private void inject_respawnPlayer_sendPacket_1(ServerPlayerEntity player, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir) {
+    //    //Not need because (I think) player gravity is synced when nbt is loaded
+    //    //((ServerPlayerEntityAccessor) player).gravitychanger$sendGravityPacket(GravityChangerAPI.getGravityDirection(player), false);
+    //}
 }

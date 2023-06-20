@@ -41,4 +41,5 @@ public abstract class CompatMath {
     private static float cos(float value) {
         return (float)Math.cos((double)value);
     }
+
 }

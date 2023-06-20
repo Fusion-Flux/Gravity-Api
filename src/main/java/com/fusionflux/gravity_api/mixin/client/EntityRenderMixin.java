@@ -44,7 +44,7 @@ public abstract class EntityRenderMixin {
             method = "renderLabelIfPresent",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;getRotation()Lnet/minecraft/util/math/Quaternion;",
+                    target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;getRotation()Lorg/joml/Quaternionf;",
                     ordinal = 0
             )
     )

@@ -193,31 +193,31 @@ public abstract class LivingEntityMixin extends Entity {
         cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection));
     }
 
-    @Inject(
-            method = "updateLimbs",
-            at = @At("HEAD"),
-            cancellable = true
-    )
-    private void inject_updateLimbs(LivingEntity entity, boolean flutter, CallbackInfo ci) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
-        if(gravityDirection == Direction.DOWN) return;
-
-        ci.cancel();
-
-        Vec3d playerPosDelta = RotationUtil.vecWorldToPlayer(entity.getX() - entity.prevX, entity.getY() - entity.prevY, entity.getZ() - entity.prevZ, gravityDirection);
-
-        entity.lastLimbDistance = entity.limbDistance;
-        double d = playerPosDelta.x;
-        double e = flutter ? playerPosDelta.y : 0.0D;
-        double f = playerPosDelta.z;
-        float g = (float)Math.sqrt(d * d + e * e + f * f) * 4.0F;
-        if (g > 1.0F) {
-            g = 1.0F;
-        }
-
-        entity.limbDistance += (g - entity.limbDistance) * 0.4F;
-        entity.limbAngle += entity.limbDistance;
-    }
+    //@Inject(
+    //        method = "updateLimbs",
+    //        at = @At("HEAD"),
+    //        cancellable = true
+    //)
+    //private void inject_updateLimbs(LivingEntity entity, boolean flutter, CallbackInfo ci) {
+    //    Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    //    if(gravityDirection == Direction.DOWN) return;
+//
+    //    ci.cancel();
+//
+    //    Vec3d playerPosDelta = RotationUtil.vecWorldToPlayer(entity.getX() - entity.prevX, entity.getY() - entity.prevY, entity.getZ() - entity.prevZ, gravityDirection);
+//
+    //    entity.lastLimbDistance = entity.limbDistance;
+    //    double d = playerPosDelta.x;
+    //    double e = flutter ? playerPosDelta.y : 0.0D;
+    //    double f = playerPosDelta.z;
+    //    float g = (float)Math.sqrt(d * d + e * e + f * f) * 4.0F;
+    //    if (g > 1.0F) {
+    //        g = 1.0F;
+    //    }
+//
+    //    entity.limbDistance += (g - entity.limbDistance) * 0.4F;
+    //    entity.limbAngle += entity.limbDistance;
+    //}
 
     @WrapOperation(
             method = "tick",
@@ -406,21 +406,35 @@ public abstract class LivingEntityMixin extends Entity {
         return RotationUtil.vecWorldToPlayer(attacker.getEyePos(), gravityDirection).z;
     }
 
-    @Redirect(
+    //@Redirect(
+    //        method = "baseTick",
+    //        at = @At(
+    //                value = "NEW",
+    //                target = "net/minecraft/util/math/BlockPos",
+    //                ordinal = 0
+    //        )
+    //)
+    //private BlockPos redirect_baseTick_new_0(double x, double y, double z) {
+    //    Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
+    //    if(gravityDirection == Direction.DOWN) {
+    //        return new BlockPos(x, y, z);
+    //    }
+//
+    //    return new BlockPos(this.getEyePos());
+    //}
+
+    @ModifyArgs(
             method = "baseTick",
             at = @At(
-                    value = "NEW",
-                    target = "net/minecraft/util/math/BlockPos",
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/BlockPos;create(DDD)Lnet/minecraft/util/math/BlockPos;",
                     ordinal = 0
             )
     )
-    private BlockPos redirect_baseTick_new_0(double x, double y, double z) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
-        if(gravityDirection == Direction.DOWN) {
-            return new BlockPos(x, y, z);
-        }
-
-        return new BlockPos(this.getEyePos());
+    private void modify_baseTick(Args args) {
+        args.set(0,this.getEyePos().x);
+        args.set(1,this.getEyePos().y);
+        args.set(2,this.getEyePos().z);
     }
 
     @WrapOperation(

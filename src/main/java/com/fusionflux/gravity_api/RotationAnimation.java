@@ -88,8 +88,7 @@ public class RotationAnimation {
         
         Vector3f lookingDirection = new Vector3f((float) oldLookingDirection.x,(float) oldLookingDirection.y,(float) oldLookingDirection.z);
         lookingDirection.rotate(deltaRotation);
-        Vec3d newLookingDirection = new Vec3d(lookingDirection);
-        return newLookingDirection;
+        return new Vec3d(lookingDirection);
     }
     
     public Quaternionf getCurrentGravityRotation(Direction currentGravity, long timeMs) {

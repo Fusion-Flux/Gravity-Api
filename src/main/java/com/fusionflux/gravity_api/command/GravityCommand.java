@@ -69,18 +69,18 @@ public class GravityCommand {
     private static void getSendFeedback(ServerCommandSource source, Entity entity, Direction gravityDirection) {
         Text text = Text.translatable("direction." + gravityDirection.getName());
         if (source.getEntity() != null && source.getEntity() == entity) {
-            source.sendFeedback(Text.translatable("commands.gravity.get.self", text), true);
+            //source.sendFeedback(Text.translatable("commands.gravity.get.self", text), true);
         } else {
-            source.sendFeedback(Text.translatable("commands.gravity.get.other", entity.getDisplayName(), text), true);
+            //source.sendFeedback(Text.translatable("commands.gravity.get.other", entity.getDisplayName(), text), true);
         }
     }
 
     private static void getStrengthSendFeedback(ServerCommandSource source, Entity entity, double strength) {
         Text text = Text.translatable("strength " + strength);
         if (source.getEntity() != null && source.getEntity() == entity) {
-            source.sendFeedback(Text.translatable("commands.gravity.get.self", text), true);
+            //source.sendFeedback(Text.translatable("commands.gravity.get.self", text), true);
         } else {
-            source.sendFeedback(Text.translatable("commands.gravity.get.other", entity.getDisplayName(), text), true);
+            //source.sendFeedback(Text.translatable("commands.gravity.get.other", entity.getDisplayName(), text), true);
         }
     }
 
