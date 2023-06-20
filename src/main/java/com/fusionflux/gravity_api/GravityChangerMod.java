@@ -1,10 +1,16 @@
 package com.fusionflux.gravity_api;
 
+import com.fusionflux.gravity_api.api.GravityChangerAPI;
+import com.fusionflux.gravity_api.api.RotationParameters;
 import com.fusionflux.gravity_api.command.GravityCommand;
 import com.fusionflux.gravity_api.config.GravityChangerConfig;
 import com.fusionflux.gravity_api.item.GravityChangerItem;
 import com.fusionflux.gravity_api.item.ModItems;
 import com.fusionflux.gravity_api.util.GravityChannel;
+import com.fusionflux.gravity_api.util.GravityComponent;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
+import dev.onyxstudios.cca.api.v3.entity.PlayerCopyCallback;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -14,8 +20,10 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,12 +48,23 @@ public class GravityChangerMod implements ModInitializer {
         collector.addItem(ModItems.GRAVITY_CHANGER_WEST_AOE);
     }).build();
 
+    public static final ComponentKey<GravityComponent> GRAVITY_COMPONENT =
+            ComponentRegistry.getOrCreate(new Identifier("gravityapi", "gravity_direction"), GravityComponent.class);
     @Override
     public void onInitialize() {
         MidnightConfig.init("gravity_api", GravityChangerConfig.class);
         ModItems.init();
         Registry.register(Registries.ITEM_GROUP, new Identifier("gravity_api", "general"), GravityChangerGroup);
         GravityChannel.initServer();
+        PlayerCopyCallback.EVENT.register((oldPlayer,newPlayer,lossless) -> {
+            if(GravityChangerConfig.resetGravityOnRespawn) {
+                GravityChangerAPI.setDefaultGravityDirection(newPlayer, Direction.DOWN, new RotationParameters().rotationTime(0));
+                GRAVITY_COMPONENT.sync(newPlayer);
+            } else {
+                GravityChangerAPI.setDefaultGravityDirection(newPlayer, GravityChangerAPI.getDefaultGravityDirection(oldPlayer), new RotationParameters().rotationTime(0));
+                GRAVITY_COMPONENT.sync(newPlayer);
+            }
+        });
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> GravityCommand.register(dispatcher));
     }
 

@@ -51,19 +51,15 @@ public abstract class ServerPlayerEntityMixin {
         }
     }
 
-    @Inject(
-            method = "copyFrom",
-            at = @At("TAIL")
-    )
-    private void inject_copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
-        if(GravityChangerConfig.resetGravityOnRespawn) {
-            //GravityChangerAPI.updateGravity((ServerPlayerEntity)(Object)this);
-            GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, Direction.DOWN, new RotationParameters().rotationTime(0));
-            GravityChangerAPI.updateGravity((ServerPlayerEntity)(Object)this);
-        } else {
-            GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection(oldPlayer), new RotationParameters().rotationTime(0));
-            GravityChangerAPI.updateGravity((ServerPlayerEntity)(Object)this);
-            //GravityChangerAPI.updateGravity((ServerPlayerEntity)(Object)this);
-        }
-    }
+    //@Inject(
+    //        method = "copyFrom",
+    //        at = @At("TAIL")
+    //)
+    //private void inject_copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
+    //    if(GravityChangerConfig.resetGravityOnRespawn) {
+    //        GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, Direction.DOWN, new RotationParameters().rotationTime(0));
+    //    } else {
+    //        GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection(oldPlayer), new RotationParameters().rotationTime(0));
+    //    }
+    //}
 }
