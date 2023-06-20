@@ -7,7 +7,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,7 +25,7 @@ public abstract class GameRendererMixin {
             method = "renderWorld",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/util/math/MatrixStack;multiply(Lnet/minecraft/util/math/Quaternion;)V",
+                    target = "Lnet/minecraft/client/util/math/MatrixStack;multiply(Lorg/joml/Quaternionf;)V",
                     ordinal = 3,
                     shift = At.Shift.AFTER
             )
@@ -37,8 +37,8 @@ public abstract class GameRendererMixin {
             Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(focusedEntity);
             if(animationOptional.isEmpty()) return;
             RotationAnimation animation = animationOptional.get();
-            long timeMs = focusedEntity.world.getTime()*50+(long)(tickDelta*50);
-            Quaternion currentGravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
+            long timeMs = focusedEntity.getWorld().getTime()*50+(long)(tickDelta*50);
+            Quaternionf currentGravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
             matrix.multiply(currentGravityRotation);
         }
     }

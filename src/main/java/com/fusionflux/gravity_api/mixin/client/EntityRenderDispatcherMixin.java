@@ -54,7 +54,7 @@ public abstract class EntityRenderDispatcherMixin {
             Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(entity);
             if(animationOptional.isEmpty()) return;
             RotationAnimation animation = animationOptional.get();
-            long timeMs = entity.world.getTime()*50+(long)(tickDelta*50);
+            long timeMs = entity.getWorld().getTime()*50+(long)(tickDelta*50);
             matrices.multiply(QuaternionUtil.inversed(animation.getCurrentGravityRotation(gravityDirection, timeMs)));
         }
     }
@@ -114,7 +114,7 @@ public abstract class EntityRenderDispatcherMixin {
         MatrixStack.Entry entry = matrices.peek();
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(SHADOW_LAYER);
 
-        for(BlockPos blockPos : BlockPos.iterate(new BlockPos(minShadowPos), new BlockPos(maxShadowPos))) {
+        for(BlockPos blockPos : BlockPos.iterate(new BlockPos((int)minShadowPos.x,(int)minShadowPos.y,(int)minShadowPos.z), new BlockPos((int)maxShadowPos.x,(int)maxShadowPos.y,(int)maxShadowPos.z))) {
             gravitychanger$renderShadowPartPlayer(entry, vertexConsumer, world, blockPos, x, y, z, radius, opacity, gravityDirection);
         }
     }

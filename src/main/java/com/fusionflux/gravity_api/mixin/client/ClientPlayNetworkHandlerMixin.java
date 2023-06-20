@@ -28,7 +28,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
     @Shadow @Final private Map<UUID, PlayerListEntry> playerListEntries;
 
     @Redirect(
-            method = "onGameStateChange",
+            method = "onGameStateUpdate",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/player/PlayerEntity;getEyeY()D",
@@ -45,7 +45,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
     }
 
     @Redirect(
-            method = "onGameStateChange",
+            method = "onGameStateUpdate",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/player/PlayerEntity;getX()D",
@@ -62,7 +62,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
     }
 
     @Redirect(
-            method = "onGameStateChange",
+            method = "onGameStateUpdate",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/player/PlayerEntity;getZ()D",

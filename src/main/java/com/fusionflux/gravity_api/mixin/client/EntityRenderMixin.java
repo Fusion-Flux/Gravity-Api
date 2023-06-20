@@ -2,6 +2,7 @@ package com.fusionflux.gravity_api.mixin.client;
 
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
+import com.fusionflux.gravity_api.util.CompatMath;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -11,7 +12,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -47,14 +48,12 @@ public abstract class EntityRenderMixin {
                     ordinal = 0
             )
     )
-    private Quaternion modifyExpressionValue_renderLabelIfPresent_getRotation_0(Quaternion originalRotation, Entity entity) {
+    private Quaternionf modifyExpressionValue_renderLabelIfPresent_getRotation_0(Quaternionf originalRotation, Entity entity) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return originalRotation;
         }
-        Quaternion quaternion = RotationUtil.getCameraRotationQuaternion(gravityDirection).copy();
-        quaternion.conjugate();
-        quaternion.hamiltonProduct(originalRotation);
-        return quaternion;
+        Quaternionf quaternion = RotationUtil.getCameraRotationQuaternion(gravityDirection).conjugate();
+        return CompatMath.hamiltonProduct(quaternion,originalRotation);
     }
 }

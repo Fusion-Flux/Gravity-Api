@@ -4,7 +4,7 @@ import com.fusionflux.gravity_api.GravityChangerMod;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.Registry;
+
 
 public abstract class ModItems {
     public static final Item GRAVITY_CHANGER_DOWN = new GravityChangerItem(new Item.Settings().group(GravityChangerMod.GravityChangerGroup).maxCount(1), Direction.DOWN);

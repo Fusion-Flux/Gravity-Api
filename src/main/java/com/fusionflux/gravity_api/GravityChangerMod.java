@@ -6,7 +6,6 @@ import com.fusionflux.gravity_api.config.MidnightConfig;
 import com.fusionflux.gravity_api.item.ModItems;
 import com.fusionflux.gravity_api.util.GravityChannel;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -20,11 +19,11 @@ public class GravityChangerMod implements ModInitializer {
 
     public static GravityChangerConfig config;
 
-    public static final ItemGroup GravityChangerGroup = FabricItemGroupBuilder.build(id("general"), () -> new ItemStack(ModItems.GRAVITY_CHANGER_UP));
+    //public static final ItemGroup GravityChangerGroup = FabricItemGroupBuilder.build(id("general"), () -> new ItemStack(ModItems.GRAVITY_CHANGER_UP));
 
     @Override
     public void onInitialize() {
-        ModItems.init();
+        //ModItems.init();
         GravityChannel.initServer();
 
         MidnightConfig.init("gravity_api", GravityChangerConfig.class);

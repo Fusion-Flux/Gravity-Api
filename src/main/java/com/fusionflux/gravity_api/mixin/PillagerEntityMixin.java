@@ -10,7 +10,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -38,8 +38,8 @@ public abstract class PillagerEntityMixin implements CrossbowUser {
         double e = targetPos.z - entity.getZ();
         double f = Math.sqrt(Math.sqrt(d * d + e * e));
         double g = targetPos.y - projectile.getY() + f * 0.20000000298023224D;
-        Vec3f vec3f = this.getProjectileLaunchVelocity(entity, new Vec3d(d, g, e), multishotSpray);
-        projectile.setVelocity((double)vec3f.getX(), (double)vec3f.getY(), (double)vec3f.getZ(), speed, (float)(14 - entity.world.getDifficulty().getId() * 4));
+        Vector3f vec3f = this.getProjectileLaunchVelocity(entity, new Vec3d(d, g, e), multishotSpray);
+        projectile.setVelocity((double)vec3f.x(), (double)vec3f.y(), (double)vec3f.z(), speed, (float)(14 - entity.getWorld().getDifficulty().getId() * 4));
         entity.playSound(SoundEvents.ITEM_CROSSBOW_SHOOT, 1.0F, 1.0F / (entity.getRandom().nextFloat() * 0.4F + 0.8F));
     }
 }

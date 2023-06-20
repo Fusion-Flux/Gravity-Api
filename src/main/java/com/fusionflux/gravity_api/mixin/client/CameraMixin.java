@@ -4,9 +4,12 @@ import java.util.Optional;
 
 import com.fusionflux.gravity_api.RotationAnimation;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
+import com.fusionflux.gravity_api.util.CompatMath;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,8 +21,6 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.BlockView;
 
 @Mixin(value = Camera.class, priority = 1001)
@@ -28,7 +29,7 @@ public abstract class CameraMixin {
 
     @Shadow private Entity focusedEntity;
 
-    @Shadow @Final private Quaternion rotation;
+    @Shadow @Final private Quaternionf rotation;
     
     @Shadow private float lastCameraY;
     
@@ -61,9 +62,8 @@ public abstract class CameraMixin {
             original.call(this, x, y, z);
             return;
         }
-        long timeMs = focusedEntity.world.getTime()*50+(long)(storedTickDelta*50);
-        Quaternion gravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).copy();
-        gravityRotation.conjugate();
+        long timeMs = focusedEntity.getWorld().getTime()*50+(long)(storedTickDelta*50);
+        Quaternionf gravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).conjugate();
 
         double entityX = MathHelper.lerp((double) tickDelta, focusedEntity.prevX, focusedEntity.getX());
         double entityY = MathHelper.lerp((double) tickDelta, focusedEntity.prevY, focusedEntity.getY());
@@ -71,14 +71,14 @@ public abstract class CameraMixin {
 
         double currentCameraY = MathHelper.lerp(tickDelta, this.lastCameraY, this.cameraY);
 
-        Vec3f eyeOffset = new Vec3f(0, (float) currentCameraY, 0);
+        Vector3f eyeOffset = new Vector3f(0, (float) currentCameraY, 0);
         eyeOffset.rotate(gravityRotation);
 
         original.call(
                 this,
-                entityX + eyeOffset.getX(),
-                entityY + eyeOffset.getY(),
-                entityZ + eyeOffset.getZ()
+                entityX + eyeOffset.x(),
+                entityY + eyeOffset.y(),
+                entityZ + eyeOffset.z()
         );
     }
 
@@ -86,8 +86,7 @@ public abstract class CameraMixin {
             method = "setRotation",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/util/math/Quaternion;hamiltonProduct(Lnet/minecraft/util/math/Quaternion;)V",
-                    ordinal = 1,
+                    target = "Lorg/joml/Quaternionf;rotationYXZ(FFF)Lorg/joml/Quaternionf;",
                     shift = At.Shift.AFTER
             )
     )
@@ -98,11 +97,10 @@ public abstract class CameraMixin {
             if(animationOptional.isEmpty()) return;
             RotationAnimation animation = animationOptional.get();
             if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) return;
-            long timeMs = focusedEntity.world.getTime()*50+(long)(storedTickDelta*50);
-            Quaternion rotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).copy();
-            rotation.conjugate();
-            rotation.hamiltonProduct(this.rotation);
-            this.rotation.set(rotation.getX(), rotation.getY(), rotation.getZ(), rotation.getW());
+            long timeMs = focusedEntity.getWorld().getTime()*50+(long)(storedTickDelta*50);
+            Quaternionf rotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).conjugate();
+            Quaternionf product = CompatMath.hamiltonProduct(rotation,this.rotation);
+            this.rotation.set(product.x(), product.y(), product.z(), product.w());
         }
     }
 }

@@ -23,7 +23,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 @Mixin(FishingBobberEntityRenderer.class)
 public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<FishingBobberEntity> {
     @Shadow @Final private static RenderLayer LAYER;
@@ -58,7 +59,7 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         matrixStack.push();
         matrixStack.scale(0.5F, 0.5F, 0.5F);
         matrixStack.multiply(this.dispatcher.getRotation());
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
+        matrixStack.multiply(Axis.Y_POSITIVE.rotationDegrees(180.0F));
         MatrixStack.Entry entry = matrixStack.peek();
         Matrix4f matrix4f = entry.getModel();
         Matrix3f matrix3f = entry.getNormal();

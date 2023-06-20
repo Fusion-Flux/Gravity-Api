@@ -2,6 +2,8 @@ package com.fusionflux.gravity_api.util;
 
 import com.fusionflux.gravity_api.GravityChangerMod;
 import net.minecraft.util.math.*;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,10 +12,10 @@ import java.util.List;
 public abstract class RotationUtil {
     record VecTransform(Vec3i pos, Vec3i sign){}
 
-    public static boolean approximatelyEquals(Vec3f a, Vec3f b){
-        return MathHelper.approximatelyEquals(a.getX(), b.getX()) &&
-                MathHelper.approximatelyEquals(a.getY(), b.getY()) &&
-                MathHelper.approximatelyEquals(a.getZ(), b.getZ());
+    public static boolean approximatelyEquals(Vector3f a, Vector3f b){
+        return MathHelper.approximatelyEquals(a.x(), b.x()) &&
+                MathHelper.approximatelyEquals(a.y(), b.y()) &&
+                MathHelper.approximatelyEquals(a.z(), b.z());
     }
 
     private static final Vec3i[] ALL_TRANSFORMATIONS = {
@@ -34,11 +36,11 @@ public abstract class RotationUtil {
             new Vec3i(-1, -1, 1),
             new Vec3i(-1, -1, -1)
     };
-    private static Vec3f transform(Vec3f v, VecTransform t){
+    private static Vector3f transform(Vector3f v, VecTransform t){
         Vec3i position = t.pos;
         Vec3i sign = t.sign;
-        float[] a = {v.getX(), v.getY(), v.getZ()};
-        return new Vec3f(a[position.getX()]*sign.getX(), a[position.getY()]*sign.getY(), a[position.getZ()]*sign.getZ());
+        float[] a = {v.x(), v.y(), v.z()};
+        return new Vector3f(a[position.getX()]*sign.getX(), a[position.getY()]*sign.getY(), a[position.getZ()]*sign.getZ());
     }
 
     private static Vec3d transform(Vec3d v, VecTransform t){
@@ -53,13 +55,13 @@ public abstract class RotationUtil {
     static {
         for(Direction d : Direction.values()) {
             //Camera Rotation
-            Vec3f cameraRotation = new Vec3f(1,2,3);
+            Vector3f cameraRotation = new Vector3f(1,2,3);
             cameraRotation.rotate(getCameraRotationQuaternion(d));
             //Camera Rotation
-            Vec3f worldRotation = new Vec3f(1,2,3);
+            Vector3f worldRotation = new Vector3f(1,2,3);
             worldRotation.rotate(getWorldRotationQuaternion(d));
             //Test Vector (Before rotation)
-            Vec3f test = new Vec3f(1,2,3);
+            Vector3f test = new Vector3f(1,2,3);
             for (Vec3i pos : ALL_TRANSFORMATIONS) {
                 for (Vec3i sign : ALL_SIGNS) {
                     VecTransform vt = new VecTransform(pos, sign);
@@ -81,7 +83,7 @@ public abstract class RotationUtil {
             for(Direction direction : Direction.values()) {
                 Vec3d directionVector = Vec3d.of(direction.getVector());
                 directionVector = RotationUtil.vecWorldToPlayer(directionVector, gravityDirection);
-                DIR_WORLD_TO_PLAYER[gravityDirection.getId()][direction.getId()] = Direction.fromVector(new BlockPos(directionVector));
+                DIR_WORLD_TO_PLAYER[gravityDirection.getId()][direction.getId()] = Direction.getFacing(directionVector.x,directionVector.y,directionVector.z);
             }
         }
     }
@@ -97,7 +99,7 @@ public abstract class RotationUtil {
             for(Direction direction : Direction.values()) {
                 Vec3d directionVector = Vec3d.of(direction.getVector());
                 directionVector = RotationUtil.vecPlayerToWorld(directionVector, gravityDirection);
-                DIR_PLAYER_TO_WORLD[gravityDirection.getId()][direction.getId()] = Direction.fromVector(new BlockPos(directionVector));
+                DIR_PLAYER_TO_WORLD[gravityDirection.getId()][direction.getId()] = Direction.getFacing(directionVector.x,directionVector.y,directionVector.z);
             }
         }
     }
@@ -122,19 +124,19 @@ public abstract class RotationUtil {
         return transform(vec3d, VEC_PLAYER_TO_WORLD.get(gravityDirection.getId()));
     }
 
-    public static Vec3f vecWorldToPlayer(float x, float y, float z, Direction gravityDirection) {
-        return vecWorldToPlayer(new Vec3f(x, y, z), gravityDirection);
+    public static Vector3f vecWorldToPlayer(float x, float y, float z, Direction gravityDirection) {
+        return vecWorldToPlayer(new Vector3f(x, y, z), gravityDirection);
     }
 
-    public static Vec3f vecWorldToPlayer(Vec3f vec3f, Direction gravityDirection) {
+    public static Vector3f vecWorldToPlayer(Vector3f vec3f, Direction gravityDirection) {
         return transform(vec3f, VEC_WORLD_TO_PLAYER.get(gravityDirection.getId()));
     }
 
-    public static Vec3f vecPlayerToWorld(float x, float y, float z, Direction gravityDirection) {
-        return vecPlayerToWorld(new Vec3f(x, y, z), gravityDirection);
+    public static Vector3f vecPlayerToWorld(float x, float y, float z, Direction gravityDirection) {
+        return vecPlayerToWorld(new Vector3f(x, y, z), gravityDirection);
     }
 
-    public static Vec3f vecPlayerToWorld(Vec3f vec3f, Direction gravityDirection) {
+    public static Vector3f vecPlayerToWorld(Vector3f vec3f, Direction gravityDirection) {
         return transform(vec3f, VEC_PLAYER_TO_WORLD.get(gravityDirection.getId()));
     }
 
@@ -216,44 +218,44 @@ public abstract class RotationUtil {
         return vecToRot(vec3d.x, vec3d.y, vec3d.z);
     }
 
-    public static Quaternion getWorldRotationQuaternion(Direction gravityDirection) {
+    public static Quaternionf getWorldRotationQuaternion(Direction gravityDirection) {
         return getRotationBetween(gravityDirection, Direction.DOWN);
     }
 
-    public static Quaternion getCameraRotationQuaternion(Direction gravityDirection) {
+    public static Quaternionf getCameraRotationQuaternion(Direction gravityDirection) {
         return getRotationBetween(Direction.DOWN, gravityDirection);
     }
 
-    public static Quaternion getRotationBetween(Direction d1, Direction d2){
+    public static Quaternionf getRotationBetween(Direction d1, Direction d2){
         Vec3d start = new Vec3d(d1.getUnitVector());
         Vec3d end = new Vec3d(d2.getUnitVector());
         if(d1.getOpposite() == d2){
-            return new Quaternion(Vec3f.NEGATIVE_Z, 180.0f, true);
+            return CompatMath.getQuat(new Vector3f(0.0F, 0.0F, -1.0F), 180.0f, true);
         }else{
             return QuaternionUtil.getRotationBetween(start, end);
         }
     }
 
-    public static Quaternion multiply(Quaternion quat ,float val) {
-        return new Quaternion(
-                quat.getX() * val, quat.getY() * val, quat.getZ() * val, quat.getW() * val
+    public static Quaternionf multiply(Quaternionf quat ,float val) {
+        return new Quaternionf(
+                quat.x() * val, quat.y() * val, quat.z() * val, quat.w() * val
         );
     }
 
-    public static Quaternion add(Quaternion a , Quaternion q) {
-        return new Quaternion(
-                a.getX() + q.getX(), a.getY() + q.getY(), a.getZ() + q.getZ(), a.getW() + q.getW()
+    public static Quaternionf add(Quaternionf a , Quaternionf q) {
+        return new Quaternionf(
+                a.x() + q.x(), a.y() + q.y(), a.y() + q.y(), a.w() + q.w()
         );
     }
 
-    public static float dotProduct(Quaternion a,Quaternion q) {
-        return a.getX() * q.getX() +
-                a.getY() * q.getY() +
-                a.getZ() * q.getZ() +
-                a.getW() * q.getW();
+    public static float dotProduct(Quaternionf a,Quaternionf q) {
+        return a.x() * q.x() +
+                a.y() * q.y() +
+                a.z() * q.z() +
+                a.w() * q.w();
     }
 
-    public static Quaternion getNormalized(Quaternion a) {
+    public static Quaternionf getNormalized(Quaternionf a) {
         float lenSq = dotProduct(a,a);
         if (lenSq != 0) {
             // no fastInverseSqrt. precision is the most important
@@ -261,11 +263,11 @@ public abstract class RotationUtil {
             return multiply(a,1.0F / (float)len);
         }
         else {
-            return new Quaternion(0, 0, 0, 0);
+            return new Quaternionf(0, 0, 0, 0);
         }
     }
 
-    public static Quaternion interpolate(Quaternion a, Quaternion b, float t) {
+    public static Quaternionf interpolate(Quaternionf a, Quaternionf b, float t) {
 
         float dot = dotProduct(a,b);
 

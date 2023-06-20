@@ -7,10 +7,7 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.encryption.PlayerPublicKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,8 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayerEntity.class)
 public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
-    public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile, @Nullable PlayerPublicKey publicKey) {
-        super(world, profile, publicKey);
+    public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
+        super(world, profile);
     }
 
     @Shadow protected abstract boolean wouldCollideAt(BlockPos pos);
@@ -64,7 +61,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         ci.cancel();
 
         Vec3d pos = RotationUtil.vecPlayerToWorld(x - this.getX(), 0.0D, z - this.getZ(), gravityDirection).add(this.getPos());
-        BlockPos blockPos = new BlockPos(pos);
+        BlockPos blockPos = new BlockPos((int) pos.x,(int) pos.y,(int) pos.z);
         if (this.wouldCollideAt(blockPos)) {
             double dx = pos.x - (double)blockPos.getX();
             double dy = pos.y - (double)blockPos.getY();

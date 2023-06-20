@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(PlayerEntityRenderer.class)
 public abstract class PlayerEntityRendererMixin {
+
     @ModifyVariable(
             method = "setupTransforms(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V",
             at = @At(

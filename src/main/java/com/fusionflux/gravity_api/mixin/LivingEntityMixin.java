@@ -2,6 +2,7 @@ package com.fusionflux.gravity_api.mixin;
 
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
+import com.fusionflux.gravity_api.util.CompatMath;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -139,7 +140,7 @@ public abstract class LivingEntityMixin extends Entity {
             return blockPos;
         }
 
-        return new BlockPos(this.getPos().add(RotationUtil.vecPlayerToWorld(0, -0.20000000298023224D, 0, gravityDirection)));
+        return new BlockPos(CompatMath.toVec3i(this.getPos().add(RotationUtil.vecPlayerToWorld(0, -0.20000000298023224D, 0, gravityDirection))));
     }
 
     @Redirect(
