@@ -172,7 +172,7 @@ public abstract class EntityMixin{
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
 
-        cir.setReturnValue(new BlockPos(CompatMath.toVec3i(this.pos.add(Vec3d.of(gravityDirection.getVector()).multiply(0.5000001D)))));
+        cir.setReturnValue(CompatMath.fastBlockPos(this.pos.add(Vec3d.of(gravityDirection.getVector()).multiply(0.5000001D))));
     }
 
     @Inject(
@@ -213,7 +213,7 @@ public abstract class EntityMixin{
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
 
-        cir.setReturnValue(this.world.isPosLoaded(this.getBlockX(), this.getBlockZ()) ? this.world.getBrightness(new BlockPos(CompatMath.toVec3i(this.getEyePos()))) : 0.0F);
+        cir.setReturnValue(this.world.isPosLoaded(this.getBlockX(), this.getBlockZ()) ? this.world.getBrightness(CompatMath.fastBlockPos(this.getEyePos())) : 0.0F);
     }
 
     @ModifyVariable(
@@ -293,7 +293,7 @@ public abstract class EntityMixin{
     private void inject_getLandingPos(CallbackInfoReturnable<BlockPos> cir) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) return;
-        BlockPos blockPos = new BlockPos(CompatMath.toVec3i(RotationUtil.vecPlayerToWorld(0.0D, -0.20000000298023224D, 0.0D, gravityDirection).add(this.pos)));
+        BlockPos blockPos = CompatMath.fastBlockPos(RotationUtil.vecPlayerToWorld(0.0D, -0.20000000298023224D, 0.0D, gravityDirection).add(this.pos));
         cir.setReturnValue(blockPos);
     }
 
@@ -550,7 +550,7 @@ public abstract class EntityMixin{
 
         Vec3d floorPos = this.getPos().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.20000000298023224D, 0.0D, gravityDirection));
 
-        BlockPos blockPos = new BlockPos(CompatMath.toVec3i(floorPos));
+        BlockPos blockPos = CompatMath.fastBlockPos(floorPos);
         BlockState blockState = this.world.getBlockState(blockPos);
         if (blockState.getRenderType() != BlockRenderType.INVISIBLE) {
             Vec3d particlePos = this.getPos().add(RotationUtil.vecPlayerToWorld((this.random.nextDouble() - 0.5D) * (double) this.dimensions.width, 0.1D, (this.random.nextDouble() - 0.5D) * (double) this.dimensions.width, gravityDirection));
@@ -616,6 +616,7 @@ public abstract class EntityMixin{
 
                 {
                     Vec3d playerEntityOffset = RotationUtil.vecWorldToPlayer(entityOffset, gravityDirection);
+                    System.out.println("halt");
                     double dx = playerEntityOffset.x;
                     double dz = playerEntityOffset.z;
                     double f = MathHelper.absMax(dx, dz);
@@ -712,7 +713,7 @@ public abstract class EntityMixin{
             ordinal = 0
     )
     private BlockPos submergedInWaterPosFix(BlockPos blockpos) {
-        blockpos = new BlockPos(CompatMath.toVec3i(this.getEyePos()));
+        blockpos = CompatMath.fastBlockPos(this.getEyePos());
         return blockpos;
     }
 

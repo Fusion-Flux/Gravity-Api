@@ -17,8 +17,8 @@ public abstract class QuaternionUtil {
     }
     
     public static Quaternionf getViewRotation(float pitch, float yaw) {
-        Quaternionf r1 = new Quaternionf().fromAxisAngleDeg(new Vector3f(1, 0, 0), pitch);
-        Quaternionf r2 = new Quaternionf().fromAxisAngleDeg(new Vector3f(0, 1, 0), yaw + 180);
+        Quaternionf r1 = new Quaternionf().fromAxisAngleDeg(new Vector3f(1.0F, 0.0F, 0.0F), pitch);
+        Quaternionf r2 = new Quaternionf().fromAxisAngleDeg(new Vector3f(0.0F, 1.0F, 0.0F), yaw + 180);
         return CompatMath.hamiltonProduct(r1,r2);
     }
     
@@ -29,10 +29,7 @@ public abstract class QuaternionUtil {
         Vec3d axis = from.crossProduct(to).normalize();
         double cos = from.dotProduct(to);
         double angle = Math.acos(cos);
-        //System.out.println();
-        //System.out.println(new Quaternionf().fromAxisAngleRad((float)axis.x,(float)axis.y,(float)axis.z, (float) angle));
-        //System.out.println(CompatMath.getQuat( new Vector3f((float)axis.x,(float)axis.y,(float)axis.z), (float) angle,false));
-        return CompatMath.getQuat( new Vector3f((float)axis.x,(float)axis.y,(float)axis.z), (float) angle,false);
+        return CompatMath.getQuat(new Vector3f((float)axis.x,(float)axis.y,(float)axis.z), (float) angle, false);
     }
     
     // does not mutate the argument

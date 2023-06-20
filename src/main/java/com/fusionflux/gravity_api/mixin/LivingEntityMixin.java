@@ -141,7 +141,7 @@ public abstract class LivingEntityMixin extends Entity {
             return blockPos;
         }
 
-        return new BlockPos(CompatMath.toVec3i(this.getPos().add(RotationUtil.vecPlayerToWorld(0, -0.20000000298023224D, 0, gravityDirection))));
+        return CompatMath.fastBlockPos(this.getPos().add(RotationUtil.vecPlayerToWorld(0, -0.20000000298023224D, 0, gravityDirection)));
     }
 
     @Redirect(

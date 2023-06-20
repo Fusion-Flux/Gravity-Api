@@ -3,6 +3,7 @@ package com.fusionflux.gravity_api.mixin;
 import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.api.RotationParameters;
+import com.fusionflux.gravity_api.config.GravityChangerConfig;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
@@ -55,9 +56,14 @@ public abstract class ServerPlayerEntityMixin {
             at = @At("TAIL")
     )
     private void inject_copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
-        if(GravityChangerMod.config.resetGravityOnRespawn) {
+        if(GravityChangerConfig.resetGravityOnRespawn) {
+            //GravityChangerAPI.updateGravity((ServerPlayerEntity)(Object)this);
+            GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, Direction.DOWN, new RotationParameters().rotationTime(0));
+            GravityChangerAPI.updateGravity((ServerPlayerEntity)(Object)this);
         } else {
             GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection(oldPlayer), new RotationParameters().rotationTime(0));
+            GravityChangerAPI.updateGravity((ServerPlayerEntity)(Object)this);
+            //GravityChangerAPI.updateGravity((ServerPlayerEntity)(Object)this);
         }
     }
 }

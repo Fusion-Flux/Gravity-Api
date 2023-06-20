@@ -59,9 +59,8 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         if(gravityDirection == Direction.DOWN) return;
 
         ci.cancel();
-
         Vec3d pos = RotationUtil.vecPlayerToWorld(x - this.getX(), 0.0D, z - this.getZ(), gravityDirection).add(this.getPos());
-        BlockPos blockPos = new BlockPos((int) pos.x,(int) pos.y,(int) pos.z);
+        BlockPos blockPos = BlockPos.create(pos.x,pos.y,pos.z);
         if (this.wouldCollideAt(blockPos)) {
             double dx = pos.x - (double)blockPos.getX();
             double dy = pos.y - (double)blockPos.getY();
@@ -84,8 +83,10 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
             if (direction != null) {
                 Vec3d velocity = this.getVelocity();
                 if (direction.getAxis() == Direction.Axis.X) {
+                    System.out.println("halt");
                     this.setVelocity(0.1D * (double)direction.getOffsetX(), velocity.y, velocity.z);
                 } else if(direction.getAxis() == Direction.Axis.Z) {
+                    System.out.println("halt");
                     this.setVelocity(velocity.x, velocity.y, 0.1D * (double)direction.getOffsetZ());
                 }
             }

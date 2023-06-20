@@ -40,14 +40,14 @@ public abstract class RotationUtil {
         Vec3i position = t.pos;
         Vec3i sign = t.sign;
         float[] a = {v.x(), v.y(), v.z()};
-        return new Vector3f(a[position.getX()]*sign.getX(), a[position.getY()]*sign.getY(), a[position.getZ()]*sign.getZ());
+        return new Vector3f((float)a[position.getX()]*(float)sign.getX(), (float)a[position.getY()]*(float)sign.getY(), (float)a[position.getZ()]*(float)sign.getZ());
     }
 
     private static Vec3d transform(Vec3d v, VecTransform t){
         Vec3i position = t.pos;
         Vec3i sign = t.sign;
         double[] a = {v.getX(), v.getY(), v.getZ()};
-        return new Vec3d(a[position.getX()]*sign.getX(), a[position.getY()]*sign.getY(), a[position.getZ()]*sign.getZ());
+        return new Vec3d((float)a[position.getX()]*(float)sign.getX(), (float)a[position.getY()]*(float)sign.getY(), (float)a[position.getZ()]*(float)sign.getZ());
     }
 
     private static final List<VecTransform> VEC_WORLD_TO_PLAYER = new ArrayList<>();

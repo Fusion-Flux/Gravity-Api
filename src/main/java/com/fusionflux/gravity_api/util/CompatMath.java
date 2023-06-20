@@ -1,5 +1,6 @@
 package com.fusionflux.gravity_api.util;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -32,8 +33,8 @@ public abstract class CompatMath {
         return new Quaternionf(x,y,z,w);
     }
 
-    public static Vec3i toVec3i(Vec3d other){
-        return new Vec3i((int)other.x,(int)other.y,(int)other.z);
+    public static BlockPos fastBlockPos(Vec3d p){
+        return BlockPos.create(p.x,p.y,p.z);
     }
     private static float sin(float value) {
         return (float)Math.sin((double)value);

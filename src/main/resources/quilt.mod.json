@@ -25,6 +25,10 @@
       {
         "id": "minecraft",
         "versions": ">=1.18.2"
+      },
+      {
+        "id": "eu.midnightdust:midnightlib",
+        "versions": ">=1.0.0"
       }
     ],
 
