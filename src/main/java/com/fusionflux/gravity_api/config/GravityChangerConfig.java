@@ -2,11 +2,11 @@ package com.fusionflux.gravity_api.config;
 
 
 import eu.midnightdust.lib.config.MidnightConfig;
-
+@SuppressWarnings("CanBeFinal")
 public class GravityChangerConfig extends MidnightConfig {
 
-    @Entry public static boolean keepWorldLook = false;
-    @Entry public static int rotationTime = 500;
+    @Entry @Client  public static boolean keepWorldLook = false;
+    @Entry @Client  public static int rotationTime = 500;
 
     @Entry public static boolean server;
     @Entry public static boolean worldVelocity = false;

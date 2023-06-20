@@ -7,6 +7,7 @@ import com.fusionflux.gravity_api.util.RotationUtil;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
+import net.minecraft.util.math.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
@@ -20,10 +21,6 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
@@ -34,6 +31,10 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Shadow public abstract float getYaw(float tickDelta);
 
+
+    @Shadow public abstract void updateLimbs(boolean flutter);
+
+    @Shadow protected abstract void updateLimbs(float limbDistance);
 
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
@@ -193,31 +194,22 @@ public abstract class LivingEntityMixin extends Entity {
         cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection));
     }
 
-    //@Inject(
-    //        method = "updateLimbs",
-    //        at = @At("HEAD"),
-    //        cancellable = true
-    //)
-    //private void inject_updateLimbs(LivingEntity entity, boolean flutter, CallbackInfo ci) {
-    //    Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
-    //    if(gravityDirection == Direction.DOWN) return;
-//
-    //    ci.cancel();
-//
-    //    Vec3d playerPosDelta = RotationUtil.vecWorldToPlayer(entity.getX() - entity.prevX, entity.getY() - entity.prevY, entity.getZ() - entity.prevZ, gravityDirection);
-//
-    //    entity.lastLimbDistance = entity.limbDistance;
-    //    double d = playerPosDelta.x;
-    //    double e = flutter ? playerPosDelta.y : 0.0D;
-    //    double f = playerPosDelta.z;
-    //    float g = (float)Math.sqrt(d * d + e * e + f * f) * 4.0F;
-    //    if (g > 1.0F) {
-    //        g = 1.0F;
-    //    }
-//
-    //    entity.limbDistance += (g - entity.limbDistance) * 0.4F;
-    //    entity.limbAngle += entity.limbDistance;
-    //}
+    @Inject(
+            method = "Lnet/minecraft/entity/LivingEntity;updateLimbs(Z)V",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void inject_updateLimbs(boolean flutter, CallbackInfo ci) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this);
+        if(gravityDirection == Direction.DOWN) return;
+
+        ci.cancel();
+
+        Vec3d playerPosDelta = RotationUtil.vecWorldToPlayer(this.getX() - this.prevX, this.getY() - this.prevY, this.getZ() - this.prevZ, gravityDirection);
+
+        float mag = (float)MathHelper.magnitude(playerPosDelta.x,flutter ? playerPosDelta.y : 0.0D,playerPosDelta.z);
+        this.updateLimbs(mag);
+    }
 
     @WrapOperation(
             method = "tick",

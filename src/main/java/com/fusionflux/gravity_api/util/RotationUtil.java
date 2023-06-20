@@ -244,7 +244,7 @@ public abstract class RotationUtil {
 
     public static Quaternionf add(Quaternionf a , Quaternionf q) {
         return new Quaternionf(
-                a.x() + q.x(), a.y() + q.y(), a.y() + q.y(), a.w() + q.w()
+                a.x() + q.x(), a.y() + q.y(), a.z() + q.z(), a.w() + q.w()
         );
     }
 
