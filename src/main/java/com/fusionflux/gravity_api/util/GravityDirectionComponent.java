@@ -242,8 +242,8 @@ public class GravityDirectionComponent implements GravityComponent {
                             entity, timeMs, rotationParameters.rotateView()
                     );
                 }
-                prevGravityDirection = oldGravity;
                 gravityDirection = newGravity;
+                prevGravityDirection = oldGravity;
                 onGravityChanged(oldGravity, newGravity, rotationParameters, initialGravity);
             }
         }

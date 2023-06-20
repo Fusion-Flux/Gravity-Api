@@ -230,7 +230,7 @@ public abstract class RotationUtil {
         Vec3d start = new Vec3d(d1.getUnitVector());
         Vec3d end = new Vec3d(d2.getUnitVector());
         if(d1.getOpposite() == d2){
-            return CompatMath.getQuat(new Vector3f(0.0F, 0.0F, -1.0F), 180.0f, true);
+            return new Quaternionf().fromAxisAngleDeg(new Vector3f(0.0F, 0.0F, -1.0F), 180.0f);
         }else{
             return QuaternionUtil.getRotationBetween(start, end);
         }
