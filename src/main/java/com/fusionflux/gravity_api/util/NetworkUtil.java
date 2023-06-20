@@ -68,6 +68,7 @@ public class NetworkUtil {
     public static void writeGravity(PacketByteBuf buf, Gravity gravity){
         writeDirection(buf, gravity.direction());
         buf.writeInt(gravity.priority());
+        buf.writeDouble(gravity.strength());
         buf.writeInt(gravity.duration());
         buf.writeString(gravity.source());
         writeRotationParameters(buf, gravity.rotationParameters());
@@ -93,6 +94,7 @@ public class NetworkUtil {
         return new Gravity(
                 readDirection(buf),
                 buf.readInt(),
+                buf.readDouble(),
                 buf.readInt(),
                 buf.readString(),
                 readRotationParameters(buf)

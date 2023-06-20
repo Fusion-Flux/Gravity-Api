@@ -22,6 +22,7 @@ public class GravityChannel<P extends GravityPacket> {
     public static GravityChannel<OverwriteGravityPacket> OVERWRITE_GRAVITY = new GravityChannel<>(OverwriteGravityPacket::new, GravityChangerMod.id("overwrite_gravity_list"));
     public static GravityChannel<UpdateGravityPacket> UPDATE_GRAVITY = new GravityChannel<>(UpdateGravityPacket::new, GravityChangerMod.id("update_gravity_list"));
     public static GravityChannel<DefaultGravityPacket> DEFAULT_GRAVITY = new GravityChannel<>(DefaultGravityPacket::new, GravityChangerMod.id("default_gravity"));
+    public static GravityChannel<DefaultGravityStrengthPacket> DEFAULT_GRAVITY_STRENGTH = new GravityChannel<>(DefaultGravityStrengthPacket::new, GravityChangerMod.id("default_gravity_strength"));
     public static GravityChannel<InvertGravityPacket> INVERT_GRAVITY = new GravityChannel<>(InvertGravityPacket::new, GravityChangerMod.id("inverted"));
 
     private final Factory<P> packetFactory;
@@ -81,6 +82,7 @@ public class GravityChannel<P extends GravityPacket> {
             OVERWRITE_GRAVITY.sendToClient(entity, new OverwriteGravityPacket(gc.getGravity(), initialGravity), mode);
             DEFAULT_GRAVITY.sendToClient(entity, new DefaultGravityPacket(gc.getDefaultGravityDirection(), rp, initialGravity), mode);
             INVERT_GRAVITY.sendToClient(entity, new InvertGravityPacket(gc.getInvertGravity(), rp, initialGravity), mode);
+            DEFAULT_GRAVITY_STRENGTH.sendToClient(entity, new DefaultGravityStrengthPacket(gc.getGravityStrength()), mode);
         });
     }
 
@@ -101,6 +103,7 @@ public class GravityChannel<P extends GravityPacket> {
         UPDATE_GRAVITY.registerClientReceiver();
         OVERWRITE_GRAVITY.registerClientReceiver();
         INVERT_GRAVITY.registerClientReceiver();
+        DEFAULT_GRAVITY_STRENGTH.registerClientReceiver();
     }
 
     public static void initServer() {
@@ -108,6 +111,7 @@ public class GravityChannel<P extends GravityPacket> {
         UPDATE_GRAVITY.registerServerReceiver();
         OVERWRITE_GRAVITY.registerServerReceiver();
         INVERT_GRAVITY.registerServerReceiver();
+        DEFAULT_GRAVITY_STRENGTH.registerServerReceiver();
     }
 
     @FunctionalInterface

@@ -1,30 +1,34 @@
 package com.fusionflux.gravity_api.mixin.client;
 
+import java.util.Map;
+import java.util.UUID;
+
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.Map;
-import java.util.UUID;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 
-@Mixin(ClientPlayNetworkHandler.class)
+@Mixin(value = ClientPlayNetworkHandler.class, priority = 1001)
 public abstract class ClientPlayNetworkHandlerMixin {
     @Shadow @Final private MinecraftClient client;
 
     @Shadow @Final private Map<UUID, PlayerListEntry> playerListEntries;
 
     @Redirect(
-            method = "onGameStateChange",
+            method = "onGameStateUpdate",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/player/PlayerEntity;getEyeY()D",
@@ -41,7 +45,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
     }
 
     @Redirect(
-            method = "onGameStateChange",
+            method = "onGameStateUpdate",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/player/PlayerEntity;getX()D",
@@ -58,7 +62,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
     }
 
     @Redirect(
-            method = "onGameStateChange",
+            method = "onGameStateUpdate",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/player/PlayerEntity;getZ()D",
@@ -74,20 +78,21 @@ public abstract class ClientPlayNetworkHandlerMixin {
         return playerEntity.getEyePos().z;
     }
 
-    @Redirect(
-            method = "onExplosion",
+    @WrapOperation(
+            method = "onExplosionOccurs",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/util/math/Vec3d;add(DDD)Lnet/minecraft/util/math/Vec3d;",
                     ordinal = 0
             )
     )
-    private Vec3d redirect_onExplosion_add_0(Vec3d vec3d, double x, double y, double z) {
+    private Vec3d wrapOperation_onExplosion_add_0(Vec3d vec3d, double x, double y, double z, Operation<Vec3d> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(client.player);
         if(gravityDirection == Direction.DOWN) {
-            return vec3d.add(x, y, z);
+            return original.call(vec3d, x, y, z);
         }
 
-        return vec3d.add(RotationUtil.vecWorldToPlayer(x, y, z, gravityDirection));
+        Vec3d player = RotationUtil.vecWorldToPlayer(x, y, z, gravityDirection);
+        return original.call(vec3d, player.x, player.y, player.z);
     }
 }

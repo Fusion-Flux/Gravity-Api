@@ -5,6 +5,7 @@ import com.fusionflux.gravity_api.util.Gravity;
 import com.fusionflux.gravity_api.api.RotationParameters;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -55,6 +56,10 @@ public class GravityCommand {
                         .executes(context -> executeClearGravity(context.getSource(), Collections.singleton(context.getSource().getPlayer())))
                         .then(argument("entities", EntityArgumentType.entity())
                                 .executes(context -> executeClearGravity(context.getSource(), EntityArgumentType.getEntities(context, "entities")))))
+                .then(literal("setdefaultstrength")
+                        .executes(context -> executeSetDefaultStrength(context.getSource(), DoubleArgumentType.getDouble(context, "double"), Collections.singleton(context.getSource().getPlayer())))
+                        .then(argument("entities", EntityArgumentType.entity()).then(argument("double", DoubleArgumentType.doubleArg())
+                                .executes(context -> executeSetDefaultStrength(context.getSource(), DoubleArgumentType.getDouble(context, "double"), Collections.singleton(EntityArgumentType.getEntity(context, "entities")))))))
                 .then(literalSet).then(literalSetDefault).then(literalRotate).then(literal("randomise")
                         .executes(context -> executeRandomise(context.getSource(), Collections.singleton(context.getSource().getPlayer())))
                         .then(argument("entities", EntityArgumentType.entities())
@@ -64,9 +69,18 @@ public class GravityCommand {
     private static void getSendFeedback(ServerCommandSource source, Entity entity, Direction gravityDirection) {
         Text text = Text.translatable("direction." + gravityDirection.getName());
         if (source.getEntity() != null && source.getEntity() == entity) {
-            source.sendFeedback(Text.translatable("commands.gravity.get.self", text), true);
+            source.sendFeedback(() -> Text.translatable("commands.gravity.get.self", text), true);
         } else {
-            source.sendFeedback(Text.translatable("commands.gravity.get.other", entity.getDisplayName(), text), true);
+            source.sendFeedback(() -> Text.translatable("commands.gravity.get.other", entity.getDisplayName(), text), true);
+        }
+    }
+
+    private static void getStrengthSendFeedback(ServerCommandSource source, Entity entity, double strength) {
+        Text text = Text.translatable("strength " + strength);
+        if (source.getEntity() != null && source.getEntity() == entity) {
+            source.sendFeedback(() -> Text.translatable("commands.gravity.get.self", text), true);
+        } else {
+            source.sendFeedback(() -> Text.translatable("commands.gravity.get.other", entity.getDisplayName(), text), true);
         }
     }
 
@@ -95,6 +109,18 @@ public class GravityCommand {
                 GravityChangerAPI.setDefaultGravityDirection(entity, gravityDirection, new RotationParameters());
                 //GravityChangerAPI.updateGravity(entity);
                 getSendFeedback(source, entity, gravityDirection);
+                i++;
+            }
+        }
+        return i;
+    }
+
+    private static int executeSetDefaultStrength(ServerCommandSource source, double gravityStrength, Collection<? extends Entity> entities) {
+        int i = 0;
+        for (Entity entity : entities) {
+            if (GravityChangerAPI.getDefaultGravityStrength(entity) != gravityStrength) {
+                GravityChangerAPI.setDefualtGravityStrength(entity, gravityStrength);
+                getStrengthSendFeedback(source, entity, gravityStrength);
                 i++;
             }
         }

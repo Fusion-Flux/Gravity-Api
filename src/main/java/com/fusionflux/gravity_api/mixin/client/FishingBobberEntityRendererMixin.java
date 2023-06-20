@@ -3,9 +3,9 @@ package com.fusionflux.gravity_api.mixin.client;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
@@ -23,16 +23,19 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 @Mixin(FishingBobberEntityRenderer.class)
 public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<FishingBobberEntity> {
     @Shadow @Final private static RenderLayer LAYER;
 
     @Shadow private static void vertex(VertexConsumer buffer, Matrix4f matrix, Matrix3f normalMatrix, int light, float x, int y, int u, int v) {}
 
-    @Shadow private static void renderFishingLine(float x, float y, float z, VertexConsumer buffer, MatrixStack.Entry normal, float f, float g) {}
-
     @Shadow private static float percentage(int value, int max) { return 0.0F; }
+
+    @Shadow
+    private static void drawArcSection(float x, float y, float z, VertexConsumer buffer, MatrixStack.Entry normal, float startPercent, float endPercent) {
+    }
 
     protected FishingBobberEntityRendererMixin(EntityRendererFactory.Context ctx) {
         super(ctx);
@@ -56,10 +59,10 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         matrixStack.push();
         matrixStack.scale(0.5F, 0.5F, 0.5F);
         matrixStack.multiply(this.dispatcher.getRotation());
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
+        matrixStack.multiply(Axis.Y_POSITIVE.rotationDegrees(180.0F));
         MatrixStack.Entry entry = matrixStack.peek();
-        Matrix4f matrix4f = entry.getPositionMatrix();
-        Matrix3f matrix3f = entry.getNormalMatrix();
+        Matrix4f matrix4f = entry.getModel();
+        Matrix3f matrix3f = entry.getNormal();
         VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(LAYER);
         vertex(vertexConsumer, matrix4f, matrix3f, light, 0.0F, 0, 0, 1);
         vertex(vertexConsumer, matrix4f, matrix3f, light, 1.0F, 0, 1, 1);
@@ -81,7 +84,7 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         Vec3d lineStart;
         if ((this.dispatcher.gameOptions == null || this.dispatcher.gameOptions.getPerspective().isFirstPerson()) && playerEntity == MinecraftClient.getInstance().player) {
             Vec3d lineOffset = RotationUtil.vecWorldToPlayer(this.dispatcher.camera.getProjection().getPosition((float) armOffset * 0.525F, -0.1F), gravityDirection);
-            lineOffset = lineOffset.multiply(960.0D / this.dispatcher.gameOptions.getFov().getValue());
+            lineOffset = lineOffset.multiply(960.0D / this.dispatcher.gameOptions.getFov().get());
             lineOffset = lineOffset.rotateY(sinHandSwingProgress * 0.5F);
             lineOffset = lineOffset.rotateX(-sinHandSwingProgress * 0.7F);
             lineStart = new Vec3d(
@@ -112,7 +115,7 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         MatrixStack.Entry entry2 = matrixStack.peek();
 
         for(int i = 0; i <= 16; ++i) {
-            renderFishingLine(relX, relY, relZ, vertexConsumer2, entry2, percentage(i, 16), percentage(i + 1, 16));
+            drawArcSection(relX, relY, relZ, vertexConsumer2, entry2, percentage(i, 16), percentage(i + 1, 16));
         }
 
         matrixStack.pop();

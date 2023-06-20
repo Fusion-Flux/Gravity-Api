@@ -3,6 +3,15 @@ package com.fusionflux.gravity_api.mixin;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,10 +20,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(FishingBobberEntity.class)
 public abstract class FishingBobberEntityMixin extends Entity {
@@ -26,7 +31,7 @@ public abstract class FishingBobberEntityMixin extends Entity {
     }
 
 
-    @Redirect(
+    @WrapOperation(
             method = "<init>(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/world/World;II)V",
             at = @At(
                     value = "INVOKE",
@@ -34,16 +39,16 @@ public abstract class FishingBobberEntityMixin extends Entity {
                     ordinal = 0
             )
     )
-    private void redirect_init_(FishingBobberEntity fishingBobberEntity, double x, double y, double z, float yaw, float pitch, PlayerEntity thrower, World world, int lureLevel, int luckOfTheSeaLevel) {
+    private void wrapOperation_init_(FishingBobberEntity fishingBobberEntity, double x, double y, double z, float yaw, float pitch, Operation<Void> original, PlayerEntity thrower, World world, int lureLevel, int luckOfTheSeaLevel) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(thrower);
         if(gravityDirection == Direction.DOWN) {
-            fishingBobberEntity.refreshPositionAndAngles(x, y, z, yaw, pitch);
+            original.call(fishingBobberEntity, x, y, z, yaw, pitch);
             return;
         }
 
         Vec3d pos = thrower.getEyePos();
         Vec2f rot = RotationUtil.rotPlayerToWorld(yaw, pitch, gravityDirection);
-        fishingBobberEntity.refreshPositionAndAngles(pos.x, pos.y, pos.z, rot.x, rot.y);
+        original.call(fishingBobberEntity, pos.x, pos.y, pos.z, rot.x, rot.y);
     }
 
     @ModifyVariable(
@@ -62,5 +67,10 @@ public abstract class FishingBobberEntityMixin extends Entity {
         }
 
         return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
+    }
+
+    @ModifyConstant(method = "tick", constant = @Constant(doubleValue = -0.03))
+    private double multiplyGravity(double constant) {
+        return constant * GravityChangerAPI.getGravityStrength(this);
     }
 }

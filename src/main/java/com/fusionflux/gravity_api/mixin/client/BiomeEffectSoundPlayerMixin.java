@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(BiomeEffectSoundPlayer.class)
 public abstract class BiomeEffectSoundPlayerMixin {
     @Redirect(
-            method = "method_26271",
+            method = {"m_hhelwrkg","method_26271"},
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEyeY()D",
@@ -29,7 +29,7 @@ public abstract class BiomeEffectSoundPlayerMixin {
     }
 
     @Redirect(
-            method = "method_26271",
+            method = "tick",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/network/ClientPlayerEntity;getX()D",
@@ -46,7 +46,7 @@ public abstract class BiomeEffectSoundPlayerMixin {
     }
 
     @Redirect(
-            method = "method_26271",
+            method = "tick",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/network/ClientPlayerEntity;getZ()D",
@@ -63,7 +63,7 @@ public abstract class BiomeEffectSoundPlayerMixin {
     }
 
     @Redirect(
-            method = "method_26271",
+            method = {"m_hhelwrkg","method_26271"},
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEyeY()D",
@@ -80,7 +80,7 @@ public abstract class BiomeEffectSoundPlayerMixin {
     }
 
     @Redirect(
-            method = "method_26271",
+            method = {"m_hhelwrkg","method_26271"},
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/network/ClientPlayerEntity;getX()D",
@@ -97,7 +97,7 @@ public abstract class BiomeEffectSoundPlayerMixin {
     }
 
     @Redirect(
-            method = "method_26271",
+            method = {"m_hhelwrkg","method_26271"},
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/network/ClientPlayerEntity;getZ()D",
@@ -114,7 +114,7 @@ public abstract class BiomeEffectSoundPlayerMixin {
     }
 
     @Redirect(
-            method = "method_26271",
+            method = {"m_hhelwrkg","method_26271"},
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEyeY()D",
@@ -131,7 +131,7 @@ public abstract class BiomeEffectSoundPlayerMixin {
     }
 
     @Redirect(
-            method = "method_26271",
+            method = {"m_hhelwrkg","method_26271"},
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/network/ClientPlayerEntity;getX()D",
@@ -148,7 +148,7 @@ public abstract class BiomeEffectSoundPlayerMixin {
     }
 
     @Redirect(
-            method = "method_26271",
+            method = {"m_hhelwrkg","method_26271"},
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/network/ClientPlayerEntity;getZ()D",
