@@ -9,7 +9,7 @@ import net.minecraft.util.Identifier;
 public class GravityDimensionStrengthWorldRegister implements WorldComponentInitializer {
 
     public static final ComponentKey<GravityDimensionStrengthInterface> GRAVITY_DIMENSION_STRENGTH_MODIFIER =
-            ComponentRegistry.getOrCreate(new Identifier("gravityapi", "gravity_dimension_strength"), GravityDimensionStrengthInterface.class);
+            ComponentRegistry.getOrCreate(new Identifier("gravity_api", "gravity_dimension_strength"), GravityDimensionStrengthInterface.class);
 
     @Override
     public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {

@@ -49,7 +49,7 @@ public class GravityChangerMod implements ModInitializer {
     }).build();
 
     public static final ComponentKey<GravityComponent> GRAVITY_COMPONENT =
-            ComponentRegistry.getOrCreate(new Identifier("gravityapi", "gravity_direction"), GravityComponent.class);
+            ComponentRegistry.getOrCreate(new Identifier("gravity_api", "gravity_direction"), GravityComponent.class);
     @Override
     public void onInitialize() {
         MidnightConfig.init("gravity_api", GravityChangerConfig.class);

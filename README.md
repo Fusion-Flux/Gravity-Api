@@ -30,7 +30,7 @@ To import the mod you can use modrinth maven.
 Add the following to your project:
 #### grable.properties
 ```properties
-gravitychanger_version = 0.3.0
+gravity_api_version = 1.0.6
 ```
 Replace 0.2.0 with the version you want to use from [here](https://modrinth.com/mod/gravitychanger/versions).
 #### build.gradle
@@ -46,15 +46,21 @@ repositories {
 }
 
 dependencies {
-    modImplementation "maven.modrinth:gravitychanger:${project.gravitychanger_version}"
+    modImplementation include ("maven.modrinth:gravity-api:${project.gravity_api_version}"){
+	    exclude group: "net.fabricmc.fabric-api"
+	    exclude group: "net.fabricmc"
+	}
 }
 ```
 #### fabric.mod.json
 ```json
-"depends": {
-    "gravitychanger": "^0.3.0"
-}
+"depends": [
+  {
+    "id": "com.fusionflux:gravity_api",
+    "versions": ">=1.0.6"
+  }
+]
 ```
-Replace 0.3.0 with the lowest version of the mod your mod works with
+Replace 1.0.6 with the lowest version of the mod your mod works with
 
 Now you should be able to use methods in `me.andrew.gravitychanger.api.GravityChangerAPI` class to manipulate player gravity.

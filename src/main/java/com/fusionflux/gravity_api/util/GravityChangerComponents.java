@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 public class GravityChangerComponents implements EntityComponentInitializer {
 
     public static final ComponentKey<GravityComponent> GRAVITY_MODIFIER =
-            ComponentRegistry.getOrCreate(new Identifier("gravityapi", "gravity_direction"), GravityComponent.class);
+            ComponentRegistry.getOrCreate(new Identifier("gravity_api", "gravity_direction"), GravityComponent.class);
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {

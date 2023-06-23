@@ -27,7 +27,7 @@
   "commands.gravity.set.self": "Set own gravity to %s",
   "commands.gravity.set.other": "Set %s's gravity to %s",
 
-  "text.autoconfig.gravity_api.title": "GravityChanger Config",
+  "text.autoconfig.gravity_api.title": "Gravity API Config",
 
   "gravity_api.midnightconfig.client.@PrefixText": "Client",
   "gravity_api.midnightconfig.keepWorldLook": "Keep World Look",

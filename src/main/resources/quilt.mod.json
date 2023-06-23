@@ -64,8 +64,8 @@
     "gravity_api.mixins.json"
   ],
   "cardinal-components": [
-    "gravityapi:gravity_direction",
-    "gravityapi:gravity_dimension_strength"
+    "gravity_api:gravity_direction",
+    "gravity_api:gravity_dimension_strength"
   ],
   "lithium:options": {
     "mixin.entity.collisions": false,
