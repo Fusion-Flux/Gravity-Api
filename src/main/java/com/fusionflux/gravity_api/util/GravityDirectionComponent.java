@@ -80,6 +80,9 @@ public class GravityDirectionComponent implements GravityComponent {
                 }
             }
         }
+        if(!entity.getWorld().isClient()) {
+            GravityChangerComponents.GRAVITY_MODIFIER.sync(entity);
+        }
     }
     
     // getVelocity() does not return the actual velocity. It returns the velocity plus acceleration.

@@ -219,8 +219,8 @@ public abstract class EntityMixin{
     @ModifyVariable(
             method = "move",
             at = @At("HEAD"),
-            ordinal = 0
-    )
+            ordinal = 0,
+            argsOnly = true)
     private Vec3d modify_move_Vec3d_0_0(Vec3d vec3d) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if (gravityDirection == Direction.DOWN) {

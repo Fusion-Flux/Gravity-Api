@@ -56,15 +56,6 @@ public class GravityChangerMod implements ModInitializer {
         ModItems.init();
         Registry.register(Registries.ITEM_GROUP, new Identifier("gravity_api", "general"), GravityChangerGroup);
         GravityChannel.initServer();
-        PlayerCopyCallback.EVENT.register((oldPlayer,newPlayer,lossless) -> {
-            if(GravityChangerConfig.resetGravityOnRespawn) {
-                GravityChangerAPI.setDefaultGravityDirection(newPlayer, Direction.DOWN, new RotationParameters().rotationTime(0));
-                GRAVITY_COMPONENT.sync(newPlayer);
-            } else {
-                GravityChangerAPI.setDefaultGravityDirection(newPlayer, GravityChangerAPI.getDefaultGravityDirection(oldPlayer), new RotationParameters().rotationTime(0));
-                GRAVITY_COMPONENT.sync(newPlayer);
-            }
-        });
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> GravityCommand.register(dispatcher));
     }
 

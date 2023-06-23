@@ -11,6 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(ServerPlayNetworkHandler.class)
@@ -209,5 +210,49 @@ public abstract class ServerPlayNetworkHandlerMixin {
         args.set(2,argVec.z);
 
     }
+    @ModifyArgs(
+            method = "onPlayerMove",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/server/network/ServerPlayerEntity;handleFall(DDDZ)V",
+                    ordinal = 0
+            )
+    )
+    private void modify_onPlayerMove_handleFall_0(Args args) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
+        Vec3d argVec = new Vec3d(args.get(0), args.get(1), args.get(2));
+        argVec = RotationUtil.vecWorldToPlayer(argVec, gravityDirection);
+        args.set(0,argVec.x);
+        args.set(1,argVec.y);
+        args.set(2,argVec.z);
 
+    }
+
+    double testvaluey =0;
+    @Inject(
+            method = "onPlayerMove",
+            at = @At(
+                    value = "HEAD"
+            )
+    )
+    private void test(PlayerMoveC2SPacket packet, CallbackInfo ci) {
+        testvaluey = this.player.getY();
+    }
+    @ModifyArgs(
+            method = "onPlayerMove",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/server/network/ServerPlayerEntity;handleFall(DDDZ)V",
+                    ordinal = 1
+            )
+    )
+    private void modify_onPlayerMove_handleFall_1(Args args) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
+        Vec3d argVec = new Vec3d(args.get(0), this.player.getY()-testvaluey, args.get(2));
+        argVec = RotationUtil.vecWorldToPlayer(argVec, gravityDirection);
+        args.set(0,argVec.x);
+        args.set(1,argVec.y);
+        args.set(2,argVec.z);
+
+    }
 }
