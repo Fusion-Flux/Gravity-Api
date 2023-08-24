@@ -83,10 +83,8 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
             if (direction != null) {
                 Vec3d velocity = this.getVelocity();
                 if (direction.getAxis() == Direction.Axis.X) {
-                    System.out.println("halt");
                     this.setVelocity(0.1D * (double)direction.getOffsetX(), velocity.y, velocity.z);
                 } else if(direction.getAxis() == Direction.Axis.Z) {
-                    System.out.println("halt");
                     this.setVelocity(velocity.x, velocity.y, 0.1D * (double)direction.getOffsetZ());
                 }
             }

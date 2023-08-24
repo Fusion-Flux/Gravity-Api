@@ -616,7 +616,6 @@ public abstract class EntityMixin{
 
                 {
                     Vec3d playerEntityOffset = RotationUtil.vecWorldToPlayer(entityOffset, gravityDirection);
-                    System.out.println("halt");
                     double dx = playerEntityOffset.x;
                     double dz = playerEntityOffset.z;
                     double f = MathHelper.absMax(dx, dz);

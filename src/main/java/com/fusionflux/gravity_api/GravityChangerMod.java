@@ -6,6 +6,7 @@ import com.fusionflux.gravity_api.command.GravityCommand;
 import com.fusionflux.gravity_api.config.GravityChangerConfig;
 import com.fusionflux.gravity_api.item.GravityChangerItem;
 import com.fusionflux.gravity_api.item.ModItems;
+import com.fusionflux.gravity_api.item.Verifier;
 import com.fusionflux.gravity_api.util.GravityChannel;
 import com.fusionflux.gravity_api.util.GravityComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
@@ -52,6 +53,8 @@ public class GravityChangerMod implements ModInitializer {
             ComponentRegistry.getOrCreate(new Identifier("gravity_api", "gravity_direction"), GravityComponent.class);
     @Override
     public void onInitialize() {
+        GravityChannel.DEFAULT_GRAVITY.getVerifierRegistry().register(Verifier.FIELD_GRAVITY_SOURCE, Verifier::check);
+
         MidnightConfig.init("gravity_api", GravityChangerConfig.class);
         ModItems.init();
         Registry.register(Registries.ITEM_GROUP, new Identifier("gravity_api", "general"), GravityChangerGroup);
