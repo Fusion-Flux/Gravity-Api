@@ -1,13 +1,24 @@
 package com.fusionflux.gravity_api.api;
 
-import com.fusionflux.gravity_api.GravityChangerMod;
 import com.fusionflux.gravity_api.config.GravityChangerConfig;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 public class RotationParameters {
+    public static final StreamCodec<ByteBuf, RotationParameters> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.BOOL, RotationParameters::rotateVelocity,
+            ByteBufCodecs.BOOL, RotationParameters::rotateView,
+            ByteBufCodecs.BOOL, RotationParameters::alternateCenter,
+            ByteBufCodecs.INT, RotationParameters::rotationTime,
+            RotationParameters::new
+    );
+    
     private boolean rotateVelocity;
     private boolean rotateView;
     private boolean alternateCenter;
     private int rotationTime;//Milliseconds
+    
     public RotationParameters(){
         this(
                 GravityChangerConfig.worldVelocity,
