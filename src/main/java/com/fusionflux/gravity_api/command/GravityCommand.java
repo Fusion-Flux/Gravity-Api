@@ -8,20 +8,15 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.entity.Entity;
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Direction;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.Direction;
 
 import java.util.Collection;
 import java.util.Collections;
 
 public class GravityCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        LiteralArgumentBuilder<ServerCommandSource> literalSet = literal("add");
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        LiteralArgumentBuilder<CommandSourceStack> literalSet = literal("add");
         for (Direction direction : Direction.values()) {
             literalSet.then(
                     literal(direction.getName())
@@ -33,14 +28,14 @@ public class GravityCommand {
             );
         }
 
-        LiteralArgumentBuilder<ServerCommandSource> literalSetDefault = literal("set");
+        LiteralArgumentBuilder<CommandSourceStack> literalSetDefault = literal("set");
         for (Direction direction : Direction.values())
             literalSetDefault.then(literal(direction.getName())
                     .executes(context -> executeSetDefault(context.getSource(), direction, Collections.singleton(context.getSource().getPlayer())))
                     .then(argument("entities", EntityArgumentType.entities())
                             .executes(context -> executeSetDefault(context.getSource(), direction, EntityArgumentType.getEntities(context, "entities")))));
 
-        LiteralArgumentBuilder<ServerCommandSource> literalRotate = literal("rotate");
+        LiteralArgumentBuilder<CommandSourceStack> literalRotate = literal("rotate");
         for (FacingDirection facingDirection : FacingDirection.values())
             literalRotate.then(literal(facingDirection.getName())
                     .executes(context -> executeRotate(context.getSource(), facingDirection, Collections.singleton(context.getSource().getPlayer())))
@@ -66,7 +61,7 @@ public class GravityCommand {
                                 .executes(context -> executeRandomise(context.getSource(), EntityArgumentType.getEntities(context, "entities"))))));
     }
 
-    private static void getSendFeedback(ServerCommandSource source, Entity entity, Direction gravityDirection) {
+    private static void getSendFeedback(CommandSourceStack source, Entity entity, Direction gravityDirection) {
         Text text = Text.translatable("direction." + gravityDirection.getName());
         if (source.getEntity() != null && source.getEntity() == entity) {
             source.sendFeedback(() -> Text.translatable("commands.gravity.get.self", text), true);
@@ -75,7 +70,7 @@ public class GravityCommand {
         }
     }
 
-    private static void getStrengthSendFeedback(ServerCommandSource source, Entity entity, double strength) {
+    private static void getStrengthSendFeedback(CommandSourceStack source, Entity entity, double strength) {
         Text text = Text.translatable("strength " + strength);
         if (source.getEntity() != null && source.getEntity() == entity) {
             source.sendFeedback(() -> Text.translatable("commands.gravity.get.self", text), true);
@@ -84,13 +79,13 @@ public class GravityCommand {
         }
     }
 
-    private static int executeGet(ServerCommandSource source, Entity entity) {
+    private static int executeGet(CommandSourceStack source, Entity entity) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         getSendFeedback(source, entity, gravityDirection);
         return gravityDirection.getId();
     }
 
-    private static int executeSet(ServerCommandSource source, Direction gravityDirection,int priority, int durration, Collection<? extends Entity> entities) {
+    private static int executeSet(CommandSourceStack source, Direction gravityDirection,int priority, int durration, Collection<? extends Entity> entities) {
         int i = 0;
         for (Entity entity : entities) {
             //if (GravityChangerAPI.getGravityDirection(entity) != gravityDirection) {
@@ -102,7 +97,7 @@ public class GravityCommand {
         return i;
     }
 
-    private static int executeSetDefault(ServerCommandSource source, Direction gravityDirection, Collection<? extends Entity> entities) {
+    private static int executeSetDefault(CommandSourceStack source, Direction gravityDirection, Collection<? extends Entity> entities) {
         int i = 0;
         for (Entity entity : entities) {
             if (GravityChangerAPI.getDefaultGravityDirection(entity) != gravityDirection) {
@@ -115,7 +110,7 @@ public class GravityCommand {
         return i;
     }
 
-    private static int executeSetDefaultStrength(ServerCommandSource source, double gravityStrength, Collection<? extends Entity> entities) {
+    private static int executeSetDefaultStrength(CommandSourceStack source, double gravityStrength, Collection<? extends Entity> entities) {
         int i = 0;
         for (Entity entity : entities) {
             if (GravityChangerAPI.getDefaultGravityStrength(entity) != gravityStrength) {
@@ -127,7 +122,7 @@ public class GravityCommand {
         return i;
     }
 
-    private static int executeRotate(ServerCommandSource source, FacingDirection relativeDirection, Collection<? extends Entity> entities) {
+    private static int executeRotate(CommandSourceStack source, FacingDirection relativeDirection, Collection<? extends Entity> entities) {
         int i = 0;
         for (Entity entity : entities) {
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
@@ -145,7 +140,7 @@ public class GravityCommand {
         return i;
     }
 
-    private static int executeRandomise(ServerCommandSource source, Collection<? extends Entity> entities) {
+    private static int executeRandomise(CommandSourceStack source, Collection<? extends Entity> entities) {
         int i = 0;
         for (Entity entity : entities) {
             Direction gravityDirection = Direction.random(source.getWorld().random);
@@ -159,7 +154,7 @@ public class GravityCommand {
         return i;
     }
 
-    private static int executeClearGravity(ServerCommandSource source, Collection<? extends Entity> entities) {
+    private static int executeClearGravity(CommandSourceStack source, Collection<? extends Entity> entities) {
         int i = 0;
         for (Entity entity : entities) {
             GravityChangerAPI.clearGravity(entity, new RotationParameters());

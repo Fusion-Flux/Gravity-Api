@@ -1,5 +1,6 @@
 package com.fusionflux.gravity_api;
 
+import com.fusionflux.gravity_api.util.PortingUtils;
 import com.fusionflux.gravity_api.util.QuaternionUtil;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.client.Minecraft;
@@ -48,14 +49,14 @@ public class RotationAnimation {
         float newYaw = newYawAndPitch.x;
         float deltaYaw = newYaw - entity.getYRot();
         float deltaPitch = newPitch - entity.getXRot();
-        entity.setYaw(entity.getYRot() + deltaYaw);
-        entity.setPitch(entity.getXRot() + deltaPitch);
-        entity.prevYaw += deltaYaw;
-        entity.prevPitch += deltaPitch;
+        entity.setYRot(entity.getYRot() + deltaYaw);
+        entity.setXRot(entity.getXRot() + deltaPitch);
+        entity.yRotO += deltaYaw;
+        entity.xRotO += deltaPitch;
         if (entity instanceof LivingEntity livingEntity) {
-            livingEntity.bodyYaw += deltaYaw;
+            livingEntity.yBodyRot += deltaYaw;
             livingEntity.prevBodyYaw += deltaYaw;
-            livingEntity.headYaw += deltaYaw;
+            livingEntity.yHeadRotO += deltaYaw;
             livingEntity.prevHeadYaw += deltaYaw;
         }
 
@@ -86,13 +87,13 @@ public class RotationAnimation {
         }
 
         Quaternionf deltaRotation = QuaternionUtil.getRotationBetween(
-            Vec3d.of(prevGravity.getNormal()),
-            Vec3d.of(newGravity.getNormal())
+                PortingUtils.from(prevGravity.getNormal()),
+                PortingUtils.from(newGravity.getNormal())
         );
         
         Vector3f lookingDirection = new Vector3f((float) oldLookingDirection.x,(float) oldLookingDirection.y,(float) oldLookingDirection.z);
         lookingDirection.rotate(deltaRotation);
-        return new Vec3d(lookingDirection);
+        return new Vector3d(lookingDirection);
     }
     
     public Quaternionf getCurrentGravityRotation(Direction currentGravity, long timeMs) {
