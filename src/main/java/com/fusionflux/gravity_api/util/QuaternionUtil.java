@@ -1,15 +1,13 @@
 package com.fusionflux.gravity_api.util;
 
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.Mth;
 import org.joml.Quaternionf;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 public abstract class QuaternionUtil {
     public static float magnitude(Quaternionf quaternion) {
-        return MathHelper.sqrt(quaternion.w() * quaternion.w() + quaternion.x() * quaternion.x() + quaternion.y() * quaternion.y() + quaternion.z() * quaternion.z());
+        return Mth.sqrt(quaternion.w() * quaternion.w() + quaternion.x() * quaternion.x() + quaternion.y() * quaternion.y() + quaternion.z() * quaternion.z());
     }
     
     public static float magnitudeSq(Quaternionf quaternion) {
@@ -23,11 +21,11 @@ public abstract class QuaternionUtil {
     }
     
     // NOTE the "from" and "to" cannot be opposite
-    public static Quaternionf getRotationBetween(Vec3d from, Vec3d to) {
+    public static Quaternionf getRotationBetween(Vector3d from, Vector3d to) {
         from = from.normalize();
         to = to.normalize();
-        Vec3d axis = from.crossProduct(to).normalize();
-        double cos = from.dotProduct(to);
+        Vector3d axis = from.cross(to).normalize();
+        double cos = from.dot(to);
         double angle = Math.acos(cos);
         return CompatMath.getQuat(new Vector3f((float)axis.x,(float)axis.y,(float)axis.z), (float) angle, false);
     }

@@ -31,7 +31,7 @@ public abstract class MobEntityMixin {
             return original.call(attacker);
         }
 
-        return RotationUtil.rotWorldToPlayer(original.call(attacker), attacker.getPitch(), gravityDirection).x;
+        return RotationUtil.rotWorldToPlayer(original.call(attacker), attacker.getXRot(), gravityDirection).x;
     }
 
     @WrapOperation(
@@ -48,7 +48,7 @@ public abstract class MobEntityMixin {
             return original.call(attacker);
         }
 
-        return RotationUtil.rotWorldToPlayer(original.call(attacker), attacker.getPitch(), gravityDirection).x;
+        return RotationUtil.rotWorldToPlayer(original.call(attacker), attacker.getXRot(), gravityDirection).x;
     }
 
     @Redirect(

@@ -4,12 +4,9 @@ import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.api.RotationParameters;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 
 import java.util.Optional;
 
@@ -24,7 +21,7 @@ public class NetworkUtil {
 
     //Access gravity component
 
-    public static Optional<GravityComponent> getGravityComponent(MinecraftClient client, int entityId){
+    public static Optional<GravityComponent> getGravityComponent(Minecraft client, int entityId){
         if(client.world == null) return Optional.empty();
         Entity entity = client.world.getEntityById(entityId);
         if(entity == null) return Optional.empty();
@@ -41,7 +38,7 @@ public class NetworkUtil {
 
     //Sending packets to players that are tracking an entity
 
-    public static void sendToTracking(Entity entity, Identifier channel, PacketByteBuf buf, PacketMode mode){
+    public static void sendToTracking(Entity entity, ResourceLocation channel, PacketByteBuf buf, PacketMode mode){
         //PlayerLookup.tracking(entity) might not return the player if entity is a player, so it has to be done separately
         if(mode != PacketMode.EVERYONE_BUT_SELF)
             if(entity instanceof ServerPlayerEntity player)

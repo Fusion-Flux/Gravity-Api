@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "gravity_api",
+  "version": "${version}",
+  "name": "Gravity API",
+  "description": "Lets you change player gravity",
+  "authors": [
+    "Fusion Flux",
+    "Gaider10",
+    "qouteall"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/portalcubed",
+    "sources": "https://github.com/Fusion-Flux/GravityChanger",
+    "issues": "https://github.com/Fusion-Flux/GravityChanger/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/gravity_api/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.fusionflux.gravity_api.GravityChangerMod"],
+    "client": ["com.fusionflux.gravity_api.ClientInit"],
+    "modmenu": ["com.fusionflux.gravity_api.config.ModMenuIntegration"],
+    "cardinal-components": ["com.fusionflux.gravity_api.util.GravityChangerComponents"]
+  },
+  "mixins": [
+    "gravity_api.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.5",
+    "minecraft": "1.21.1",
+    "java": ">=21",
+    "fabric-api": "*",
+    "midnightlib": "*"
+  },
+  "custom": {
+    "cardinal-components": [
+      "gravity_api:gravity_direction",
+      "gravity_api:gravity_dimension_strength"
+    ],
+    "lithium:options": {
+      "mixin.entity.collisions": false,
+      "mixin.entity.fast_suffocation_check": false
+    }
+  }
+}

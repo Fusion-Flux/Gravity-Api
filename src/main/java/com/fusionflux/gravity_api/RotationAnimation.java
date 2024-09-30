@@ -2,13 +2,17 @@ package com.fusionflux.gravity_api;
 
 import com.fusionflux.gravity_api.util.QuaternionUtil;
 import com.fusionflux.gravity_api.util.RotationUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.Validate;
 import org.joml.Quaternionf;
+import org.joml.Vector2f;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 public class RotationAnimation {
@@ -26,9 +30,9 @@ public class RotationAnimation {
         
         Validate.notNull(entity);
         
-        Vec3d newLookingDirection = getNewLookingDirection(newGravity, prevGravity, entity);
+        Vector3d newLookingDirection = getNewLookingDirection(newGravity, prevGravity, entity);
 
-        Quaternionf oldViewRotation = QuaternionUtil.getViewRotation(entity.getPitch(), entity.getYaw());
+        Quaternionf oldViewRotation = QuaternionUtil.getViewRotation(entity.getXRot(), entity.getYRot());
 
         Quaternionf currentAnimatedGravityRotation = getCurrentGravityRotation(prevGravity, timeMs);
         
@@ -37,15 +41,15 @@ public class RotationAnimation {
 
         Quaternionf newEndGravityRotation = RotationUtil.getWorldRotationQuaternion(newGravity);
         
-        Vec2f newYawAndPitch = RotationUtil.vecToRot(
+        Vector2f newYawAndPitch = RotationUtil.vecToRot(
             RotationUtil.vecWorldToPlayer(newLookingDirection, newGravity)
         );
         float newPitch = newYawAndPitch.y;
         float newYaw = newYawAndPitch.x;
-        float deltaYaw = newYaw - entity.getYaw();
-        float deltaPitch = newPitch - entity.getPitch();
-        entity.setYaw(entity.getYaw() + deltaYaw);
-        entity.setPitch(entity.getPitch() + deltaPitch);
+        float deltaYaw = newYaw - entity.getYRot();
+        float deltaPitch = newPitch - entity.getXRot();
+        entity.setYaw(entity.getYRot() + deltaYaw);
+        entity.setPitch(entity.getXRot() + deltaPitch);
         entity.prevYaw += deltaYaw;
         entity.prevPitch += deltaPitch;
         if (entity instanceof LivingEntity livingEntity) {
@@ -55,7 +59,7 @@ public class RotationAnimation {
             livingEntity.prevHeadYaw += deltaYaw;
         }
 
-        Quaternionf newViewRotation = QuaternionUtil.getViewRotation(entity.getPitch(), entity.getYaw());
+        Quaternionf newViewRotation = QuaternionUtil.getViewRotation(entity.getXRot(), entity.getYRot());
         
         // gravity rotation = (view rotation^-1) * camera rotation
         Quaternionf animationStartGravityRotation = QuaternionUtil.mult(
@@ -69,21 +73,21 @@ public class RotationAnimation {
         endTimeMs = timeMs + durationTimeMs;
     }
     
-    private Vec3d getNewLookingDirection(
+    private Vector3d getNewLookingDirection(
         Direction newGravity, Direction prevGravity, Entity player
     ) {
-        Vec3d oldLookingDirection = RotationUtil.vecPlayerToWorld(
-            RotationUtil.rotToVec(player.getYaw(), player.getPitch()),
+        Vector3d oldLookingDirection = RotationUtil.vecPlayerToWorld(
+            RotationUtil.rotToVec(player.getYRot(), player.getXRot()),
             prevGravity
         );
         
         if (newGravity == prevGravity.getOpposite()) {
-            return oldLookingDirection.multiply(-1);
+            return oldLookingDirection.mul(-1);
         }
 
         Quaternionf deltaRotation = QuaternionUtil.getRotationBetween(
-            Vec3d.of(prevGravity.getVector()),
-            Vec3d.of(newGravity.getVector())
+            Vec3d.of(prevGravity.getNormal()),
+            Vec3d.of(newGravity.getNormal())
         );
         
         Vector3f lookingDirection = new Vector3f((float) oldLookingDirection.x,(float) oldLookingDirection.y,(float) oldLookingDirection.z);
@@ -104,7 +108,7 @@ public class RotationAnimation {
         double delta = (double) (timeMs - startTimeMs) / (endTimeMs - startTimeMs);
         
         // make sure that frustum culling updates when running rotation animation
-        MinecraftClient.getInstance().worldRenderer.scheduleTerrainUpdate();
+        Minecraft.getInstance().levelRenderer.needsUpdate();
         
         return RotationUtil.interpolate(
             startGravityRotation, endGravityRotation,
@@ -113,14 +117,14 @@ public class RotationAnimation {
     }
     
     private static float mapProgress(float delta) {
-        return MathHelper.clamp((delta * delta * (3 - 2 * delta)), 0, 1);
+        return Mth.clamp((delta * delta * (3 - 2 * delta)), 0, 1);
     }
     
     public boolean isInAnimation() {
         return inAnimation;
     }
     
-    public void toNbt(NbtCompound nbt) {
+    public void toNbt(CompoundTag nbt) {
         nbt.putBoolean("InAnimation", inAnimation);
         if (inAnimation) {
             nbt.putFloat("Q0X", startGravityRotation.x());
@@ -136,7 +140,7 @@ public class RotationAnimation {
         }
     }
     
-    public void fromNbt(NbtCompound nbt) {
+    public void fromNbt(CompoundTag nbt) {
         inAnimation = nbt.getBoolean("InAnimation");//Will return false if no such element exists
         if (inAnimation) {
             startGravityRotation = new Quaternionf(

@@ -23,7 +23,7 @@ public abstract class ProjectileEntityMixin {
             return value;
         }
 
-        return RotationUtil.rotPlayerToWorld(user.getYaw(), user.getPitch(), gravityDirection).y;
+        return RotationUtil.rotPlayerToWorld(user.getYRot(), user.getXRot(), gravityDirection).y;
     }
 
     @ModifyVariable(
@@ -37,6 +37,6 @@ public abstract class ProjectileEntityMixin {
             return value;
         }
 
-        return RotationUtil.rotPlayerToWorld(user.getYaw(), user.getPitch(), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld(user.getYRot(), user.getXRot(), gravityDirection).x;
     }
 }

@@ -134,7 +134,7 @@ public class GravityCommand {
             Direction combinedRelativeDirection = switch(relativeDirection) {
                 case DOWN -> Direction.DOWN;
                 case UP -> Direction.UP;
-                case FORWARD, BACKWARD, LEFT, RIGHT -> Direction.fromHorizontal(relativeDirection.getHorizontalOffset() + Direction.fromRotation(entity.getYaw()).getHorizontal());
+                case FORWARD, BACKWARD, LEFT, RIGHT -> Direction.fromHorizontal(relativeDirection.getHorizontalOffset() + Direction.fromRotation(entity.getYRot()).getHorizontal());
             };
             Direction newGravityDirection = RotationUtil.dirPlayerToWorld(combinedRelativeDirection, gravityDirection);
             GravityChangerAPI.setDefaultGravityDirection(entity, newGravityDirection, new RotationParameters());

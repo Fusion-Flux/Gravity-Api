@@ -225,7 +225,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             return original.call(attacker);
         }
 
-        return RotationUtil.rotWorldToPlayer(RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getPitch(), attackerGravityDirection), targetGravityDirection).x;
+        return RotationUtil.rotWorldToPlayer(RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getXRot(), attackerGravityDirection), targetGravityDirection).x;
     }
 
     @WrapOperation(
@@ -243,7 +243,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             return original.call(attacker);
         }
 
-        return RotationUtil.rotWorldToPlayer(RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getPitch(), attackerGravityDirection), targetGravityDirection).x;
+        return RotationUtil.rotWorldToPlayer(RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getXRot(), attackerGravityDirection), targetGravityDirection).x;
     }
 
     @WrapOperation(
@@ -260,7 +260,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             return original.call(attacker);
         }
 
-        return RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getPitch(), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getXRot(), gravityDirection).x;
     }
 
     @WrapOperation(
@@ -277,7 +277,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             return original.call(attacker);
         }
 
-        return RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getPitch(), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getXRot(), gravityDirection).x;
     }
 
     @ModifyArgs(

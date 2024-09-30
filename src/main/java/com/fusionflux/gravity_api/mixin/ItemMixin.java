@@ -25,7 +25,7 @@ public class ItemMixin {
     private static float wrapOperation_raycast_getYaw(PlayerEntity player, Operation<Float> original){
         Direction direction = GravityChangerAPI.getGravityDirection(player);
         if(direction == Direction.DOWN) return original.call(player);
-        return RotationUtil.rotPlayerToWorld(original.call(player), player.getPitch(), direction).x;
+        return RotationUtil.rotPlayerToWorld(original.call(player), player.getXRot(), direction).x;
     }
 
     @WrapOperation(
@@ -39,6 +39,6 @@ public class ItemMixin {
     private static float wrapOperation_raycast_getPitch(PlayerEntity player, Operation<Float> original){
         Direction direction = GravityChangerAPI.getGravityDirection(player);
         if(direction == Direction.DOWN) return original.call(player);
-        return RotationUtil.rotPlayerToWorld(player.getYaw(), original.call(player), direction).y;
+        return RotationUtil.rotPlayerToWorld(player.getYRot(), original.call(player), direction).y;
     }
 }

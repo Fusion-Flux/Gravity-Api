@@ -1,12 +1,10 @@
 package com.fusionflux.gravity_api.item;
 
 import com.fusionflux.gravity_api.GravityChangerMod;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.Item;
+import org.intellij.lang.annotations.Identifier;
 
 
 public abstract class ModItems {

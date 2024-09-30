@@ -29,6 +29,6 @@ public abstract class ItemUsageContextMixin {
             return original.call(entity);
         }
 
-        return RotationUtil.rotPlayerToWorld(original.call(entity), entity.getPitch(), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld(original.call(entity), entity.getXRot(), gravityDirection).x;
     }
 }

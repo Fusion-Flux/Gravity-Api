@@ -19,11 +19,11 @@ import net.minecraft.util.Identifier;
 import static com.fusionflux.gravity_api.util.NetworkUtil.*;
 
 public class GravityChannel<P extends GravityPacket> {
-    public static GravityChannel<OverwriteGravityPacket> OVERWRITE_GRAVITY = new GravityChannel<>(OverwriteGravityPacket::new, GravityChangerMod.id("overwrite_gravity_list"));
-    public static GravityChannel<UpdateGravityPacket> UPDATE_GRAVITY = new GravityChannel<>(UpdateGravityPacket::new, GravityChangerMod.id("update_gravity_list"));
-    public static GravityChannel<DefaultGravityPacket> DEFAULT_GRAVITY = new GravityChannel<>(DefaultGravityPacket::new, GravityChangerMod.id("default_gravity"));
-    public static GravityChannel<DefaultGravityStrengthPacket> DEFAULT_GRAVITY_STRENGTH = new GravityChannel<>(DefaultGravityStrengthPacket::new, GravityChangerMod.id("default_gravity_strength"));
-    public static GravityChannel<InvertGravityPacket> INVERT_GRAVITY = new GravityChannel<>(InvertGravityPacket::new, GravityChangerMod.id("inverted"));
+    public static GravityChannel<OverwriteGravityPacket> OVERWRITE_GRAVITY = new GravityChannel<>(OverwriteGravityPacket::new, GravityChangerMod.asResource("overwrite_gravity_list"));
+    public static GravityChannel<UpdateGravityPacket> UPDATE_GRAVITY = new GravityChannel<>(UpdateGravityPacket::new, GravityChangerMod.asResource("update_gravity_list"));
+    public static GravityChannel<DefaultGravityPacket> DEFAULT_GRAVITY = new GravityChannel<>(DefaultGravityPacket::new, GravityChangerMod.asResource("default_gravity"));
+    public static GravityChannel<DefaultGravityStrengthPacket> DEFAULT_GRAVITY_STRENGTH = new GravityChannel<>(DefaultGravityStrengthPacket::new, GravityChangerMod.asResource("default_gravity_strength"));
+    public static GravityChannel<InvertGravityPacket> INVERT_GRAVITY = new GravityChannel<>(InvertGravityPacket::new, GravityChangerMod.asResource("inverted"));
 
     private final Factory<P> packetFactory;
     private final Identifier channel;
