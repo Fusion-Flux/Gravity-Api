@@ -1,15 +1,17 @@
 package com.fusionflux.gravity_api.util;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.world.World;
+
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
 
 public class GravityDimensionStrengthComponent implements GravityDimensionStrengthInterface {
     double gravityStrength = 1;
 
-    private final World currentWorld;
+    private final Level currentLevel;
 
-    public GravityDimensionStrengthComponent(World world) {
-        this.currentWorld = world;
+    public GravityDimensionStrengthComponent(Level level) {
+        this.currentLevel = level;
     }
 
     @Override
@@ -19,19 +21,19 @@ public class GravityDimensionStrengthComponent implements GravityDimensionStreng
 
     @Override
     public void setDimensionGravityStrength(double strength) {
-        if(!currentWorld.isClient) {
+        if (!currentLevel.isClientSide()) {
             gravityStrength = strength;
-            GravityDimensionStrengthWorldRegister.GRAVITY_DIMENSION_STRENGTH_MODIFIER.sync(currentWorld);
+            GravityDimensionStrengthWorldRegister.GRAVITY_DIMENSION_STRENGTH_MODIFIER.sync(currentLevel);
         }
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag) {
+    public void readFromNbt(CompoundTag tag, HolderLookup.Provider registries) {
         gravityStrength = tag.getDouble("DimensionGravityStrength");
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag) {
+    public void writeToNbt(CompoundTag tag, HolderLookup.Provider registries) {
         tag.putDouble("DimensionGravityStrength" , gravityStrength);
     }
 }

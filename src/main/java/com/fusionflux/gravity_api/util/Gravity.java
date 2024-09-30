@@ -1,7 +1,7 @@
 package com.fusionflux.gravity_api.util;
 
 import com.fusionflux.gravity_api.api.RotationParameters;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
 
 public class Gravity {
     private final Direction direction;

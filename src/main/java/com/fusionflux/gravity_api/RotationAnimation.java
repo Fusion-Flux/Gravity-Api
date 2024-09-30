@@ -1,6 +1,5 @@
 package com.fusionflux.gravity_api;
 
-import com.fusionflux.gravity_api.util.PortingUtils;
 import com.fusionflux.gravity_api.util.QuaternionUtil;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.client.Minecraft;
@@ -13,7 +12,6 @@ import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.Validate;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
-import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 public class RotationAnimation {
@@ -31,7 +29,7 @@ public class RotationAnimation {
         
         Validate.notNull(entity);
         
-        Vector3d newLookingDirection = getNewLookingDirection(newGravity, prevGravity, entity);
+        Vec3 newLookingDirection = getNewLookingDirection(newGravity, prevGravity, entity);
 
         Quaternionf oldViewRotation = QuaternionUtil.getViewRotation(entity.getXRot(), entity.getYRot());
 
@@ -74,26 +72,26 @@ public class RotationAnimation {
         endTimeMs = timeMs + durationTimeMs;
     }
     
-    private Vector3d getNewLookingDirection(
+    private Vec3 getNewLookingDirection(
         Direction newGravity, Direction prevGravity, Entity player
     ) {
-        Vector3d oldLookingDirection = RotationUtil.vecPlayerToWorld(
+        Vec3 oldLookingDirection = RotationUtil.vecPlayerToWorld(
             RotationUtil.rotToVec(player.getYRot(), player.getXRot()),
             prevGravity
         );
         
         if (newGravity == prevGravity.getOpposite()) {
-            return oldLookingDirection.mul(-1);
+            return oldLookingDirection.multiply(-1, -1, -1);
         }
 
         Quaternionf deltaRotation = QuaternionUtil.getRotationBetween(
-                PortingUtils.from(prevGravity.getNormal()),
-                PortingUtils.from(newGravity.getNormal())
+                Vec3.atLowerCornerOf(prevGravity.getNormal()),
+                Vec3.atLowerCornerOf(newGravity.getNormal())
         );
         
         Vector3f lookingDirection = new Vector3f((float) oldLookingDirection.x,(float) oldLookingDirection.y,(float) oldLookingDirection.z);
         lookingDirection.rotate(deltaRotation);
-        return new Vector3d(lookingDirection);
+        return new Vec3(lookingDirection);
     }
     
     public Quaternionf getCurrentGravityRotation(Direction currentGravity, long timeMs) {

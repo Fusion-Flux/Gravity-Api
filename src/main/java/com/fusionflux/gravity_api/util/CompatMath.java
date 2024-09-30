@@ -1,9 +1,7 @@
 package com.fusionflux.gravity_api.util;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -33,8 +31,8 @@ public abstract class CompatMath {
         return new Quaternionf(x,y,z,w);
     }
 
-    public static BlockPos fastBlockPos(Vec3d p){
-        return BlockPos.create(p.x,p.y,p.z);
+    public static BlockPos fastBlockPos(Vec3 p){
+        return BlockPos.containing(p.x, p.y, p.z);
     }
     private static float sin(float value) {
         return (float)Math.sin((double)value);
