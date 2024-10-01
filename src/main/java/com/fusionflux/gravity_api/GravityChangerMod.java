@@ -52,10 +52,8 @@ public class GravityChangerMod implements ModInitializer {
         MidnightConfig.init("gravity_api", GravityChangerConfig.class);
         ModItems.init();
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, asResource("general"), GravityChangerGroup);
-        GravityChannel.initServer();
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> GravityCommand.register(dispatcher));
-
         GravityPackets.registerPackets();
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> GravityCommand.register(dispatcher));
     }
 
     public static ResourceLocation asResource(String path) {

@@ -19,7 +19,6 @@
   "environment": "*",
   "entrypoints": {
     "main": ["com.fusionflux.gravity_api.GravityChangerMod"],
-    "client": ["com.fusionflux.gravity_api.ClientInit"],
     "modmenu": ["com.fusionflux.gravity_api.config.ModMenuIntegration"],
     "cardinal-components": ["com.fusionflux.gravity_api.util.GravityChangerComponents"]
   },

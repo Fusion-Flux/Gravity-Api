@@ -69,7 +69,7 @@ public class GravityChannel<P extends GravityPacket> {
                 if (v != null && v.check(player, verifierInfoBuf, packet)) {
                     packet.run(gc);
                     sendToClient(player, packet, PacketMode.EVERYONE_BUT_SELF);
-                }else {
+                } else {
                     GravityChangerMod.LOGGER.info("VerifierFunction returned FALSE");
                     sendFullStatePacket(player, PacketMode.ONLY_SELF, packet.getRotationParameters(), false);
                 }
@@ -96,22 +96,6 @@ public class GravityChannel<P extends GravityPacket> {
 
     public void registerServerReceiver(){
         ServerPlayNetworking.registerGlobalReceiver(channel, this::receiveFromClient);
-    }
-
-    public static void initClient() {
-        DEFAULT_GRAVITY.registerClientReceiver();
-        UPDATE_GRAVITY.registerClientReceiver();
-        OVERWRITE_GRAVITY.registerClientReceiver();
-        INVERT_GRAVITY.registerClientReceiver();
-        DEFAULT_GRAVITY_STRENGTH.registerClientReceiver();
-    }
-
-    public static void initServer() {
-        DEFAULT_GRAVITY.registerServerReceiver();
-        UPDATE_GRAVITY.registerServerReceiver();
-        OVERWRITE_GRAVITY.registerServerReceiver();
-        INVERT_GRAVITY.registerServerReceiver();
-        DEFAULT_GRAVITY_STRENGTH.registerServerReceiver();
     }
 
     @FunctionalInterface

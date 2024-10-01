@@ -2,10 +2,18 @@ package com.fusionflux.gravity_api.util.packet;
 
 import com.fusionflux.gravity_api.api.RotationParameters;
 import com.fusionflux.gravity_api.util.GravityComponent;
-import com.fusionflux.gravity_api.util.NetworkUtil;
-import net.minecraft.network.PacketByteBuf;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
-public class InvertGravityPacket extends GravityPacket{
+public class InvertGravityPacket extends GravityPacket {
+    public static StreamCodec<ByteBuf, InvertGravityPacket> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.BOOL, p -> p.inverted,
+            RotationParameters.STREAM_CODEC, p -> p.rotationParameters,
+            ByteBufCodecs.BOOL, p -> p.initialGravity,
+            InvertGravityPacket::new
+    );
+    
     public final boolean inverted;
     public final RotationParameters rotationParameters;
     public final boolean initialGravity;
@@ -14,21 +22,6 @@ public class InvertGravityPacket extends GravityPacket{
         inverted = _inverted;
         rotationParameters = _rotationParameters;
         initialGravity = _initialGravity;
-    }
-
-    public InvertGravityPacket(PacketByteBuf buf) {
-        this(
-            buf.readBoolean(),
-            NetworkUtil.readRotationParameters(buf),
-            buf.readBoolean()
-        );
-    }
-
-    @Override
-    public void write(PacketByteBuf buf) {
-        buf.writeBoolean(inverted);
-        NetworkUtil.writeRotationParameters(buf, rotationParameters);
-        buf.writeBoolean(initialGravity);
     }
 
     @Override

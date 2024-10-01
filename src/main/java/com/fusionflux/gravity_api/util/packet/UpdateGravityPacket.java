@@ -3,29 +3,23 @@ package com.fusionflux.gravity_api.util.packet;
 import com.fusionflux.gravity_api.api.RotationParameters;
 import com.fusionflux.gravity_api.util.Gravity;
 import com.fusionflux.gravity_api.util.GravityComponent;
-import com.fusionflux.gravity_api.util.NetworkUtil;
-import net.minecraft.network.PacketByteBuf;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
-public class UpdateGravityPacket extends GravityPacket{
+public class UpdateGravityPacket extends GravityPacket {
+    public static StreamCodec<ByteBuf, UpdateGravityPacket> STREAM_CODEC = StreamCodec.composite(
+            Gravity.STREAM_CODEC, p -> p.gravity,
+            ByteBufCodecs.BOOL, p -> p.initialGravity,
+            UpdateGravityPacket::new
+    );
+    
     public final Gravity gravity;
     public final boolean initialGravity;
 
-    public UpdateGravityPacket(Gravity _gravity, boolean _initialGravity){
+    public UpdateGravityPacket(Gravity _gravity, boolean _initialGravity) {
         gravity =  _gravity;
         initialGravity = _initialGravity;
-    }
-
-    public UpdateGravityPacket(PacketByteBuf buf) {
-        this(
-            NetworkUtil.readGravity(buf),
-            buf.readBoolean()
-        );
-    }
-
-    @Override
-    public void write(PacketByteBuf buf) {
-        NetworkUtil.writeGravity(buf, gravity);
-        buf.writeBoolean(initialGravity);
     }
 
     @Override
