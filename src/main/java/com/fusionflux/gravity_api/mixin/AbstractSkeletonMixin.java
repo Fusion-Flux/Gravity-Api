@@ -3,15 +3,15 @@ package com.fusionflux.gravity_api.mixin;
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.util.RotationUtil;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.AbstractSkeletonEntity;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.AbstractSkeleton;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(AbstractSkeletonEntity.class)
-public abstract class AbstractSkeletonEntityMixin {
+@Mixin(AbstractSkeleton.class)
+public abstract class AbstractSkeletonMixin {
     @Redirect(
             method = "attack",
             at = @At(

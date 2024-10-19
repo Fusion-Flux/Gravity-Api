@@ -4,9 +4,10 @@ import com.fusionflux.gravity_api.api.GravityChangerAPI;
 import com.fusionflux.gravity_api.api.RotationParameters;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 
 import java.util.Optional;
 
@@ -21,18 +22,21 @@ public class NetworkUtil {
 
     //Access gravity component
 
-    public static Optional<GravityComponent> getGravityComponent(Minecraft client, int entityId){
-        if(client.world == null) return Optional.empty();
-        Entity entity = client.world.getEntityById(entityId);
-        if(entity == null) return Optional.empty();
-        GravityComponent gc = GravityChangerAPI.getGravityComponent(entity);
-        if(gc == null) return Optional.empty();
-        return Optional.of(gc);
+    public static Optional<GravityComponent> getGravityComponent(Level level, int entityId) {
+        if (level == null)
+            return Optional.empty();
+        
+        Entity entity = level.getEntity(entityId);
+        if (entity == null)
+            return Optional.empty();
+        
+        return getGravityComponent(entity);
     }
 
     public static Optional<GravityComponent> getGravityComponent(Entity entity){
         GravityComponent gc = GravityChangerAPI.getGravityComponent(entity);
-        if(gc == null) return Optional.empty();
+        if (gc == null)
+            return Optional.empty();
         return Optional.of(gc);
     }
 

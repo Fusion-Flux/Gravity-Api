@@ -10,6 +10,8 @@ import com.fusionflux.gravity_api.util.*;
 import com.fusionflux.gravity_api.util.packet.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
@@ -268,7 +270,7 @@ public abstract class GravityChangerAPI {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.setDefaultGravityDirection(gravityDirection, rotationParameters, false);
-                    GravityChannel.DEFAULT_GRAVITY.sendToClient(entity, new DefaultGravityPacket(gravityDirection, rotationParameters, false), NetworkUtil.PacketMode.EVERYONE);
+                    GravityChannel.DEFAULT_GRAVITY.sendToClient(entity, new DefaultGravityPacket(entity.getId(), gravityDirection, rotationParameters, false), NetworkUtil.PacketMode.EVERYONE);
                 });
             }
         }

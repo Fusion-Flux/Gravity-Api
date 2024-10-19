@@ -1,20 +1,18 @@
 package com.fusionflux.gravity_api.mixin;
 
 import com.fusionflux.gravity_api.api.GravityChangerAPI;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(AbstractMinecartEntity.class)
-public abstract class AbstractMinecartEntityMixin extends Entity {
-    public AbstractMinecartEntityMixin(EntityType<?> type, World world) {
-        super(type, world);
+@Mixin(AbstractMinecart.class)
+public abstract class AbstractMinecartMixin extends Entity {
+    public AbstractMinecartMixin(EntityType<?> type, Level level) {
+        super(type, level);
     }
 
     @ModifyArg(
